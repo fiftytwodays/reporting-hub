@@ -13,17 +13,25 @@ const schema = a.schema({
     })
     // .authorization((allow) => [allow.publicApiKey()]),
     .authorization((allow) => [allow.owner()]),
+  Cluster: a
+    .model({
+      name: a.string().required(),
+      description: a.string(),
+      regionId: a.id(),
+      region: a.belongsTo("Region", "regionId"),
+    })
+    .authorization((allow) => [
+      allow.publicApiKey().to(["read"]),
+      allow.owner(),
+    ]),
   Region: a
     .model({
-      name: a.string(),
+      name: a.string().required(),
       description: a.string(),
+      clusters: a.hasMany("Cluster", "regionId"),
     })
-    // .authorization((allow) => [allow.publicApiKey()]),
     .authorization((allow) => [
-      // Allow anyone auth'd with an API key to read everyone's posts.
       allow.publicApiKey().to(["read"]),
-      // Allow signed-in user to create, read, update,
-      // and delete their __OWN__ posts.
       allow.owner(),
     ]),
 });
