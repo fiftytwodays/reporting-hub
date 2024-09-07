@@ -12,7 +12,20 @@ const schema = a.schema({
       content: a.string(),
     })
     // .authorization((allow) => [allow.publicApiKey()]),
-    .authorization(allow => [allow.owner()]),
+    .authorization((allow) => [allow.owner()]),
+  Region: a
+    .model({
+      name: a.string(),
+      description: a.string(),
+    })
+    // .authorization((allow) => [allow.publicApiKey()]),
+    .authorization((allow) => [
+      // Allow anyone auth'd with an API key to read everyone's posts.
+      allow.publicApiKey().to(["read"]),
+      // Allow signed-in user to create, read, update,
+      // and delete their __OWN__ posts.
+      allow.owner(),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -21,7 +34,7 @@ export const data = defineData({
   schema,
   authorizationModes: {
     // defaultAuthorizationMode: "apiKey",
-    defaultAuthorizationMode: 'userPool',
+    defaultAuthorizationMode: "userPool",
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },
