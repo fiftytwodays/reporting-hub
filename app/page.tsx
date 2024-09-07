@@ -9,6 +9,7 @@ import outputs from "@/amplify_outputs.json";
 
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+import Layout from "./shared/ui/core/ui/Layout";
 
 Amplify.configure(outputs);
 
