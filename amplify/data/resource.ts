@@ -13,6 +13,15 @@ const schema = a.schema({
     })
     // .authorization((allow) => [allow.publicApiKey()]),
     .authorization((allow) => [allow.owner()]),
+  ProjectType: a
+    .model({
+      name: a.string().required(),
+      description: a.string(),
+    })
+    .authorization((allow) => [
+      allow.publicApiKey().to(["read"]),
+      allow.owner(),
+    ]),
   Cluster: a
     .model({
       name: a.string().required(),
