@@ -117,6 +117,7 @@ export default function App() {
                   <TableCell>
                     {editingRegionId === region.id ? (
                       <TextField
+                        label="Region name"
                         value={region.name}
                         onChange={(e) =>
                           handleRegionChange(region.id, "name", e.target.value)
@@ -129,6 +130,7 @@ export default function App() {
                   <TableCell>
                     {editingRegionId === region.id ? (
                       <TextField
+                        label="Region description"
                         value={region.description || ""}
                         onChange={(e) =>
                           handleRegionChange(
@@ -183,6 +185,7 @@ export default function App() {
                 <TableRow>
                   <TableCell>
                     <TextField
+                      label="Region name"
                       value={newRegion.name}
                       onChange={(e) =>
                         handleNewRegionChange("name", e.target.value)
@@ -193,6 +196,7 @@ export default function App() {
                   </TableCell>
                   <TableCell>
                     <TextField
+                      label="Region description"
                       value={newRegion.description}
                       onChange={(e) =>
                         handleNewRegionChange("description", e.target.value)
