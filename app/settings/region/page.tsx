@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-import "./../../app/app.css";
 import { Amplify } from "aws-amplify";
+
+import type { Schema } from "@/amplify/data/resource";
 import outputs from "@/amplify_outputs.json";
+
+import "../../../app/app.css";
 
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
