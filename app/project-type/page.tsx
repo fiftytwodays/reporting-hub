@@ -132,6 +132,7 @@ export default function ProjectTypePage() {
                   <TableCell>
                     {editingProjectTypeId === projectType.id ? (
                       <TextField
+                        label="Project type name"
                         value={projectType.name}
                         onChange={(e) =>
                           handleProjectTypeChange(
@@ -148,6 +149,7 @@ export default function ProjectTypePage() {
                   <TableCell>
                     {editingProjectTypeId === projectType.id ? (
                       <TextField
+                        label="Project type description"
                         value={projectType.description || ""}
                         onChange={(e) =>
                           handleProjectTypeChange(
@@ -204,6 +206,7 @@ export default function ProjectTypePage() {
                 <TableRow>
                   <TableCell>
                     <TextField
+                      label="Project type name"
                       value={newProjectType.name}
                       onChange={(e) =>
                         handleNewProjectTypeChange("name", e.target.value)
@@ -214,6 +217,7 @@ export default function ProjectTypePage() {
                   </TableCell>
                   <TableCell>
                     <TextField
+                      label="Project type description"
                       value={newProjectType.description}
                       onChange={(e) =>
                         handleNewProjectTypeChange(

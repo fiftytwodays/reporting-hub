@@ -142,6 +142,7 @@ export default function ClusterPage() {
                   <TableCell>
                     {editingClusterId === cluster.id ? (
                       <TextField
+                        label="Cluster name"
                         value={cluster.name}
                         onChange={(e) =>
                           handleClusterChange(
@@ -158,6 +159,7 @@ export default function ClusterPage() {
                   <TableCell>
                     {editingClusterId === cluster.id ? (
                       <TextField
+                        label="Cluster description"
                         value={cluster.description || ""}
                         onChange={(e) =>
                           handleClusterChange(
@@ -174,7 +176,8 @@ export default function ClusterPage() {
                   <TableCell>
                     {editingClusterId === cluster.id ? (
                       <SelectField
-                        value={cluster.regionId}
+                        label="Region"
+                        value={cluster.regionId ?? ""}
                         onChange={(e) =>
                           handleClusterChange(
                             cluster.id,
@@ -183,6 +186,8 @@ export default function ClusterPage() {
                           )
                         }
                       >
+                        <option value="">Select Region</option>{" "}
+                        {/* Provide a default option for no selection */}
                         {regions.map((region) => (
                           <option key={region.id} value={region.id}>
                             {region.name}
@@ -235,6 +240,7 @@ export default function ClusterPage() {
                 <TableRow>
                   <TableCell>
                     <TextField
+                      label="Cluster name"
                       value={newCluster.name}
                       onChange={(e) =>
                         handleNewClusterChange("name", e.target.value)
@@ -245,6 +251,7 @@ export default function ClusterPage() {
                   </TableCell>
                   <TableCell>
                     <TextField
+                      label="Cluster description"
                       value={newCluster.description}
                       onChange={(e) =>
                         handleNewClusterChange("description", e.target.value)
@@ -254,6 +261,7 @@ export default function ClusterPage() {
                   </TableCell>
                   <TableCell>
                     <SelectField
+                      label="Region"
                       value={newCluster.regionId}
                       onChange={(e) =>
                         handleNewClusterChange("regionId", e.target.value)
