@@ -127,7 +127,7 @@ const AppLayout = ({ children }: LayoutProps) => {
           textAlign: "center",
         }}
       >
-        Timetable maker ©{new Date().getFullYear()} Created by Fiftytwodays
+        Reporting hub ©{new Date().getFullYear()} Created by Fiftytwodays
       </Footer>
     </Layout>
   );
