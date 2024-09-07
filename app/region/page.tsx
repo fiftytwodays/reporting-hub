@@ -30,7 +30,7 @@ export default function App() {
     listRegions();
   }, []);
 
-  function createTodo() {
+  function createRegion() {
     client.models.Region.create({
       name: window.prompt("Region name"),
       description: window.prompt("Region description"),
@@ -42,7 +42,7 @@ export default function App() {
       {({ signOut, user }) => (
         <main>
           <h1>{user?.signInDetails?.loginId}'s regions</h1>
-          <button onClick={createTodo}>+ new</button>
+          <button onClick={createRegion}>+ new</button>
           <ul>
             {regions.map((region) => (
               <li onClick={() => deleteRegion(region.id)} key={region.id}>
