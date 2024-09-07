@@ -7,8 +7,9 @@ import "./../app/app.css";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 
-import { Authenticator } from '@aws-amplify/ui-react';
+import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+import Layout from "./shared/ui/core/ui/Layout";
 
 Amplify.configure(outputs);
 
@@ -22,9 +23,9 @@ export default function App() {
       next: (data) => setTodos([...data.items]),
     });
   }
-    
+
   function deleteTodo(id: string) {
-    client.models.Todo.delete({ id })
+    client.models.Todo.delete({ id });
   }
 
   useEffect(() => {
@@ -45,7 +46,9 @@ export default function App() {
           <button onClick={createTodo}>+ new</button>
           <ul>
             {todos.map((todo) => (
-              <li onClick={() => deleteTodo(todo.id)} key={todo.id}>{todo.content}</li>
+              <li onClick={() => deleteTodo(todo.id)} key={todo.id}>
+                {todo.content}
+              </li>
             ))}
           </ul>
           <div>
