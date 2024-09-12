@@ -66,10 +66,6 @@ const items = [
         label: <Link href="/settings/role">Role</Link>,
       },
       {
-        key: "department",
-        label: <Link href="/settings/department">Department</Link>,
-      },
-      {
         key: "region",
         label: <Link href="/settings/region">Region</Link>,
       },
