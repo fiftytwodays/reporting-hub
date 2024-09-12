@@ -43,6 +43,16 @@ const schema = a.schema({
       allow.publicApiKey().to(["read"]),
       allow.owner(),
     ]),
+  // Add FunctionalArea model here
+  FunctionalArea: a
+    .model({
+      name: a.string().required(),
+      description: a.string(),
+    })
+    .authorization((allow) => [
+      allow.publicApiKey().to(["read"]),
+      allow.owner(),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
