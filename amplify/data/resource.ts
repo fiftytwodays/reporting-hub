@@ -17,6 +17,7 @@ const schema = a.schema({
     .model({
       name: a.string().required(),
       description: a.string(),
+      projects: a.hasMany("Project", "projectTypeId"), // Reference the related Projects
     })
     .authorization((allow) => [
       allow.publicApiKey().to(["read"]),
@@ -28,6 +29,7 @@ const schema = a.schema({
       description: a.string(),
       regionId: a.id(),
       region: a.belongsTo("Region", "regionId"),
+      projects: a.hasMany("Project", "clusterId"), // Reference the related Projects
     })
     .authorization((allow) => [
       allow.publicApiKey().to(["read"]),
@@ -47,6 +49,20 @@ const schema = a.schema({
   FunctionalArea: a
     .model({
       name: a.string().required(),
+      description: a.string(),
+    })
+    .authorization((allow) => [
+      allow.publicApiKey().to(["read"]),
+      allow.owner(),
+    ]),
+  Project: a
+    .model({
+      name: a.string().required(),
+      location: a.string().required(),
+      projectTypeId: a.id(),
+      projectType: a.belongsTo("ProjectType", "projectTypeId"), // Belongs to ProjectType
+      clusterId: a.id(),   //
+      cluster: a.belongsTo("Cluster", "clusterId"), // Belongs to Cluster
       description: a.string(),
     })
     .authorization((allow) => [
