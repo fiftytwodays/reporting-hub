@@ -21,7 +21,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [
       allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.groups(["admin"]),
     ]),
   Cluster: a
     .model({
@@ -33,7 +33,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [
       allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.groups(["admin"]),
     ]),
   Region: a
     .model({
@@ -43,7 +43,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [
       allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.groups(["admin"]),
     ]),
   // Add FunctionalArea model here
   FunctionalArea: a
@@ -53,7 +53,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [
       allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.groups(["admin"]),
     ]),
   Project: a
     .model({
@@ -61,13 +61,13 @@ const schema = a.schema({
       location: a.string().required(),
       projectTypeId: a.id(),
       projectType: a.belongsTo("ProjectType", "projectTypeId"), // Belongs to ProjectType
-      clusterId: a.id(),   //
+      clusterId: a.id(), //
       cluster: a.belongsTo("Cluster", "clusterId"), // Belongs to Cluster
       description: a.string(),
     })
     .authorization((allow) => [
       allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.groups(["admin"]),
     ]),
 });
 
