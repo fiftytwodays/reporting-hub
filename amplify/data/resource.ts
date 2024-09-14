@@ -11,8 +11,8 @@ const schema = a.schema({
     .model({
       content: a.string(),
     })
-    // .authorization((allow) => [allow.publicApiKey()]),
-    .authorization((allow) => [allow.owner()]),
+    .authorization((allow) => [allow.authenticated()]),
+  // .authorization((allow) => [allow.owner()]),
   ProjectType: a
     .model({
       name: a.string().required(),
@@ -20,8 +20,8 @@ const schema = a.schema({
       projects: a.hasMany("Project", "projectTypeId"), // Reference the related Projects
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
     ]),
   Cluster: a
     .model({
@@ -32,8 +32,8 @@ const schema = a.schema({
       projects: a.hasMany("Project", "clusterId"), // Reference the related Projects
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
     ]),
   Region: a
     .model({
@@ -42,8 +42,8 @@ const schema = a.schema({
       clusters: a.hasMany("Cluster", "regionId"),
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
     ]),
   // Add FunctionalArea model here
   FunctionalArea: a
@@ -52,8 +52,8 @@ const schema = a.schema({
       description: a.string(),
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
     ]),
   Project: a
     .model({
@@ -61,13 +61,13 @@ const schema = a.schema({
       location: a.string().required(),
       projectTypeId: a.id(),
       projectType: a.belongsTo("ProjectType", "projectTypeId"), // Belongs to ProjectType
-      clusterId: a.id(),   //
+      clusterId: a.id(), //
       cluster: a.belongsTo("Cluster", "clusterId"), // Belongs to Cluster
       description: a.string(),
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
-      allow.owner(),
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
     ]),
 });
 
