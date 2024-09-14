@@ -11,8 +11,8 @@ const schema = a.schema({
     .model({
       content: a.string(),
     })
-    // .authorization((allow) => [allow.publicApiKey()]),
-    .authorization((allow) => [allow.owner()]),
+    .authorization((allow) => [allow.authenticated()]),
+  // .authorization((allow) => [allow.owner()]),
   ProjectType: a
     .model({
       name: a.string().required(),
@@ -20,7 +20,7 @@ const schema = a.schema({
       projects: a.hasMany("Project", "projectTypeId"), // Reference the related Projects
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
+      allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
   Cluster: a
@@ -32,7 +32,7 @@ const schema = a.schema({
       projects: a.hasMany("Project", "clusterId"), // Reference the related Projects
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
+      allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
   Region: a
@@ -42,7 +42,7 @@ const schema = a.schema({
       clusters: a.hasMany("Cluster", "regionId"),
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
+      allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
   // Add FunctionalArea model here
@@ -52,7 +52,7 @@ const schema = a.schema({
       description: a.string(),
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
+      allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
   Project: a
@@ -66,7 +66,7 @@ const schema = a.schema({
       description: a.string(),
     })
     .authorization((allow) => [
-      allow.publicApiKey().to(["read"]),
+      allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
 });
