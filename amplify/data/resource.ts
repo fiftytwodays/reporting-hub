@@ -1,6 +1,7 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 import { listGroups } from "./groups/list-groups/resource";
+import { listUsers } from "./groups/list-users/resource";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -15,12 +16,20 @@ const schema = a.schema({
     .authorization((allow) => [allow.group("admin")])
     .handler(a.handler.function(listGroups))
     .returns(a.json()),
+  listUsers: a
+    .mutation()
+    .arguments({})
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.function(listUsers))
+    .returns(a.json()),
+
   Todo: a
     .model({
       content: a.string(),
     })
     .authorization((allow) => [allow.authenticated()]),
   // .authorization((allow) => [allow.owner()]),
+
   ProjectType: a
     .model({
       name: a.string().required(),
