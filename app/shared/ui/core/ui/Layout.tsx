@@ -63,7 +63,7 @@ const items = [
       },
       {
         key: "role",
-        label: <Link href="/settings/role">Role</Link>,
+        label: <Link href="/settings/roles">Roles</Link>,
       },
       {
         key: "region",
