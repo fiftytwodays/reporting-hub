@@ -1,6 +1,7 @@
 import { defineAuth } from "@aws-amplify/backend";
 
 import { listGroups } from "../data/groups/list-groups/resource";
+import { listUsers } from "../data/groups//list-users/resource";
 
 /**
  * Define and configure your auth resource
@@ -12,5 +13,8 @@ export const auth = defineAuth({
   },
   groups: ["admin", "report-viewer", "user"],
 
-  access: (allow) => [allow.resource(listGroups).to(["listGroups"])],
+  access: (allow) => [
+    allow.resource(listGroups).to(["listGroups"]),
+    allow.resource(listUsers).to(["listUsers"]),
+  ],
 });

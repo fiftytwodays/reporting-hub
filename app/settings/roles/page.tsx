@@ -30,8 +30,6 @@ export default function GroupList() {
     try {
       // Call the mutation to get all the groups
       const response = await client.mutations.listGroups({});
-      console.log("Response: ", response);
-      console.log("Response: ", response.data);
 
       if (response.data && typeof response.data === "string") {
         const parsedData = JSON.parse(response.data);
