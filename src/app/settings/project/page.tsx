@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
+import type { Schema } from "../../../../amplify/data/resource";
 import "@/app/app.css";
 import { Amplify } from "aws-amplify";
-import outputs from "@/amplify_outputs.json";
+import outputs from "@root/amplify_outputs.json";
 import {
   Authenticator,
   Button,
@@ -23,9 +23,15 @@ Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
 export default function ProjectPage() {
-  const [projects, setProjects] = useState<Array<Schema["Project"]["type"]>>([]);
-  const [projectTypes, setProjectTypes] = useState<Array<Schema["ProjectType"]["type"]>>([]);
-  const [clusters, setClusters] = useState<Array<Schema["Cluster"]["type"]>>([]);
+  const [projects, setProjects] = useState<Array<Schema["Project"]["type"]>>(
+    []
+  );
+  const [projectTypes, setProjectTypes] = useState<
+    Array<Schema["ProjectType"]["type"]>
+  >([]);
+  const [clusters, setClusters] = useState<Array<Schema["Cluster"]["type"]>>(
+    []
+  );
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [newProject, setNewProject] = useState<{
     name: string;
@@ -80,7 +86,9 @@ export default function ProjectPage() {
             name: project.name,
             location: project.location,
             description: project.description,
-            ...(project.projectTypeId && { projectTypeId: project.projectTypeId }),
+            ...(project.projectTypeId && {
+              projectTypeId: project.projectTypeId,
+            }),
             ...(project.clusterId && { clusterId: project.clusterId }),
           };
           await client.models.Project.update(updatedProject);
@@ -93,7 +101,9 @@ export default function ProjectPage() {
             name: newProject.name,
             location: newProject.location,
             description: newProject.description,
-            ...(newProject.projectTypeId && { projectTypeId: newProject.projectTypeId }),
+            ...(newProject.projectTypeId && {
+              projectTypeId: newProject.projectTypeId,
+            }),
             ...(newProject.clusterId && { clusterId: newProject.clusterId }),
           };
           await client.models.Project.create(newProjectData);
@@ -166,7 +176,11 @@ export default function ProjectPage() {
                         label="Project name"
                         value={project.name}
                         onChange={(e) =>
-                          handleProjectChange(project.id, "name", e.target.value)
+                          handleProjectChange(
+                            project.id,
+                            "name",
+                            e.target.value
+                          )
                         }
                       />
                     ) : (
@@ -211,8 +225,9 @@ export default function ProjectPage() {
                         ))}
                       </SelectField>
                     ) : (
-                      projectTypes.find((type) => type.id === project.projectTypeId)
-                        ?.name || ""
+                      projectTypes.find(
+                        (type) => type.id === project.projectTypeId
+                      )?.name || ""
                     )}
                   </TableCell>
                   <TableCell>
@@ -221,7 +236,11 @@ export default function ProjectPage() {
                         label="Cluster"
                         value={project.clusterId ?? ""}
                         onChange={(e) =>
-                          handleProjectChange(project.id, "clusterId", e.target.value)
+                          handleProjectChange(
+                            project.id,
+                            "clusterId",
+                            e.target.value
+                          )
                         }
                       >
                         <option value="">Select Cluster</option>
@@ -232,8 +251,9 @@ export default function ProjectPage() {
                         ))}
                       </SelectField>
                     ) : (
-                      clusters.find((cluster) => cluster.id === project.clusterId)
-                        ?.name || ""
+                      clusters.find(
+                        (cluster) => cluster.id === project.clusterId
+                      )?.name || ""
                     )}
                   </TableCell>
                   <TableCell>

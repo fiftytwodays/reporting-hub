@@ -18,8 +18,10 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".", // Set the root as the base URL
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["src/*"], // Set @/ to point to src
+      "@root/*": ["*"] // Set @root/ to point to the root folder
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
