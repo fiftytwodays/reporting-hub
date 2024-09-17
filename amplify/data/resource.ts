@@ -13,7 +13,8 @@ const schema = a.schema({
   listGroups: a
     .mutation()
     .arguments({})
-    .authorization((allow) => [allow.group("admin")])
+    // Changed authorization to allow.authenticated()
+    .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(listGroups))
     .returns(a.json()),
   listUsers: a
