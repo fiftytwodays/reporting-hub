@@ -15,9 +15,9 @@ import {
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
-import type { Schema } from "@/amplify/data/resource";
+import type { Schema } from "@root/amplify/data/resource";
 import "@/app/app.css";
-import outputs from "@/amplify_outputs.json";
+import outputs from "@root/amplify_outputs.json";
 
 Amplify.configure(outputs);
 const client = generateClient<Schema>();
@@ -46,17 +46,16 @@ export default function FunctionalAreaPage() {
   }
 
   // Delete a functional area by ID
-function deleteFunctionalArea(id: string, name: string) {
-  const confirmDelete = window.confirm(
-    `Are you sure you want to delete the Functional Area: "${name}"?`
-  );
+  function deleteFunctionalArea(id: string, name: string) {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete the Functional Area: "${name}"?`
+    );
 
-  if (confirmDelete) {
-    // Proceed with deletion if confirmed
-    client.models.FunctionalArea.delete({ id });
+    if (confirmDelete) {
+      // Proceed with deletion if confirmed
+      client.models.FunctionalArea.delete({ id });
+    }
   }
-}
-
 
   // Handle the create or edit form submission
   const handleSubmit = async (functionalAreaId?: string) => {
@@ -100,7 +99,9 @@ function deleteFunctionalArea(id: string, name: string) {
   ) => {
     setFunctionalAreas((prevFunctionalAreas) =>
       prevFunctionalAreas.map((functionalArea) =>
-        functionalArea.id === id ? { ...functionalArea, [field]: value } : functionalArea
+        functionalArea.id === id
+          ? { ...functionalArea, [field]: value }
+          : functionalArea
       )
     );
   };
@@ -200,7 +201,10 @@ function deleteFunctionalArea(id: string, name: string) {
                         </Button>
                         <Button
                           onClick={() =>
-                            deleteFunctionalArea(functionalArea.id, functionalArea.name)
+                            deleteFunctionalArea(
+                              functionalArea.id,
+                              functionalArea.name
+                            )
                           }
                           variation="link"
                         >
@@ -240,16 +244,10 @@ function deleteFunctionalArea(id: string, name: string) {
                     />
                   </TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() => handleSubmit()}
-                      variation="primary"
-                    >
+                    <Button onClick={() => handleSubmit()} variation="primary">
                       Add
                     </Button>
-                    <Button
-                      onClick={() => setIsAdding(false)}
-                      variation="link"
-                    >
+                    <Button onClick={() => setIsAdding(false)} variation="link">
                       Cancel
                     </Button>
                   </TableCell>
