@@ -5,7 +5,7 @@ import { Table } from "antd"; // Using Ant Design components
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import outputs from "@root/amplify_outputs.json";
-import type { Schema } from "../../../../amplify/data/resource";
+import type { Schema } from "@root/amplify/data/resource";
 
 Amplify.configure(outputs);
 

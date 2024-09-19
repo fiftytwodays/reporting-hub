@@ -15,7 +15,7 @@ import {
 } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
-import type { Schema } from "../../../../amplify/data/resource";
+import type { Schema } from "@root/amplify/data/resource";
 import "@/app/app.css";
 import outputs from "@root/amplify_outputs.json";
 
