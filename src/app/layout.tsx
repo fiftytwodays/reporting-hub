@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./app.css";
-import AppLayout from "./shared/ui/core/ui/Layout";
+import AppLayout from "@/shared/ui/core/ui/Layout";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 const inter = Inter({ subsets: ["latin"] });
