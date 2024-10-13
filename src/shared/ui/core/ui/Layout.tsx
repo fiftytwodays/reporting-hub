@@ -1,21 +1,25 @@
 "use client";
 
 import React from "react";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Dropdown, Button, Avatar, Typography } from "antd";
+import type { MenuProps } from "antd";
 import Link from "next/link";
-import Router, { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import styled from "@emotion/styled";
+import { signOut, getCurrentUser } from "aws-amplify/auth";
+import useSWR, { mutate } from "swr";
 
 import { Header, Content, Footer } from "antd/lib/layout/layout";
-import Title from "antd/es/typography/Title";
+
 interface LayoutProps {
   children: any;
 }
 
+const { Text, Title } = Typography;
+
 const layoutStyle = {
-  borderRadius: 8,
-  overflow: "hidden",
-  width: "calc(50% - 8px)",
-  maxWidth: "calc(50% - 8px)",
+  padding: "0 2rem",
 };
 
 const items = [
@@ -89,9 +93,28 @@ const items = [
   },
 ];
 
+const useMenuItems: MenuProps["items"] = [
+  {
+    key: "sign-out",
+    label: "Sign out",
+    icon: <LogoutOutlined />,
+  },
+];
+
 const AppLayout = ({ children }: LayoutProps) => {
+  const router = useRouter();
   const pathname = usePathname();
   const menuName = pathname?.split("/")[1];
+  const { data: userData } = useSWR(["user-details"], getCurrentUser);
+
+  const handleMenuClick = async ({ key }: { key: string }) => {
+    if (key === "sign-out") {
+      await signOut();
+      router.push("/login");
+      mutate(["user-details"], null);
+    }
+  };
+
   return (
     <Layout className="" style={{ minHeight: "100vh" }}>
       <Header
@@ -116,8 +139,36 @@ const AppLayout = ({ children }: LayoutProps) => {
             minWidth: 0,
           }}
         />
+        {userData ? (
+          <Dropdown
+            menu={{
+              items: useMenuItems,
+              onClick: handleMenuClick,
+            }}
+            placement="bottomLeft"
+            arrow
+          >
+            <Button
+              type="text"
+              icon={<_Avatar size="small" icon={<UserOutlined />} />}
+            >
+              <Text style={{ color: "#fff" }}>
+                {userData?.signInDetails?.loginId}
+              </Text>
+            </Button>
+          </Dropdown>
+        ) : (
+          <Link href="/login">
+            <Button
+              type="text"
+              icon={<_Avatar size="small" icon={<UserOutlined />} />}
+            >
+              <Text style={{ color: "#fff" }}>Sign in</Text>
+            </Button>
+          </Link>
+        )}
       </Header>
-      <Content>{children}</Content>
+      <Content style={layoutStyle}>{children}</Content>
       <Footer
         style={{
           textAlign: "center",
@@ -128,5 +179,10 @@ const AppLayout = ({ children }: LayoutProps) => {
     </Layout>
   );
 };
+
+const _Avatar = styled(Avatar)`
+  background-color: #fde3cf;
+  color: #f56a00;
+`;
 
 export default AppLayout;
