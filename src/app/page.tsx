@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
 import { Amplify } from "aws-amplify";
 import type { Schema } from "@root/amplify/data/resource";
