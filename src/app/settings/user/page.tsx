@@ -17,10 +17,12 @@ export default function UserList() {
         breadcrumbs: [
           {
             title: "Home",
+            href: "/",
           },
 
           {
             title: "Users",
+            href: "/settings/user",
           },
         ],
       }}
