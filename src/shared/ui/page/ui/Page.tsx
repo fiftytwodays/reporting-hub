@@ -1,13 +1,26 @@
 import Head from "next/head";
 import { Breadcrumb, Col, Row, Typography, theme } from "antd";
+import { ReactNode } from "react";
 const { Title } = Typography;
 import styled from "@emotion/styled";
+
+interface HeaderProps {
+  breadcrumbs?: { href: string; title: string }[];
+  title?: string;
+  extra?: ReactNode;
+}
+
+interface PageProps {
+  content?: ReactNode;
+  showPageHeader?: boolean;
+  header?: HeaderProps;
+}
 
 export default function Page({
   content = <div />,
   showPageHeader = false,
   header = {},
-}) {
+}: PageProps) {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -15,7 +28,6 @@ export default function Page({
   return (
     <_Page>
       <Head>
-        <title>{`TTM${header?.title ? ` - ${header?.title}` : ""}`}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -23,7 +35,7 @@ export default function Page({
         <PageHeader>
           <Row justify="space-between">
             <Col>
-              <Breadcrumb items={header.breadcrumbs} />
+              <Breadcrumb items={header.breadcrumbs || []} />
               <_Title level={4}>{header?.title}</_Title>
             </Col>
             {header?.extra && <Col>{header?.extra}</Col>}
