@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/nextjs-registry": "1.0.1",
     "@aws-amplify/auth": "^6.4.0",
+    "@aws-amplify/datastore": "^5.0.57",
     "@aws-amplify/ui-react": "^6.2.1",
     "@aws-sdk/client-cognito-identity-provider": "^3.651.1",
     "@emotion/styled": "11.13.0",
