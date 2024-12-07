@@ -1,7 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, Select, message } from "antd"; // Importing necessary Ant Design components
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  message,
+  Popconfirm,
+  Checkbox,
+  Tooltip,
+} from "antd"; // Importing necessary Ant Design components
+import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons"; // Import icons from Ant Design
 import { Amplify } from "aws-amplify";
 import { generateClient } from "aws-amplify/data";
 import outputs from "@root/amplify_outputs.json";
@@ -11,7 +23,10 @@ Amplify.configure(outputs);
 
 export default function UserList() {
   interface User {
-    Attributes: Array<{ Name: string; Value: string }>;
+    Attributes?: Array<{ Name: string; Value: string }>;
+    FirstName: string;
+    GivenName: string;
+    Email: string;
     Enabled: boolean;
     UserCreateDate: string;
     UserLastModifiedDate: string;
@@ -25,9 +40,65 @@ export default function UserList() {
 
   const client = generateClient<Schema>();
 
-  const dummyProjects = ["Project1", "Project2", "Project3"];
-  const dummyClusters = ["Cluster1", "Cluster2", "Cluster3"];
-  const dummyRegions = ["Region1", "Region2", "Region3"];
+  // Define an interface for the Group structure
+  interface Group {
+    CreationDate: string;
+    GroupName: string;
+    LastModifiedDate: string;
+    Precedence: number;
+    RoleArn: string;
+    UserPoolId: string;
+  }
+  const [roles, setRoles] = useState<Group[]>([]);
+  async function listRoles() {
+    try {
+      // Call the mutation to get all the groups
+      const response = await client.mutations.listGroups({});
+
+      if (response.data && typeof response.data === "string") {
+        const parsedData = JSON.parse(response.data);
+        console.log("groups: ", parsedData);
+
+        // Extract the groups from the parsed data
+        const groupList: Group[] = parsedData.Groups;
+
+        // Sort the group list by precedence (lowest first)
+        const sortedGroupList = groupList.sort(
+          (a, b) => a.Precedence - b.Precedence
+        );
+
+        // Set the sorted roles to state
+        setRoles(sortedGroupList);
+      }
+    } catch (error) {
+      console.error("Error fetching groups:", error);
+    }
+  }
+
+  const [projects, setProjects] = useState<Array<Schema["Project"]["type"]>>(
+    []
+  );
+  function listProjects() {
+    client.models.Project.observeQuery().subscribe({
+      next: (data) => setProjects([...data.items]),
+    });
+  }
+
+  const [clusters, setClusters] = useState<Array<Schema["Cluster"]["type"]>>(
+    []
+  );
+  function listClusters() {
+    client.models.Cluster.observeQuery().subscribe({
+      next: (data) => setClusters([...data.items]),
+    });
+  }
+
+  const [regions, setRegions] = useState<Array<Schema["Region"]["type"]>>([]);
+  function listRegions() {
+    client.models.Region.observeQuery().subscribe({
+      next: (data) => setRegions([...data.items]),
+    });
+  }
 
   // Fetch and list users
   async function listUsers() {
@@ -35,6 +106,7 @@ export default function UserList() {
       const response = await client.mutations.listUsers({});
       if (response.data && typeof response.data === "string") {
         const parsedData = JSON.parse(response.data);
+        console.log("parsedData: ", parsedData);
         const userList: User[] = parsedData.Users;
         setUsers(userList);
       }
@@ -45,6 +117,10 @@ export default function UserList() {
 
   useEffect(() => {
     listUsers();
+    listRoles();
+    listProjects();
+    listClusters();
+    listRegions();
   }, []);
 
   // Helper function to get the attribute value from user's attributes array
@@ -102,14 +178,39 @@ export default function UserList() {
       title: "Action",
       key: "Action",
       render: (text: any, user: User) => (
-        <Button onClick={() => handleViewUserDetails(user)}>
-          View Details
-        </Button>
+        <>
+          <Tooltip title="View Details">
+            <Button
+              onClick={() => handleViewUserDetails(user)}
+              icon={<EyeOutlined />} // Add the "View" icon
+              type="link"
+            />
+          </Tooltip>
+          {/* Edit Icon */}
+          <Tooltip title="Edit User">
+            <Button
+              onClick={() => handleEditUser(user)}
+              icon={<EditOutlined />}
+              type="link"
+            />
+          </Tooltip>
+          <Tooltip title="Delete User">
+            <Popconfirm
+              title="Are you sure you want to delete this user?"
+              onConfirm={() => handleDeleteUser(user)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button danger icon={<DeleteOutlined />} type="link" />
+            </Popconfirm>
+          </Tooltip>
+        </>
       ),
     },
   ];
 
   const userData = users.map((user, index) => ({
+    Attributes: user.Attributes,
     key: index,
     FirstName: getAttributeValue(user.Attributes, "given_name"),
     GivenName: getAttributeValue(user.Attributes, "family_name"),
@@ -133,16 +234,80 @@ export default function UserList() {
     setViewUser(user); // Set the selected user for the view details modal
   };
 
+  const handleEditUser = async (user: User) => {
+    try {
+      console.log("edit user", user);
+      const input = {
+        userName: user.Email, // Assuming email is the username
+      };
+      // const input = {
+      //   userName: user.Username,
+      // };
+      console.log("Delete user input: ", input);
+      const response = await client.mutations.deleteUser(input);
+      console.log("Delete user response: ", response);
+      message.success("User deleted successfully");
+      listUsers(); // Refresh the user list
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      message.error("Error deleting user: " + error);
+    }
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    try {
+      console.log("delete user", user);
+      const input = {
+        userName: user.Email, // Assuming email is the username
+      };
+      // const input = {
+      //   userName: user.Username,
+      // };
+      console.log("Delete user input: ", input);
+      const response = await client.mutations.deleteUser(input);
+      console.log("Delete user response: ", response);
+      message.success("User deleted successfully");
+      listUsers(); // Refresh the user list
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      message.error("Error deleting user: " + error);
+    }
+  };
+
   const handleCreateUser = async (values: any) => {
     try {
-      // Pass the email as the username to the createUser mutation
+      // Create user with initial details
       const input = {
         ...values,
         userName: values.email, // Set email as the username
       };
+      console.log("Create user input", input);
       const response = await client.mutations.createUser(input);
       console.log("Create user response: ", response);
-      message.success("User created successfully");
+
+      // Check if password should be set as permanent
+      if (values.isPermanent) {
+        const setPasswordInput = {
+          userName: values.email, // Assuming email is the username
+          password: values.password,
+          permanent: true,
+        };
+        await client.mutations.setUserPassword(setPasswordInput);
+        console.log("Password set as permanent");
+      }
+
+      if (values.roles && values.roles.length > 0) {
+        for (const role of values.roles) {
+          const addUserToGroupInput = {
+            userName: values.email,
+            groupName: role, // Assuming 'role' is the group name
+          };
+          await client.mutations.addUserToGroup(addUserToGroupInput);
+          console.log(`User added to group: ${role}`);
+        }
+      }
+
+      message.success("User created and assigned to roles successfully");
       setIsModalVisible(false);
       form.resetFields();
       listUsers(); // Refresh user list after creation
@@ -166,7 +331,14 @@ export default function UserList() {
         onCancel={handleCancel}
         footer={null} // Footer will be part of the form
       >
-        <Form form={form} layout="vertical" onFinish={handleCreateUser}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleCreateUser}
+          initialValues={{
+            roles: roles.length > 0 ? [roles[0].GroupName] : [], // Set default role
+          }}
+        >
           <Form.Item
             label="Email"
             name="email"
@@ -179,6 +351,20 @@ export default function UserList() {
             ]}
           >
             <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Roles"
+            name="roles"
+            rules={[{ required: true, message: "Please input the role!" }]}
+          >
+            <Select
+              mode="multiple"
+              options={roles.map((role) => ({
+                value: role.GroupName,
+                label: role.GroupName,
+              }))}
+            />
           </Form.Item>
 
           <Form.Item
@@ -208,13 +394,16 @@ export default function UserList() {
           >
             <Input.Password />
           </Form.Item>
+          <Form.Item name="isPermanent" valuePropName="checked">
+            <Checkbox>Set Password as Permanent</Checkbox>
+          </Form.Item>
 
           <Form.Item label="Projects" name="projects">
             <Select
               mode="multiple"
-              options={dummyProjects.map((project) => ({
-                value: project,
-                label: project,
+              options={projects.map((project) => ({
+                value: project.id,
+                label: project.name,
               }))}
             />
           </Form.Item>
@@ -222,9 +411,9 @@ export default function UserList() {
           <Form.Item label="Clusters" name="clusters">
             <Select
               mode="multiple"
-              options={dummyClusters.map((cluster) => ({
-                value: cluster,
-                label: cluster,
+              options={clusters.map((cluster) => ({
+                value: cluster.id,
+                label: cluster.name,
               }))}
             />
           </Form.Item>
@@ -232,9 +421,9 @@ export default function UserList() {
           <Form.Item label="Regions" name="regions">
             <Select
               mode="multiple"
-              options={dummyRegions.map((region) => ({
-                value: region,
-                label: region,
+              options={regions.map((region) => ({
+                value: region.id,
+                label: region.name,
               }))}
             />
           </Form.Item>
@@ -260,16 +449,13 @@ export default function UserList() {
         {viewUser && (
           <div>
             <p>
-              <strong>First Name:</strong>{" "}
-              {getAttributeValue(viewUser.Attributes, "given_name")}
+              <strong>First Name:</strong> {viewUser.FirstName}
             </p>
             <p>
-              <strong>Given Name:</strong>{" "}
-              {getAttributeValue(viewUser.Attributes, "family_name")}
+              <strong>Given Name:</strong> {viewUser.GivenName}
             </p>
             <p>
-              <strong>Email:</strong>{" "}
-              {getAttributeValue(viewUser.Attributes, "email")}
+              <strong>Email:</strong> {viewUser.Email}
             </p>
             <p>
               <strong>Enabled:</strong> {viewUser.Enabled ? "Yes" : "No"}
@@ -278,13 +464,16 @@ export default function UserList() {
               <strong>User Status:</strong> {viewUser.UserStatus}
             </p>
             <p>
-              <strong>Projects:</strong> {dummyProjects.join(", ")}
+              <strong>Projects:</strong>{" "}
+              {getAttributeValue(viewUser.Attributes, "custom:projects")}
             </p>
             <p>
-              <strong>Clusters:</strong> {dummyClusters.join(", ")}
+              <strong>Clusters:</strong>{" "}
+              {getAttributeValue(viewUser.Attributes, "custom:clusters")}
             </p>
             <p>
-              <strong>Regions:</strong> {dummyRegions.join(", ")}
+              <strong>Regions:</strong>{" "}
+              {getAttributeValue(viewUser.Attributes, "custom:regions")}
             </p>
             <p>
               <strong>Created:</strong>{" "}

@@ -3,7 +3,9 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { listGroups } from "./groups/list-groups/resource";
 import { addUserToGroup } from "./groups/add-user-to-group/resource";
 import { listUsers } from "./users/list-users/resource";
+import { listGroupsForUser } from "./users/list-groups-for-user/resource";
 import { createUser } from "./users/create-user/resource";
+import { deleteUser } from "./users/delete-user/resource";
 import { setUserPassword } from "./users/set-user-password/resource";
 
 /*== STEP 1 ===============================================================
@@ -23,7 +25,7 @@ const schema = a.schema({
   addUserToGroup: a
     .mutation()
     .arguments({
-      userId: a.string().required(),
+      userName: a.string().required(),
       groupName: a.string().required(),
     })
     .authorization((allow) => [allow.group("admin")])
@@ -34,6 +36,14 @@ const schema = a.schema({
     .arguments({})
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(listUsers))
+    .returns(a.json()),
+  listGroupsForUser: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+    })
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.function(listGroupsForUser))
     .returns(a.json()),
   createUser: a
     .mutation()
@@ -50,11 +60,20 @@ const schema = a.schema({
     .authorization((allow) => [allow.group("admin")])
     .handler(a.handler.function(createUser))
     .returns(a.json()),
+  deleteUser: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(deleteUser))
+    .returns(a.json()),
   setUserPassword: a
     .mutation()
     .arguments({
       userName: a.string().required(),
       password: a.string().required(),
+      permanent: a.boolean().required(),
     })
     .authorization((allow) => [allow.group("admin")])
     .handler(a.handler.function(setUserPassword))
