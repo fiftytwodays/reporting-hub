@@ -1,44 +1,38 @@
-import type { Project } from "./types";
-
-type ColumnConfig<T> = {
-  title: string;
-  dataIndex: keyof T;
-  key: string;
-  render?: (value: any) => React.ReactElement; // Optional render function, taking any type and returning a string
-};
-
-export const columns: ColumnConfig<Project>[] = [
+export const columns = [
+  {
+    title: "Id",
+    dataIndex: "id",
+    key: "id",
+    hidden: true,
+  },
   {
     title: "Name",
-    dataIndex: "Name",
-    key: "Name",
+    dataIndex: "name",
+    key: "name",
   },
   {
     title: "Location",
-    dataIndex: "Location",
-    key: "Location",
+    dataIndex: "location",
+    key: "location",
   },
   {
     title: "Project type",
-    dataIndex: "ProjectType",
-    key: "ProjectType",
+    dataIndex: "projectType",
+    key: "projectType",
   },
   {
     title: "Cluster",
-    dataIndex: "Cluster",
-    key: "Cluster",
+    dataIndex: "cluster",
+    key: "cluster",
   },
   {
     title: "Description",
-    dataIndex: "Description",
-    key: "Description",
+    dataIndex: "description",
+    key: "description",
   },
-  // {
-  //   title: "Actions",
-  //   dataIndex: "Actions",
-  //   key: "Actions",
-  //   render: (actions: string) => (
-  //     <Button >Click Me</Button>
-  //   )
-  // }
-];
+  {
+    title: "Actions",
+    key: "actions",
+  },
+] 
+

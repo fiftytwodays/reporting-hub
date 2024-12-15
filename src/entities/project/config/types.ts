@@ -1,18 +1,12 @@
-// export interface ProjectAttribute {
-//   Name: string;
-//   Value: string;
-// }
-
-
-
 export interface Project {
-  // Attributes?: ProjectAttribute[];
-  Name: string;
-  Location: string;
-  ProjectType: string;
-  Cluster: string
-  Description: string;
-  Actions: string;
+  id: string;
+  name: string;
+  location: string;
+  projectType: string;
+  cluster: string;
+  description: string;
+  projectTypeId: string;
+  clusterId: string;
 }
 
 export interface ApiResponse {

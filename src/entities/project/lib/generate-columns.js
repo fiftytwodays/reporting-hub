@@ -1,36 +1,37 @@
+import { Button } from "antd";
 import styled from "@emotion/styled";
-import { Flex, Space, Typography } from "antd";
-import { Button } from 'antd';
+import { Flex, Space, Typography, Popconfirm } from "antd";
 
-import Image from "next/image";
+export default function generateColumns(
+  columns,
+  handleDelete,
+  handleEdit
+) {
 
-const getColumnTitle = (column) => {
-  if (column?.isLogoVisible && column?.logoURL) {
-    return (
-      <Flex justify="center">
-        <Image src={column?.logoURL} alt="Logo" width={70} height={70} />
-      </Flex>
-    );
-  } else return column?.title;
-};
+  const { Text } = Typography;
 
-const { Text } = Typography;
-
-export default function mapToAntDColumns(columns, data) {
   return columns.map((column) => ({
     ...column,
-    title: getColumnTitle(column, data),
+    // title: getColumnTitle(column, data),
     render: (item) => {
-      // if (column.key === "actions") {
-      //   return (
-      //     <div>
-      //       <Space>
-      //       <_Button type="link" onClick={() => handleEdit(record)}>Edit</_Button>
-      //       <_Button type="link" danger onClick={() => handleDelete(record)}>Delete</_Button>
-      //       </Space>
-      //     </div>
-      //   );
-      // }
+      if (column.key === "actions") {
+        return (
+          <div>
+            <Space>
+            <_Button type="link" onClick={() => handleEdit(item)}>Edit</_Button>
+            <Popconfirm
+              placement="bottomRight"
+              title="Are you sure you want to delete the project?"
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => handleDelete(item)}
+            >
+              <_Button type="link" danger>Delete</_Button>
+            </Popconfirm>
+            </Space>
+          </div>
+        );
+      }
       if (column?.type === "break") {
         return (
           <Flex justify="center">
@@ -75,6 +76,7 @@ const VerticalText = styled.div`
   text-transform: uppercase;
   letter-spacing: 3px;
 `;
+
 
 const _Button = styled(Button)`
   padding: 0;

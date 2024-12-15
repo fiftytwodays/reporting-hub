@@ -3,61 +3,70 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
 
 import type { Project } from "../config/types";
+import { useState } from "react";
 
 interface FetchOptions {
   condition: boolean;
 }
 
 interface ApiResponse {
-  $metadata: {
-    httpStatusCode: number;
-    requestId: string;
-    attempts: number;
-    totalRetryDelay: number;
-  };
   Projects: Project[];
 }
-
-// Helper function to get the email attribute from the user's attributes array
-// const getAttributeValue = (
-//   attributes: Array<{ Name: string; Value: string }>,
-//   attributeName: string
-// ) => {
-//   const attribute = attributes.find((attr) => attr.Name === attributeName);
-//   return attribute ? attribute.Value : "";
-// };
 
 export default function useProjectsList({ condition = true }: FetchOptions) {
   const client = generateClient<Schema>();
 
 
-  const fetcher = async (): Promise<ApiResponse | null> => {
-    const response = await client.mutations.listProjects({});
-    console.log("response SKMasflm",response);
-    if (response?.data && typeof response.data === "string") {
-      return JSON.parse(response.data) as ApiResponse;
+  const fetcher = async () => {
+    const response = await client.models.Project.list();
+    if (response?.data) {
+      // Use Promise.all to handle async operations for all projects
+      const projects = await Promise.all(
+        response.data.map(async (project) => {
+          const projectType = await client.models.ProjectType.get({ id: project.projectTypeId ?? "" });
+          const cluster = await client.models.Cluster.get({ id: project.clusterId ?? "" });
+          return {
+            id: project.id ?? "",
+            name: project.name ?? "",
+            description: project.description ?? "",
+            projectTypeId: project.projectTypeId ?? "",
+            clusterId: project.clusterId ?? "",
+            location: project.location ?? "",
+            projectType: projectType.data?.name ?? "",  // projectType should be fetched asynchronously
+            cluster: cluster.data?.name ?? "",
+          };
+        })
+      );
+  
+      const apiResponse: ApiResponse = {
+        Projects: projects
+      };
+  
+      return apiResponse;  // Return the apiResponse instead of response.data to include projectType
     }
     return null;
   };
   
-  const { data, isLoading, error } = useSWR<ApiResponse | null>(
+  
+  const { data, isLoading, error } = useSWR(
     condition ? ["api/projects"] : null,
     fetcher,
     {
       keepPreviousData: true,
     }
   );
-
   const projectData = data?.Projects?.map((project, index) => ({
     key: index,
-    Name: project.Name,
-    Description: project.Description,
-    ProjectType: project.ProjectType,
-    Cluster: project.ProjectType,
-    Location: project.Location,
-    Actions: project.Actions,
+    id: project.id,
+    name: project.name,
+    description: project.description,
+    projectType: project.projectType,
+    cluster: project.cluster,
+    location: project.location,
+    projectTypeId: project.projectTypeId,
+    clusterId: project.clusterId
+    // Actions: project.actions,
   }));
-
   return {
     projectsList: projectData ?? [],
     isProjectsListLoading: isLoading,
