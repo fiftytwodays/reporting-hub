@@ -5,6 +5,7 @@ import React from "react";
 import { Form, Input, Button, Row, Col, Space, Flex } from "antd";
 import ProjectTypes from "./ProjectTypes";
 import Clusters from "./Clusters";
+import useProjectsList from "@/entities/project/api/project-list";
 
 interface EditProjectFormProps {
   onEditProjectModalClose: () => void;
@@ -30,6 +31,8 @@ const EditProjectForm: React.FC<EditProjectFormProps> = ({
   messageApi,
 }) => {
   const [form] = Form.useForm<FormValues>();
+
+  const { reloadProjectList } = useProjectsList({condition: true});
   const { updateProject, isUpdating } = useEditProject();
 
   const formLayout = {
@@ -51,6 +54,7 @@ const EditProjectForm: React.FC<EditProjectFormProps> = ({
       const data = await updateProject(payload);
       if (data) {
         messageApi.success("Project has been updated successfully.");
+        reloadProjectList();
         onEditProjectModalClose();
         form.resetFields();
       }

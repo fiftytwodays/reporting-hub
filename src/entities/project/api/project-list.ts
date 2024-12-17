@@ -55,6 +55,19 @@ export default function useProjectsList({ condition = true }: FetchOptions) {
       keepPreviousData: true,
     }
   );
+
+  const reloadProjectList = () => {
+    mutate(
+      (keys) =>
+        Array.isArray(keys) &&
+        keys.some((item) => item.startsWith("api/projects")),
+      undefined,
+      {
+        revalidate: true,
+      },
+    );
+  };
+
   const projectData = data?.Projects?.map((project, index) => ({
     key: index,
     id: project.id,
@@ -71,5 +84,6 @@ export default function useProjectsList({ condition = true }: FetchOptions) {
     projectsList: projectData ?? [],
     isProjectsListLoading: isLoading,
     isProjectsListError: error,
+    reloadProjectList
   };
 }

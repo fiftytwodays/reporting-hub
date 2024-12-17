@@ -2,6 +2,7 @@ import { Button, Col, Flex, Form, Input, Row, Space } from "antd";
 import ProjectTypes from "./ProjectTypes";
 import Clusters from "./Clusters";
 import useCreateProject from "../api/create-project";
+import useProjectsList from "@/entities/project/api/project-list";
 
 interface CreateProjectFormProps {
   onCreateProjectModalClose: () => void;
@@ -25,6 +26,8 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
 }) => {
   const [form] = Form.useForm<FormValues>();
 
+  const { reloadProjectList } = useProjectsList({condition: true});
+
   const { createProject, isCreating } = useCreateProject();
 
   const handleFinish = async (values: FormValues) => {
@@ -40,7 +43,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({
       const data = await createProject(payload);
       if (data) {
         messageApi.success("Project has been created successfully.");
-        // reloadData();
+        reloadProjectList();
         onCreateProjectModalClose();
         form.resetFields();
       }

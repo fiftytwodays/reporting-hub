@@ -26,9 +26,6 @@ export default function useCreateProject() {
 
   const { data: projects } = useSWR("api/projects");
   
-
-console.log(projects);
-
   // Function to create a project
   const createProject = async (key: string, { arg }: { arg: CreateProjectInput }) => {
     const response = await client.models.Project.create({
