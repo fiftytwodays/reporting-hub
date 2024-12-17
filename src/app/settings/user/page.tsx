@@ -118,26 +118,27 @@ export default function UserList() {
     });
   }
 
-  async function fetchUsersByRoles() {
-    const roleUserMap: Record<string, User[]> = {};
+  // async function fetchUsersByRoles() {
+  //   const roleUserMap: Record<string, User[]> = {};
 
-    // Use Promise.all to handle asynchronous calls
-    await Promise.all(
-      roles.map(async (role) => {
-        const listUsersInGroupInput = {
-          groupName: role.GroupName,
-        };
-        const response = await client.mutations.listUsersInGroup(
-          listUsersInGroupInput
-        );
-        console.log("listusersingroup resp: ", response);
-        // Assign to the map with role as the key
-        // roleUserMap[role.GroupName] = users;
-      })
-    );
+  //   // Use Promise.all to handle asynchronous calls
+  //   await Promise.all(
+  //     roles.map(async (role) => {
+  //       const listUsersInGroupInput = {
+  //         groupName: role.GroupName,
+  //       };
+  //       const response = await client.mutations.listUsersInGroup(
+  //         listUsersInGroupInput
+  //       );
+  //       console.log("listusersingroup resp: ", response);
+  //       // Assign to the map with role as the key
+  //       // roleUserMap[role.GroupName] = users;
+  //     })
+  //   );
 
-    return roleUserMap;
-  }
+  //   return roleUserMap;
+  // }
+
   // Fetch and list users
   async function listUsers() {
     try {
@@ -323,13 +324,36 @@ export default function UserList() {
     form.resetFields();
   };
 
-  const handleViewUserDetails = (user: User) => {
+  const handleViewUserDetails = async (user: User) => {
+    if (!user.Roles) {
+      await listGroupsForUser(user);
+    }
     setViewUser(user); // Set the selected user for the view details modal
   };
+
+  async function listGroupsForUser(user: User) {
+    try {
+      const response = await client.mutations.listGroupsForUser({
+        userName: user.Email,
+      });
+
+      if (response.data && typeof response.data === "string") {
+        const parsedData = JSON.parse(response.data);
+        user.Roles =
+          parsedData?.Groups?.map((group: Group) => group.GroupName) || [];
+        console.log("user roles: ", user.Roles);
+      }
+    } catch (error) {
+      console.error("Error fetching groups for user:", user.Email);
+    }
+  }
 
   const handleEditUser = async (user: User) => {
     try {
       setMode("edit");
+      if (!user.Roles) {
+        await listGroupsForUser(user);
+      }
       setEditUserData(user);
       setIsEditModalVisible(true);
     } catch (error) {
@@ -638,11 +662,7 @@ export default function UserList() {
               <strong>Family Name:</strong> {viewUser.FamilyName}
             </p>
             <p>
-              <strong>Roles:</strong>{" "}
-              {getEntityNames(
-                getAttributeValue(viewUser.Attributes, "custom:projects"),
-                projects
-              )}
+              <strong>Roles:</strong> {convertArrayToTags(viewUser.Roles)}
             </p>
             <p>
               <strong>Enabled:</strong> {viewUser.Enabled ? "Yes" : "No"}
@@ -771,7 +791,7 @@ const UserModal: React.FC<UserModalProps> = ({
 
   const title = mode === "create" ? "Create User" : "Edit User";
 
-  const handleFinish = async (values: any) => {
+  const handleFinish = async (values: any, initialValues: any) => {
     // onSubmit(values);
     try {
       // Update user with initial details
@@ -797,6 +817,50 @@ const UserModal: React.FC<UserModalProps> = ({
       //     console.log(`User added to group: ${role}`);
       //   }
       // }
+      // Extract the roles from the values and initialValues
+      const currentRoles = values.roles || [];
+      const previousRoles = initialValues.Roles || [];
+
+      // Find roles that have been added (present in currentRoles but not in previousRoles)
+      const rolesToAdd = currentRoles.filter(
+        (role: string) => !previousRoles.includes(role)
+      );
+
+      // Find roles that have been removed (present in previousRoles but not in currentRoles)
+      const rolesToRemove = previousRoles.filter(
+        (role: string) => !currentRoles.includes(role)
+      );
+
+      // Call the removeUserFromGroup mutation for each role removed
+      for (const role of rolesToRemove) {
+        try {
+          const removeUserFromGroupInput = {
+            userName: values.email,
+            groupName: role,
+          };
+          console.log("removing group: ", removeUserFromGroupInput);
+          await client.mutations.removeUserFromGroup(removeUserFromGroupInput);
+        } catch (error) {
+          console.error(
+            `Failed to remove user from group for role: ${role}`,
+            error
+          );
+        }
+      }
+
+      // Call the addUserToGroup mutation for each role added
+      for (const role of rolesToAdd) {
+        try {
+          const addUserToGroupInput = {
+            userName: values.email,
+            groupName: role,
+          };
+          console.log("adding group: ", addUserToGroupInput);
+          await client.mutations.addUserToGroup(addUserToGroupInput);
+        } catch (error) {
+          console.error(`Failed to add user to group for role: ${role}`, error);
+        }
+      }
 
       message.success("User updated successfully");
       form.resetFields();
@@ -835,11 +899,9 @@ const UserModal: React.FC<UserModalProps> = ({
             "custom:regions"
           ),
 
-          roles:
-            initialValues.roles ||
-            (roles.length > 0 ? [roles[0].GroupName] : []),
+          roles: initialValues.Roles,
         }}
-        onFinish={handleFinish}
+        onFinish={(values) => handleFinish(values, initialValues)}
       >
         <Form.Item
           label="Email"
@@ -948,6 +1010,19 @@ const UserModal: React.FC<UserModalProps> = ({
     </Modal>
   );
 };
+
+function convertArrayToTags(arr: string[] | undefined) {
+  if (arr) {
+    return arr
+      .map((elm) => {
+        if (elm) {
+          return <Tag key={elm}>{elm}</Tag>; // Return a Tag for each found entity
+        }
+        return <></>; // If not found, return null
+      })
+      .filter(Boolean);
+  }
+}
 
 // Helper function to get the attribute value from user's attributes array
 const getAttributeValue = (

@@ -2,6 +2,7 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 import { listGroups } from "./groups/list-groups/resource";
 import { addUserToGroup } from "./groups/add-user-to-group/resource";
+import { removeUserFromGroup } from "./groups/remove-user-from-group/resource";
 import { listUsersInGroup } from "./groups/list-users-in-group/resource";
 import { listUsers } from "./users/list-users/resource";
 import { listGroupsForUser } from "./users/list-groups-for-user/resource";
@@ -34,6 +35,15 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.group("admin")])
     .handler(a.handler.function(addUserToGroup))
+    .returns(a.json()),
+  removeUserFromGroup: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+      groupName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(removeUserFromGroup))
     .returns(a.json()),
   listUsersInGroup: a
     .mutation()

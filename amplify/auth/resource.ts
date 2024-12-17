@@ -2,6 +2,7 @@ import { defineAuth } from "@aws-amplify/backend";
 
 import { listGroups } from "../data/groups/list-groups/resource";
 import { addUserToGroup } from "../data/groups/add-user-to-group/resource";
+import { removeUserFromGroup } from "../data/groups/remove-user-from-group/resource";
 import { listUsersInGroup } from "../data/groups/list-users-in-group/resource";
 
 import { listUsers } from "../data/users/list-users/resource";
@@ -40,6 +41,7 @@ export const auth = defineAuth({
   access: (allow) => [
     allow.resource(listGroups).to(["listGroups"]),
     allow.resource(addUserToGroup).to(["addUserToGroup"]),
+    allow.resource(removeUserFromGroup).to(["removeUserFromGroup"]),
     allow.resource(listUsersInGroup).to(["listUsersInGroup"]),
     allow.resource(listUsers).to(["listUsers"]),
     allow.resource(listGroupsForUser).to(["listGroupsForUser"]),
