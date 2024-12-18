@@ -73,7 +73,7 @@ const schema = a.schema({
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
-  Project: a
+    Project: a
     .model({
       name: a.string().required(),
       location: a.string().required(),

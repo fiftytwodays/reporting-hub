@@ -8,16 +8,18 @@ import type {
   SorterResult,
 } from "antd/lib/table/interface";
 
-interface Column {
+interface Column <T = any> {
   key: string;
   title: string;
-  dataIndex: string;
+  dataIndex?: string;
   hidden?: boolean;
+  // render?: (value: any, record: T, index: number) => React.ReactNode;
 }
 
 interface EntityListProps {
   componentRef?: React.RefObject<HTMLDivElement> | null;
   columns?: Column[];
+  mapColumn?: (...args: any[]) => Column | undefined;  // Accepts varying arguments
   data?: any[];
   rowKey?: string;
   totalCount?: number;
@@ -40,6 +42,7 @@ interface EntityListProps {
 const EntityList: React.FC<EntityListProps> = ({
   componentRef = null,
   columns = [],
+  mapColumn = mapToAntDColumns,
   data = [],
   rowKey = "id",
   totalCount = 0,
@@ -59,7 +62,6 @@ const EntityList: React.FC<EntityListProps> = ({
   components = false,
 }) => {
   const visibleColumns = columns.filter((column) => !column?.hidden);
-
   const setSortValue = (sorter: SorterResult<any>) => {
     let sortField: string | undefined;
 
@@ -98,7 +100,7 @@ const EntityList: React.FC<EntityListProps> = ({
           title={() => title}
           loading={isLoading}
           bordered={isBordered}
-          columns={mapToAntDColumns(visibleColumns)} // mapToAntDColumns is assumed to be defined elsewhere
+          columns={mapColumn(visibleColumns)} // mapToAntDColumns is assumed to be defined elsewhere
           dataSource={data}
           rowKey={rowKey}
           rowSelection={
