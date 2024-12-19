@@ -1,7 +1,7 @@
 import { columns } from "../config/columns";
 import { EntityList } from "@/shared/ui/entity-list";
 import type { Project } from "../config/types";
-import generateColumns from "../lib/generate-columns"
+import generateColumns from "../lib/generate-columns";
 
 interface ProjectListProps {
   data: Project[];

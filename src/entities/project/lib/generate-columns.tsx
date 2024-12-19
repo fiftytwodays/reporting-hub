@@ -3,20 +3,24 @@ import { Button } from "antd";
 import styled from "@emotion/styled";
 import { Flex, Space, Typography, Popconfirm } from "antd";
 import { ColumnsType } from "antd/es/table";
+import Item from "antd/es/list/Item";
 
-export interface Column {
+interface Column<T = any> {
   key: string;
-  dataType?: string;
+  title: string;
   type?: string;
+  dataIndex?: string;
+  hidden?: boolean;
+  dataType?: string;
   copyable?: boolean;
-  [key: string]: any; // To support any additional properties in the column definition
+  render?: (value: any, record: T, index: number) => React.ReactNode;
 }
 
 export default function generateColumns<T>(
   columns: Column[],
   handleDelete: (item: T) => void,
   handleEdit: (item: T) => void
-): ColumnsType<T> {
+): Column<T>[] {
   const { Text } = Typography;
 
   return columns.map((column) => ({
