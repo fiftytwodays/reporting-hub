@@ -9,6 +9,7 @@ import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import styled from "@emotion/styled";
 import { signOut, getCurrentUser } from "aws-amplify/auth";
 import useSWR, { mutate } from "swr";
+import { Authenticator } from "@aws-amplify/ui-react";
 
 import { Header, Content, Footer } from "antd/lib/layout/layout";
 
@@ -116,6 +117,7 @@ const AppLayout = ({ children }: LayoutProps) => {
   };
 
   return (
+    <Authenticator>
     <Layout className="" style={{ minHeight: "100vh" }}>
       <Header
         style={{
@@ -177,6 +179,7 @@ const AppLayout = ({ children }: LayoutProps) => {
         Reporting hub ©{new Date().getFullYear()} Created by Fiftytwodays
       </Footer>
     </Layout>
+    </Authenticator>
   );
 };
 
