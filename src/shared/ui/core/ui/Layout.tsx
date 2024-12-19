@@ -39,7 +39,21 @@ const items = [
   },
   {
     key: "yearly-form",
-    label: <Link href="/yearly-form">Yearly form</Link>,
+    label: "Yearly Form",
+    children: [
+      {
+        key: "my-forms",
+        label: <Link href="/yearly-form/my-forms">My Forms</Link>,
+      },
+      {
+        key: "reviewer-view",
+        label: <Link href="/yearly-form/reviewer-view">Reviewer View</Link>,
+      },
+      {
+        key: "approver-view",
+        label: <Link href="/yearly-form/approver-view">Approver View</Link>,
+      },
+    ],
   },
   {
     key: "reports",
