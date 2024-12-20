@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./app.css";
 import AppLayout from "@/shared/ui/core/ui/Layout";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import "@aws-amplify/ui-react/styles.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
