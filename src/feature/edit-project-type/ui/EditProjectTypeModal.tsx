@@ -1,39 +1,39 @@
 import { MessageInstance } from "antd/es/message/interface";
 import { Modal } from "antd";
-import EditRegionForm from "./EditRegionForm";
-import { Region } from "@/entities/region/config/types";
+import { ProjectType } from "@/entities/project-type/config/types";
+import EditProjectTypeForm from "./EditProjectTypeForm";
 
 
-interface EditRegionModalProps {
-  regionDetails: Region;
+interface EditProjectTypeModalProps {
+  projectTypeDetails: ProjectType;
   isModalVisible: boolean;
   setIsModalVisible: (visible: boolean) => void;
   messageApi: MessageInstance;
 }
 
-export default function EditRegionModal({
-  regionDetails,
+export default function EditProjectTypeModal({
+  projectTypeDetails,
   isModalVisible,
   setIsModalVisible,
   messageApi,
-}: EditRegionModalProps) {
+}: EditProjectTypeModalProps) {
   const onModalClose = () => {
     setIsModalVisible(false);
   };
 
   return (
     <Modal
-      title="Edit Region"
+      title="Edit Project type"
       centered
       footer={null}
       open={isModalVisible}
       onCancel={onModalClose}
       destroyOnClose
     >
-      <EditRegionForm
-        onEditRegionModalClose={onModalClose}
+      <EditProjectTypeForm
+        onEditProjectTypeModalClose={onModalClose}
         messageApi={messageApi}
-        regionDetails={regionDetails}
+        projectTypeDetails={projectTypeDetails}
       />
     </Modal>
   );
