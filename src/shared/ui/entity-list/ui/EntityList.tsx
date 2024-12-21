@@ -1,30 +1,17 @@
-import type {
-  SorterResult,
-  TablePaginationConfig,
-} from "antd/lib/table/interface";
-import React from "react";
-import { Space, Table } from "antd";
-import { ColumnsType } from "antd/es/table";
+import { Table, Space } from "antd";
 import styled from "@emotion/styled";
 
 import mapToAntDColumns from "../lib/map-to-antd-columns";
-import { Project } from "@/entities/project/config/types";
+import React from "react";
+import type {
+  TablePaginationConfig,
+  SorterResult,
+} from "antd/lib/table/interface";
 
-interface Column<T = any> {
-  key: string;
-  title: string;
-  type?: string;
-  dataIndex?: string;
-  hidden?: boolean;
-  dataType?: string;
-  copyable?: boolean;
-  render?: (value: any, record: T, index: number) => React.ReactNode;
-}
-
+import type { Column } from "../config/types";
 interface EntityListProps {
   componentRef?: React.RefObject<HTMLDivElement> | null;
   columns?: Column[];
-  mapColumn?: (columns: Column[]) => Column<any>[];
   data?: any[];
   rowKey?: string;
   totalCount?: number;
@@ -47,7 +34,6 @@ interface EntityListProps {
 const EntityList: React.FC<EntityListProps> = ({
   componentRef = null,
   columns = [],
-  mapColumn = mapToAntDColumns,
   data = [],
   rowKey = "id",
   totalCount = 0,
@@ -67,6 +53,7 @@ const EntityList: React.FC<EntityListProps> = ({
   components = false,
 }) => {
   const visibleColumns = columns.filter((column) => !column?.hidden);
+
   const setSortValue = (sorter: SorterResult<any>) => {
     let sortField: string | undefined;
 
@@ -105,7 +92,7 @@ const EntityList: React.FC<EntityListProps> = ({
           title={() => title}
           loading={isLoading}
           bordered={isBordered}
-          columns={mapColumn(visibleColumns)} // mapToAntDColumns is assumed to be defined elsewhere
+          columns={mapToAntDColumns(visibleColumns)}
           dataSource={data}
           rowKey={rowKey}
           rowSelection={
@@ -118,7 +105,7 @@ const EntityList: React.FC<EntityListProps> = ({
           onChange={(
             pagination: TablePaginationConfig,
             _,
-            sorter: SorterResult<any> | SorterResult<any>[],
+            sorter: SorterResult<any> | SorterResult<any>[]
           ) => {
             setSortValue(sorter as SorterResult<any>);
             setPageNo((pagination.current || 1) - 1);

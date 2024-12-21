@@ -10,3 +10,5 @@ export const formatDate = (dateString: string) => {
     hour12: true, // Display in 12-hour format with AM/PM
   });
 };
+
+export default formatDate;
