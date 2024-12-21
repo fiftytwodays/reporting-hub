@@ -14,5 +14,6 @@ export const handler: Handler = async (/* event*/) => {
     UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
   });
   const response = await client.send(command);
+  console.log("the response for group call is", response);
   return response;
 };
