@@ -10,7 +10,7 @@ import { RegionsList } from "@/widgets/regions-list";
 
 Amplify.configure(outputs);
 
-export default function ClusterList() {
+export default function RegionList() {
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
   return (
     <>
