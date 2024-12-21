@@ -1,14 +1,7 @@
 import { formatDate } from "@/shared/lib/format-date";
-import type { User } from "./types";
+import { Column } from "@/shared/ui/entity-list/config/types";
 
-type ColumnConfig<T> = {
-  title: string;
-  dataIndex: keyof T;
-  key: string;
-  render?: (value: any) => string; // Optional render function, taking any type and returning a string
-};
-
-export const columns: ColumnConfig<User>[] = [
+export const columns: Column[] = [
   {
     title: "Username",
     dataIndex: "Username",
@@ -42,4 +35,5 @@ export const columns: ColumnConfig<User>[] = [
     dataIndex: "UserStatus",
     key: "UserStatus",
   },
+  { title: "Actions", actions: ["view", "edit", "delete"], key: "actions" },
 ];

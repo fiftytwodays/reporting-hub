@@ -1,4 +1,4 @@
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
 
@@ -50,6 +50,13 @@ export default function useUsersList({ condition = true }: FetchOptions) {
     key: index,
     Username: user.Username,
     Email: getAttributeValue(user?.Attributes ?? [], "email"),
+    EmailVerified: getAttributeValue(user?.Attributes ?? [], "email_verified"),
+    FamilyName: getAttributeValue(user?.Attributes ?? [], "family_name"),
+    GivenName: getAttributeValue(user?.Attributes ?? [], "given_name"),
+    Projects: getAttributeValue(user?.Attributes ?? [], "custom:projects"),
+    Clusters: getAttributeValue(user?.Attributes ?? [], "custom:clusters"),
+    Regions: getAttributeValue(user?.Attributes ?? [], "custom:regions"),
+    Sub: getAttributeValue(user?.Attributes ?? [], "sub"),
     Enabled: user.Enabled,
     UserCreateDate: user.UserCreateDate,
     UserLastModifiedDate: user.UserLastModifiedDate,
