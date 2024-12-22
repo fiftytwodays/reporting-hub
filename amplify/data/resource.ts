@@ -90,12 +90,12 @@ const schema = a.schema({
     Organization: a
     .model({
       name: a.string().required(),
-      website: a.string().required(),
+      website: a.string(),
       address: a.string().required(),
       logo: a.string(),
       phoneNumber: a.string().required(),
       email: a.string().required(),
-      description: a.string().required(),
+      description: a.string(),
       history: a.string(),
       mission: a.string(),
       vision: a.string(),
