@@ -87,6 +87,33 @@ const schema = a.schema({
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
+    Organization: a
+    .model({
+      name: a.string().required(),
+      website: a.string(),
+      address: a.string(),
+      logo: a.string(),
+      phoneNumber: a.string(),
+      email: a.string(),
+      description: a.string(),
+      history: a.string(),
+      mission: a.string(),
+      vision: a.string(),
+      coreValues: a.string(),
+    })
+    .authorization((allow) => [
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
+    ]),
+    Document: a
+    .model({
+      name: a.string().required(),
+      document: a.string().required(),
+    })
+    .authorization((allow) => [
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
+    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

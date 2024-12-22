@@ -90,6 +90,10 @@ const items = [
         key: "functional-area",
         label: <Link href="/settings/functional-area">Functional area</Link>,
       },
+      {
+        key: "organization",
+        label: <Link href="/settings/organization">Organization</Link>,
+      },
     ],
   },
 ];
