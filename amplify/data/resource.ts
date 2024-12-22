@@ -91,10 +91,10 @@ const schema = a.schema({
     .model({
       name: a.string().required(),
       website: a.string(),
-      address: a.string().required(),
+      address: a.string(),
       logo: a.string(),
-      phoneNumber: a.string().required(),
-      email: a.string().required(),
+      phoneNumber: a.string(),
+      email: a.string(),
       description: a.string(),
       history: a.string(),
       mission: a.string(),

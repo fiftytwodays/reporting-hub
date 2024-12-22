@@ -251,23 +251,21 @@ const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
             {renderTextField("Name", "name", [{ required: true }])}
           </Col>
           <Col xs={24} sm={12}>
-            {renderTextField("Website", "website", [{ required: true }])}
+            {renderTextField("Website", "website")}
           </Col>
         </Row>
         <Row gutter={24}>
           <Col xs={24} sm={12}>
-            {renderTextField("Address", "address", [{ required: true }])}
+            {renderTextField("Address", "address")}
           </Col>
           <Col xs={24} sm={12}>
-            {renderTextField("Phone Number", "phoneNumber", [
-              { required: true },
-            ])}
+            {renderTextField("Phone Number", "phoneNumber")}
           </Col>
         </Row>
         <Row gutter={24}>
           <Col xs={24} sm={12}>
             {renderTextField("Email", "email", [
-              { required: true, type: "email" },
+              {type: "email" },
             ])}
           </Col>
         </Row>
