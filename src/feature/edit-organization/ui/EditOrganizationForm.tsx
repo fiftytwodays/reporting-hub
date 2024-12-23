@@ -1,36 +1,25 @@
-import React, { useEffect, useState } from "react";
+import useOrganizationsList from "@/entities/organization/api/oganization-list";
+import { Organization } from "@/entities/organization/config/types";
+import { UploadOutlined } from "@ant-design/icons";
 import {
+  Button,
+  Col,
   Form,
   Input,
-  Button,
   Row,
-  Col,
-  Space,
-  Flex,
-  UploadFile,
   Skeleton,
+  Space,
+  UploadFile,
 } from "antd";
-import { Organization } from "@/entities/organization/config/types";
-import useOrganizationsList from "@/entities/organization/api/oganization-list";
-import useUpdateOrganzation from "../api/update-organization";
-import useCreateOrganzation from "@/feature/create-organization/api/create-organization";
-import useUploadDocument from "@/feature/upload-document/api/upload-document";
-import useDeleteDocument from "@/feature/delete-document/api/delete-document";
 import Upload, { RcFile } from "antd/es/upload";
-import { UploadOutlined } from "@ant-design/icons";
-import useGetDocument from "@/feature/get-document/api/get-document";
+import React, { useEffect, useState } from "react";
+import useUpdateOrganzation from "../api/update-organization";
 
-interface Document {
-  id: string;
-  name: string;
-  document: string;
-}
-
-interface EditClusterFormProps {
+interface EditOrganizationFormProps {
+  setIsEditing: (status: boolean) => void;
+  isEditing: boolean;
   isLoading: boolean;
-  onEditOrganizationModalClose: () => void;
   organizationDetails: Organization;
-  document: Document | undefined;
   messageApi: {
     success: (message: string) => void;
     error: (message: string) => void;
@@ -63,59 +52,46 @@ enum UploadFileStatus {
   "error" = "error",
 }
 
-interface UploadDocumentInput {
-  name: string;
-  document: string;
-}
-
-const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
+const EditOrganizationForm: React.FC<EditOrganizationFormProps> = ({
+  setIsEditing,
+  isEditing,
   isLoading,
   organizationDetails,
-  document,
-  onEditOrganizationModalClose,
   messageApi,
 }) => {
   const [form] = Form.useForm<FormValues>();
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [uploadedDocumentState, setUploadedDocumentState] = useState<
-    string | null
-  >(null);
+  const [fileListInitial, setFileListInitial] = useState<UploadFile[]>([]);
+
+  const [uploadedDocument, setUploadedDocument] = useState<string | null>(
+    organizationDetails.logo
+  );
 
   const { reloadOrganizationList } = useOrganizationsList({ condition: true });
-  const { uploadDocument } = useUploadDocument();
-  const { deleteDocument } = useDeleteDocument();
   const { updateOrganzation, isUpdating } = useUpdateOrganzation();
 
   useEffect(() => {
-    if (!document) {
-      setFileList([]);
-    }
-    if (document && document.document) {
-      const base64String = document.document; // Assuming this contains the base64 image data
+    if (organizationDetails.logo !== "") {
+      const base64String = organizationDetails.logo; // Assuming this contains the base64 image data
       const fileObj: UploadFile = {
-        uid: organizationDetails.logo, // Use unique ID
-        name: document.name, // File name
+        uid: organizationDetails.id, // Use unique ID
+        name: "logo", // File name
         status: "done", // Upload status
         url: `${base64String}`, // Convert base64 to a data URL
         preview: `${base64String}`,
       };
+      setFileListInitial([fileObj]);
       setFileList([fileObj]);
-      setUploadedDocumentState(organizationDetails.logo); // Set the document ID
       form.setFieldsValue({ logo: organizationDetails.logo });
     }
-  }, [document, organizationDetails.logo, form]);
+  }, [organizationDetails?.logo, form]);
 
   const validateMessages = {
     required: "${label} is required",
     types: {
       email: "Please enter a valid email",
     },
-  };
-
-  const formLayout = {
-    labelCol: { span: 24 },
-    wrapperCol: { span: 24 },
   };
 
   const customRequest = ({
@@ -129,34 +105,21 @@ const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
       reader.onload = async () => {
         const base64String = reader.result as string;
 
-        const uploadPayload: UploadDocumentInput = {
+        const fileObj: UploadFile = {
+          uid: (file as RcFile).uid,
           name: (file as RcFile).name,
-          document: base64String,
+          status: UploadFileStatus.done,
+          url: base64String,
         };
 
-        const response = await uploadDocument(uploadPayload);
-
-        const uploadedDocumentId = response.id;
-
-        if (uploadedDocumentId) {
-          const fileObj: UploadFile = {
-            uid: (file as RcFile).uid,
-            name: (file as RcFile).name,
-            status: UploadFileStatus.done,
-            url: base64String,
-          };
-
-          setUploadedDocumentState(uploadedDocumentId);
-
-          form.setFieldsValue({ logo: uploadedDocumentId });
-
-          setFileList((prevFileList) => [...prevFileList, fileObj]);
-        }
-
-        if (onSuccess) {
-          onSuccess({ status: "done" });
-        }
+        form.setFieldsValue({ logo: base64String });
+        setUploadedDocument(base64String);
+        setFileList((prevFileList) => [...prevFileList, fileObj]);
       };
+
+      if (onSuccess) {
+        onSuccess({ status: "done" });
+      }
 
       reader.onerror = (error) => {
         if (onError) {
@@ -175,10 +138,9 @@ const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
   const handleFinish = async (values: FormValues) => {
     const payload = {
       ...values,
-      logo: fileList ? uploadedDocumentState ?? "" : "",
+      logo: fileList ? uploadedDocument ?? "" : "",
       id: organizationDetails.id,
     };
-
     try {
       const data = await updateOrganzation(payload);
       if (data) {
@@ -186,8 +148,8 @@ const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
         reloadOrganizationList();
         form.resetFields();
         setFileList([]);
-        setUploadedDocumentState(null);
-        onEditOrganizationModalClose();
+        setUploadedDocument(null);
+        setIsEditing(false);
       }
     } catch (error) {
       messageApi.error("Unable to update the organization. Please try again.");
@@ -195,14 +157,9 @@ const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
   };
 
   const handleRemove = () => {
-    deleteDocument({ id: uploadedDocumentState ?? "" });
     setFileList([]);
     form.setFieldValue("logo", "");
-    setUploadedDocumentState(null);
-  };
-
-  const handleReset = () => {
-    form.resetFields();
+    setUploadedDocument(null);
   };
 
   const renderTextField = (
@@ -235,6 +192,7 @@ const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
   return (
     <Skeleton loading={isLoading}>
       <Form
+        disabled={!isEditing}
         form={form}
         initialValues={organizationDetails}
         onFinish={handleFinish}
@@ -242,7 +200,7 @@ const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
           form.resetFields();
           setFileList([]);
           form.setFieldValue("logo", "");
-          setUploadedDocumentState(null);
+          setUploadedDocument(null);
         }}
         validateMessages={validateMessages}
       >
@@ -264,9 +222,7 @@ const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
         </Row>
         <Row gutter={24}>
           <Col xs={24} sm={12}>
-            {renderTextField("Email", "email", [
-              {type: "email" },
-            ])}
+            {renderTextField("Email", "email", [{ type: "email" }])}
           </Col>
         </Row>
         <Row gutter={24}>
@@ -311,11 +267,23 @@ const EditOrganizationForm: React.FC<EditClusterFormProps> = ({
           </Col>
         </Row>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <Button type="default" onClick={() => form.resetFields()}>
+          <Button
+            type="default"
+            onClick={() => {
+              form.resetFields();
+              setFileList(fileListInitial);
+            }}
+          >
             Reset
           </Button>
           <Space>
-            <Button onClick={onEditOrganizationModalClose} type="default">
+            <Button
+              type="default"
+              onClick={() => {
+                setIsEditing(false);
+                setFileList(fileListInitial);
+              }}
+            >
               Cancel
             </Button>
             <Button type="primary" htmlType="submit" loading={isUpdating}>

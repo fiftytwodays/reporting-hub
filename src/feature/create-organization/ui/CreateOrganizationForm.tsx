@@ -1,26 +1,15 @@
-import { Button, Col, Form, Input, Row, Space, Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import { useState } from "react";
 import useOrganizationsList from "@/entities/organization/api/oganization-list";
+import { UploadOutlined } from "@ant-design/icons";
+import { Button, Col, Form, Input, Row, Space, Upload } from "antd";
+import { RcFile, UploadFile } from "antd/es/upload/interface";
+import { useState } from "react";
 import useCreateOrganzation from "../api/create-organization";
-import useUploadDocument from "@/feature/upload-document/api/upload-document";
-import {
-  RcFile,
-  UploadFile,
-} from "antd/es/upload/interface";
-import useDeleteDocument from "@/feature/delete-document/api/delete-document";
 
 interface CreateOrganizationFormProps {
-  onCreateOrganizationModalClose: () => void;
   messageApi: {
     success: (message: string) => void;
     error: (message: string) => void;
   };
-}
-
-interface UploadDocumentInput {
-  name: string;
-  document: string;
 }
 
 interface FormValues {
@@ -50,7 +39,6 @@ interface CustomRequestProps {
 }
 
 const CreateOrganizationForm: React.FC<CreateOrganizationFormProps> = ({
-  onCreateOrganizationModalClose,
   messageApi,
 }) => {
   const [form] = Form.useForm<FormValues>();
@@ -61,8 +49,6 @@ const CreateOrganizationForm: React.FC<CreateOrganizationFormProps> = ({
 
   const { reloadOrganizationList } = useOrganizationsList({ condition: true });
   const { createOrganzation, isCreating } = useCreateOrganzation();
-  const { uploadDocument } = useUploadDocument();
-  const { deleteDocument } = useDeleteDocument();
 
   const validateMessages = {
     required: "${label} is required",
@@ -82,34 +68,22 @@ const CreateOrganizationForm: React.FC<CreateOrganizationFormProps> = ({
       reader.onload = async () => {
         const base64String = reader.result as string;
 
-        const uploadPayload: UploadDocumentInput = {
+        const fileObj: UploadFile = {
+          uid: (file as RcFile).uid,
           name: (file as RcFile).name,
-          document: base64String,
+          status: UploadFileStatus.done,
+          url: base64String,
         };
+        setUploadedDocumentState(base64String);
 
-        const response = await uploadDocument(uploadPayload);
+        form.setFieldsValue({ logo: base64String });
 
-        const uploadedDocumentId = response.id;
-
-        if (uploadedDocumentId) {
-          const fileObj: UploadFile = {
-            uid: (file as RcFile).uid,
-            name: (file as RcFile).name,
-            status: UploadFileStatus.done,
-            url: base64String,
-          };
-
-          setUploadedDocumentState(uploadedDocumentId);
-
-          form.setFieldsValue({ logo: uploadedDocumentId });
-
-          setFileList((prevFileList) => [...prevFileList, fileObj]);
-        }
-
-        if (onSuccess) {
-          onSuccess({ status: "done" });
-        }
+        setFileList((prevFileList) => [...prevFileList, fileObj]);
       };
+
+      if (onSuccess) {
+        onSuccess({ status: "done" });
+      }
 
       reader.onerror = (error) => {
         if (onError) {
@@ -139,7 +113,6 @@ const CreateOrganizationForm: React.FC<CreateOrganizationFormProps> = ({
         form.resetFields();
         setFileList([]);
         setUploadedDocumentState(null);
-        onCreateOrganizationModalClose();
       }
     } catch (error) {
       messageApi.error("Unable to add the organization. Please try again.");
@@ -147,7 +120,6 @@ const CreateOrganizationForm: React.FC<CreateOrganizationFormProps> = ({
   };
 
   const handleRemove = () => {
-    deleteDocument({ id: uploadedDocumentState ?? "" });
     setFileList([]);
     form.setFieldValue("logo", "");
     setUploadedDocumentState(null);
@@ -204,9 +176,7 @@ const CreateOrganizationForm: React.FC<CreateOrganizationFormProps> = ({
       </Row>
       <Row gutter={24}>
         <Col xs={24} sm={12}>
-          {renderTextField("Email", "email", [
-            { type: "email" },
-          ])}
+          {renderTextField("Email", "email", [{ type: "email" }])}
         </Col>
       </Row>
       <Row gutter={24}>
@@ -251,12 +221,9 @@ const CreateOrganizationForm: React.FC<CreateOrganizationFormProps> = ({
         </Col>
       </Row>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <Button type="default" onClick={() => form.resetFields()}>
-          Reset
-        </Button>
         <Space>
-          <Button onClick={onCreateOrganizationModalClose} type="default">
-            Cancel
+          <Button type="default" onClick={() => form.resetFields()}>
+            Reset
           </Button>
           <Button type="primary" htmlType="submit" loading={isCreating}>
             Save

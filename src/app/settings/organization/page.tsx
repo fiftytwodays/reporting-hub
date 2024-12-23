@@ -2,10 +2,12 @@
 
 import { Amplify } from "aws-amplify";
 
-import { message } from "antd";
-import outputs from "@root/amplify_outputs.json";
 import Page from "@/shared/ui/page/ui/Page";
 import { OrganizationsList } from "@/widgets/organizations-list";
+import outputs from "@root/amplify_outputs.json";
+import { message } from "antd";
+import { useState } from "react";
+import { EditButton } from "@/feature/edit-organization";
 
 Amplify.configure(outputs);
 
@@ -14,6 +16,9 @@ export default function OrganizationList() {
     maxCount: 1,
     duration: 2,
   });
+
+  const [isEditing, setIsEditing] = useState(false);
+
   return (
     <>
       {contextHolder}
@@ -32,8 +37,14 @@ export default function OrganizationList() {
               href: "/settings/organization",
             },
           ],
+          extra: <EditButton setIsEditing={setIsEditing} />,
         }}
-        content={<OrganizationsList />}
+        content={
+          <OrganizationsList
+            setIsEditing={setIsEditing}
+            isEditing={isEditing}
+          />
+        }
       />
     </>
   );
