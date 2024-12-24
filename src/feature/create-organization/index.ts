@@ -1,1 +1,1 @@
-export { default as CreateOrganizationModal } from "./ui/CreateOrganizationModal";
+export { default as CreateOrganizationForm } from "./ui/CreateOrganizationForm";

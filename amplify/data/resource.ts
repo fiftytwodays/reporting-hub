@@ -105,15 +105,6 @@ const schema = a.schema({
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
-    Document: a
-    .model({
-      name: a.string().required(),
-      document: a.string().required(),
-    })
-    .authorization((allow) => [
-      allow.authenticated().to(["read"]),
-      allow.groups(["admin"]),
-    ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

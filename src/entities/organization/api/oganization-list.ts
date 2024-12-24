@@ -9,10 +9,10 @@ interface FetchOptions {
 }
 
 interface ApiResponse {
-  Organizations: Organization[];
+  Organizations: Organization;
 }
 
-export default function useOrganizationsList({
+export default function useOrganization({
   condition = true,
 }: FetchOptions) {
   const client = generateClient<Schema>();
@@ -20,24 +20,21 @@ export default function useOrganizationsList({
   const fetcher = async () => {
     const response = await client.models.Organization.list();
     if (response?.data) {
-      const organizations = await Promise.all(
-        response.data.map(async (organization) => {
-          return {
-            id: organization.id ?? "",
-            name: organization.name ?? "",
-            website: organization.website ?? "",
-            address: organization.address ?? "",
-            phoneNumber: organization.phoneNumber ?? "",
-            email: organization.email ?? "",
-            description: organization.description ?? "",
-            history: organization.history ?? "",
-            mission: organization.mission ?? "",
-            vision: organization.vision ?? "",
-            coreValues: organization.coreValues ?? "",
-            logo: organization.logo ?? "",
+      const organizations = 
+          {
+            id: response.data.at(0)?.id ?? "",
+            name: response.data.at(0)?.name ?? "",
+            website: response.data.at(0)?.website ?? "",
+            address: response.data.at(0)?.address ?? "",
+            phoneNumber: response.data.at(0)?.phoneNumber ?? "",
+            email: response.data.at(0)?.email ?? "",
+            description: response.data.at(0)?.description ?? "",
+            history: response.data.at(0)?.history ?? "",
+            mission: response.data.at(0)?.mission ?? "",
+            vision: response.data.at(0)?.vision ?? "",
+            coreValues: response.data.at(0)?.coreValues ?? "",
+            logo: response.data.at(0)?.logo ?? "",
           };
-        })
-      );
 
       const apiResponse: ApiResponse = {
         Organizations: organizations,
@@ -68,23 +65,9 @@ export default function useOrganizationsList({
     );
   };
 
-  const organizationsData = data?.Organizations?.map((organization, index) => ({
-    key: index,
-    id: organization.id ?? "",
-    name: organization.name ?? "",
-    website: organization.website ?? "",
-    address: organization.address ?? "",
-    phoneNumber: organization.phoneNumber ?? "",
-    email: organization.email ?? "",
-    description: organization.description ?? "",
-    history: organization.history ?? "",
-    mission: organization.mission ?? "",
-    vision: organization.vision ?? "",
-    coreValues: organization.coreValues ?? "",
-    logo: organization.logo ?? "",
-  }));
+  const organizationsData = data?.Organizations
   return {
-    organizationsList: organizationsData ?? [],
+    organizationsList: organizationsData,
     isOrganizationsListLoading: isLoading,
     isOrganziationsListError: error,
     reloadOrganizationList,

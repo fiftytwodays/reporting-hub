@@ -1,1 +1,2 @@
-export { default as EditOrganizationModal } from "./ui/EditOrganizationModal";
+export { default as EditOrganizationForm } from "./ui/EditOrganizationForm";
+export { default as EditButton } from "./ui/EditButton"
