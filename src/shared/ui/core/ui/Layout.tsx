@@ -1,17 +1,16 @@
 "use client";
 
-import React from "react";
-import { Layout, Menu, Dropdown, Button, Avatar, Typography } from "antd";
+import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { Authenticator } from "@aws-amplify/ui-react";
+import styled from "@emotion/styled";
 import type { MenuProps } from "antd";
+import { Avatar, Button, Dropdown, Layout, Menu, Typography } from "antd";
+import { getCurrentUser, signOut } from "aws-amplify/auth";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
-import styled from "@emotion/styled";
-import { signOut, getCurrentUser } from "aws-amplify/auth";
 import useSWR, { mutate } from "swr";
-import { Authenticator } from "@aws-amplify/ui-react";
 
-import { Header, Content, Footer } from "antd/lib/layout/layout";
+import { Content, Footer, Header } from "antd/lib/layout/layout";
 
 interface LayoutProps {
   children: any;
@@ -96,6 +95,10 @@ const items = [
       },
     ],
   },
+  {
+    key: "about-us",
+    label: <Link href="/about-us">About us</Link>,
+  },
 ];
 
 const useMenuItems: MenuProps["items"] = [
@@ -122,67 +125,67 @@ const AppLayout = ({ children }: LayoutProps) => {
 
   return (
     <Authenticator>
-    <Layout className="" style={{ minHeight: "100vh" }}>
-      <Header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "2rem",
-          padding: "2rem",
-        }}
-      >
-        <Title level={4} style={{ margin: 0, color: "#fff" }}>
-          Reporting Hub
-        </Title>
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          selectedKeys={[menuName]}
-          items={items}
+      <Layout className="" style={{ minHeight: "100vh" }}>
+        <Header
           style={{
-            flex: 1,
-            minWidth: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "2rem",
+            padding: "2rem",
           }}
-        />
-        {userData ? (
-          <Dropdown
-            menu={{
-              items: useMenuItems,
-              onClick: handleMenuClick,
+        >
+          <Title level={4} style={{ margin: 0, color: "#fff" }}>
+            Reporting Hub
+          </Title>
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            selectedKeys={[menuName]}
+            items={items}
+            style={{
+              flex: 1,
+              minWidth: 0,
             }}
-            placement="bottomLeft"
-            arrow
-          >
-            <Button
-              type="text"
-              icon={<_Avatar size="small" icon={<UserOutlined />} />}
+          />
+          {userData ? (
+            <Dropdown
+              menu={{
+                items: useMenuItems,
+                onClick: handleMenuClick,
+              }}
+              placement="bottomLeft"
+              arrow
             >
-              <Text style={{ color: "#fff" }}>
-                {userData?.signInDetails?.loginId}
-              </Text>
-            </Button>
-          </Dropdown>
-        ) : (
-          <Link href="/login">
-            <Button
-              type="text"
-              icon={<_Avatar size="small" icon={<UserOutlined />} />}
-            >
-              <Text style={{ color: "#fff" }}>Sign in</Text>
-            </Button>
-          </Link>
-        )}
-      </Header>
-      <Content style={layoutStyle}>{children}</Content>
-      <Footer
-        style={{
-          textAlign: "center",
-        }}
-      >
-        Reporting hub ©{new Date().getFullYear()} Created by Fiftytwodays
-      </Footer>
-    </Layout>
+              <Button
+                type="text"
+                icon={<_Avatar size="small" icon={<UserOutlined />} />}
+              >
+                <Text style={{ color: "#fff" }}>
+                  {userData?.signInDetails?.loginId}
+                </Text>
+              </Button>
+            </Dropdown>
+          ) : (
+            <Link href="/login">
+              <Button
+                type="text"
+                icon={<_Avatar size="small" icon={<UserOutlined />} />}
+              >
+                <Text style={{ color: "#fff" }}>Sign in</Text>
+              </Button>
+            </Link>
+          )}
+        </Header>
+        <Content style={layoutStyle}>{children}</Content>
+        <Footer
+          style={{
+            textAlign: "center",
+          }}
+        >
+          Reporting hub ©{new Date().getFullYear()} Created by Fiftytwodays
+        </Footer>
+      </Layout>
     </Authenticator>
   );
 };

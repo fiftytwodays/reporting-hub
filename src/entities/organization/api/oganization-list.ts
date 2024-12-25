@@ -1,6 +1,8 @@
-import useSWR, { mutate } from "swr";
+import useSWR from "swr";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
+import { mutate } from 'swr'; // Correct for SWR < 2.0 or SWR with named exports
+
 
 import type { Organization } from "../config/types";
 
