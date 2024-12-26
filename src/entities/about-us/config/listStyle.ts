@@ -1,13 +1,10 @@
 export const listStyle: React.CSSProperties = {
-  color: "#fff",
-  textAlign: "left",
-  justifyItems: "center",
-  fontFamily: "'Quicksand', sans-serif", // Updated to Quicksand font
-  fontWeight: "normal", // Normal weight for content text
+  color: "#000",
+  textAlign: "justify",
+  fontFamily: "'Quicksand', sans-serif",
+  fontWeight: "normal",
   fontSize: "18px",
-  lineHeight: "1.8",
-  padding: "0",
-  margin: "0 auto",
-  width: "60%", // Restrict width for better focus
-  marginTop: "60px", // Added margin-top for spacing between content and title
+  lineHeight: "1.5",
+  paddingLeft: "20px", // Removed padding
+  marginTop: "10px"
 };

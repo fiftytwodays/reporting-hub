@@ -1,12 +1,10 @@
 export const contentStyle: React.CSSProperties = {
-  color: "#fff",
-  textAlign: "center",
-  fontFamily: "'Quicksand', sans-serif", // Updated to Quicksand font
-  fontWeight: "normal", // Normal weight for content text
+  color: "#000",
+  textAlign: "justify",
+  fontFamily: "'Quicksand', sans-serif",
+  fontWeight: "normal",
   fontSize: "18px",
-  lineHeight: "1.8",
-  padding: "0 20px",
-  margin: "0 auto",
-  width: "60%", // Restrict width for better focus
-  marginTop: "60px", // Added margin-top for spacing between content and title
+  lineHeight: "1.5",
+  padding: "0", // Removed padding
+  marginTop: "10px", // Added top spacing
 };
