@@ -53,6 +53,10 @@ export default function UserAdd({ isLoading }: UserAddProps) {
     onModalOk();
   };
 
+  const sortedRoleList = roleList.sort(
+    (a: any, b: any) => a.Precedence - b.Precedence
+  );
+
   const handleFinish = async (values: any) => {
     const input = {
       ...values,
@@ -126,7 +130,8 @@ export default function UserAdd({ isLoading }: UserAddProps) {
           layout="vertical"
           onFinish={handleFinish}
           initialValues={{
-            roles: roleList.length > 0 ? [roleList[0].GroupName] : [], // Set default role
+            roles:
+              sortedRoleList.length > 0 ? [sortedRoleList[0].GroupName] : [],
           }}
         >
           <Form.Item
@@ -150,7 +155,7 @@ export default function UserAdd({ isLoading }: UserAddProps) {
           >
             <Select
               mode="multiple"
-              options={roleList?.map((role: UserGroup) => ({
+              options={sortedRoleList?.map((role: UserGroup) => ({
                 value: role.GroupName,
                 label: role.GroupName,
               }))}
@@ -158,7 +163,7 @@ export default function UserAdd({ isLoading }: UserAddProps) {
           </Form.Item>
 
           <Form.Item
-            label="Given Name"
+            label="Given name"
             name="givenName"
             rules={[
               { required: true, message: "Please input the given name!" },
@@ -168,7 +173,7 @@ export default function UserAdd({ isLoading }: UserAddProps) {
           </Form.Item>
 
           <Form.Item
-            label="Family Name"
+            label="Family name"
             name="familyName"
             rules={[
               { required: true, message: "Please input the family name!" },
@@ -185,7 +190,7 @@ export default function UserAdd({ isLoading }: UserAddProps) {
             <Input.Password />
           </Form.Item>
           <Form.Item name="isPermanent" valuePropName="checked">
-            <Checkbox>Set Password as Permanent</Checkbox>
+            <Checkbox>Set password as permanent</Checkbox>
           </Form.Item>
 
           <Form.Item label="Projects" name="projects">

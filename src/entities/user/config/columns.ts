@@ -3,12 +3,12 @@ import { Column } from "@/shared/ui/entity-list/config/types";
 
 export const columns: Column[] = [
   {
-    title: "Given Name",
+    title: "Given name",
     dataIndex: "GivenName",
     key: "GivenName",
   },
   {
-    title: "Family Name",
+    title: "Family name",
     dataIndex: "FamilyName",
     key: "FamilyName",
   },
@@ -24,7 +24,7 @@ export const columns: Column[] = [
     render: (enabled: boolean) => (enabled ? "Yes" : "No"),
   },
   {
-    title: "User Status",
+    title: "User status",
     dataIndex: "UserStatus",
     key: "UserStatus",
   },

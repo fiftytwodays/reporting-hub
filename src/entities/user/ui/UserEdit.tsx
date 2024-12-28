@@ -207,7 +207,7 @@ export default function UserEdit({
           </Form.Item>
 
           <Form.Item
-            label="Given Name"
+            label="Given name"
             name="givenName"
             rules={[
               { required: true, message: "Please input the given name!" },
@@ -217,7 +217,7 @@ export default function UserEdit({
           </Form.Item>
 
           <Form.Item
-            label="Family Name"
+            label="Family name"
             name="familyName"
             rules={[
               { required: true, message: "Please input the family name!" },
