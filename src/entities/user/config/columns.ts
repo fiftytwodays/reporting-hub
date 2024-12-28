@@ -35,5 +35,9 @@ export const columns: Column[] = [
     dataIndex: "UserStatus",
     key: "UserStatus",
   },
-  { title: "Actions", actions: ["view", "edit", "delete"], key: "actions" },
+  {
+    title: "Actions",
+    actions: ["view", "edit", "reset-password", "disable", "enable", "delete"],
+    key: "actions",
+  },
 ];

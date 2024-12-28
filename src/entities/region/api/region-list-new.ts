@@ -17,15 +17,15 @@ export default function useRegionList({
   condition = true,
   filter = {},
 }: FetchOptions) {
-  const { data, error, isValidating } = useSWR(
+  const { data, error, isLoading } = useSWR(
     condition ? ["/api/region-list", filter] : null,
     ([, filter]) => fetchRegionList(filter),
     { keepPreviousData: true }
   );
 
   return {
-    regionList: data || [],
-    isRegionListLoading: isValidating,
+    regionList: condition ? data : [],
+    isRegionListLoading: isLoading,
     regionListError: error,
   };
 }
