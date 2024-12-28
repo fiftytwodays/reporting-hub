@@ -1,14 +1,13 @@
+import { useState } from "react";
 import { Modal, Form, Input, message, Checkbox } from "antd";
 import { generateClient } from "aws-amplify/data";
 import { mutate } from "swr";
 
 import type { Schema } from "@root/amplify/data/resource";
-
 import type { User } from "../config/types";
 
 interface UserResetPasswordProps {
   userData: User | undefined;
-
   isLoading?: boolean;
   isModalOpen: boolean;
   onModalOk: () => void;
@@ -23,23 +22,20 @@ export default function UserResetPassword({
 }: UserResetPasswordProps) {
   const [form] = Form.useForm();
   const client = generateClient<Schema>();
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
 
   const [messageApi, contextHolder] = message.useMessage();
 
   const handleOk = () => {
-    console.log("trigger");
     form.submit();
-    onModalCancel();
   };
 
   const handleFinish = async (values: any) => {
-    console.log("values: ", values);
     if (values.password !== values.confirm) {
       message.error("Passwords do not match!");
       return;
     }
     try {
-      console.log("values.isPermanent: ", values.isPermanent);
       if (userData) {
         const setPasswordInput = {
           userName: userData?.Email,
@@ -49,43 +45,40 @@ export default function UserResetPassword({
         // Check if password should be set as permanent
         await client.mutations.setUserPassword(setPasswordInput);
         messageApi.success("Password reset completed successfully");
+        onModalOk();
       } else {
         messageApi.error("Error while resetting password: Email is null");
       }
 
       form.resetFields();
+      onModalOk();
     } catch (error) {
-      messageApi.error("Error while resetting password: " + error);
+      messageApi.error("Error resetting password. Please try again.");
     }
-    mutate(["/api/users"]);
+  };
+
+  const handleFieldsChange = () => {
+    const password = form.getFieldValue("password");
+    const confirm = form.getFieldValue("confirm");
+    setPasswordsMatch(password === confirm);
   };
 
   return (
     <>
       {contextHolder}
       <Modal
-        title="Reset user password"
+        title="Reset password"
         open={isModalOpen}
-        okText="Reset password"
-        onCancel={onModalCancel}
         onOk={handleOk}
-        destroyOnClose={true}
+        onCancel={onModalCancel}
+        okButtonProps={{ disabled: !passwordsMatch }}
       >
-        <Form form={form} layout="vertical" onFinish={handleFinish}>
-          {/* <Form.Item
-            label="Current password"
-            name="current-password"
-            dependencies={["password"]}
-            rules={[
-              {
-                required: true,
-                message: "Please input your current password!",
-              },
-            ]}
-          >
-            <Input.Password />
-          </Form.Item> */}
-
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleFinish}
+          onFieldsChange={handleFieldsChange}
+        >
           <Form.Item
             name="password"
             label="Password"
@@ -112,10 +105,9 @@ export default function UserResetPassword({
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (value || getFieldValue("password") === value) {
+                  if (!value || getFieldValue("password") === value) {
                     return Promise.resolve();
                   }
-                  messageApi.error("Passwords do not match!");
                   return Promise.reject(
                     new Error("The new password that you entered do not match!")
                   );
