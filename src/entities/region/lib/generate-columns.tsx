@@ -4,10 +4,10 @@ import styled from "@emotion/styled";
 import { Flex, Space, Typography, Popconfirm } from "antd";
 
 interface Column<T = any> {
-  key: string;
+  key?: string | undefined;
   title: string;
   type?: string;
-  dataIndex?: string;
+  dataIndex?: string | number | symbol | undefined;
   hidden?: boolean;
   dataType?: string;
   copyable?: boolean;

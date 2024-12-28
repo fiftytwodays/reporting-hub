@@ -11,8 +11,8 @@ import type {
 import type { Column } from "../config/types";
 interface EntityListProps {
   componentRef?: React.RefObject<HTMLDivElement> | null;
-  columns?: Column[];
-  mapColumn?: (columns: Column[]) => Column[];
+  columns?: Column<any>[];
+  mapColumn?: (columns: Column<any>[]) => Column<any>[];
   data?: any[];
   rowKey?: string;
   totalCount?: number;

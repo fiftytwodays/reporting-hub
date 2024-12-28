@@ -1,14 +1,14 @@
-export interface Column {
+export interface Column<T = any> {
   key?: string;
   title: string;
-  dataIndex?: string | undefined;
+  dataIndex?: keyof T | undefined;
   hidden?: boolean;
-  render?: (params: any) => any;
-  actions?: String[];
-  onViewAction?: (params: any) => any;
-  onEditAction?: (params: any) => any;
-  onDeleteAction?: (params: any) => any;
-  onResetPasswordAction?: (params: any) => any;
-  onDisableAction?: (params: any) => any;
-  onEnableAction?: (params: any) => any;
+  render?: (params: T) => any;
+  actions?: string[];
+  onViewAction?: (params: T) => any;
+  onEditAction?: (params: T) => any;
+  onDeleteAction?: (params: T) => any;
+  onResetPasswordAction?: (params: T) => any;
+  onDisableAction?: (params: T) => any;
+  onEnableAction?: (params: T) => any;
 }
