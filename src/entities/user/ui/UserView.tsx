@@ -1,4 +1,4 @@
-import { Modal, Descriptions, Tag } from "antd";
+import { Modal, Descriptions, Tag, Button } from "antd";
 import type { DescriptionsProps } from "antd";
 
 import useClusterList from "@/entities/cluster/api/cluster-list";
@@ -135,7 +135,11 @@ export default function UserView({
         isRegionListLoading
       }
       open={isModalOpen}
-      onOk={onModalOk}
+      footer={[
+        <Button key="ok" type="primary" onClick={onModalOk}>
+          OK
+        </Button>,
+      ]}
       onCancel={onModalCancel}
     >
       <Descriptions
