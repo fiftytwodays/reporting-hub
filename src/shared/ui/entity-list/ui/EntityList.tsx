@@ -89,7 +89,7 @@ const EntityList: React.FC<EntityListProps> = ({
       )}
       <div ref={componentRef}>
         <Table
-          title={() => title}
+          title={title ? () => title : undefined}
           loading={isLoading}
           bordered={isBordered}
           columns={mapToAntDColumns(visibleColumns)}
