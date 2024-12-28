@@ -84,7 +84,11 @@ export default function UserEdit({
 
       // Manage roles
       const currentRoles = values.roles || [];
-      const previousRoles = userRoleList || [];
+      const previousRoles =
+        userRoleList.map((role: any) => role?.GroupName) || [];
+
+      console.log("currentRoles", currentRoles);
+      console.log("previousRoles", previousRoles);
 
       // Find roles to add and remove
       const rolesToAdd = currentRoles.filter(
@@ -130,6 +134,7 @@ export default function UserEdit({
       console.error("Failed to update user attributes or roles: ", error);
     }
     mutate(["/api/users"]);
+    mutate(["api/user-group-list", userData?.Email]);
   };
 
   useEffect(() => {
