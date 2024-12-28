@@ -10,15 +10,21 @@ interface ProjectListProps {
   handleDelete: (project: Project) => void;
 }
 
-export default function ProjectsList({ data, isLoading, handleDelete, handleEdit }: ProjectListProps) {
+export default function ProjectsList({
+  data,
+  isLoading,
+  handleDelete,
+  handleEdit,
+}: ProjectListProps) {
   return (
     <EntityList
       rowKey="id"
       columns={columns}
-      mapColumn={(columns) => generateColumns(columns, handleDelete, handleEdit)}
+      mapColumn={(columns): any =>
+        generateColumns(columns, handleDelete, handleEdit)
+      }
       data={data}
       isLoading={isLoading}
-
     />
   );
 }

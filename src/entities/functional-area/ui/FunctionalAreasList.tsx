@@ -10,15 +10,21 @@ interface FunctionalAreasListProps {
   handleDelete: (functionalArea: FunctionalArea) => void;
 }
 
-export default function FunctionalAreasList({ data, isLoading, handleDelete, handleEdit }: FunctionalAreasListProps) {
+export default function FunctionalAreasList({
+  data,
+  isLoading,
+  handleDelete,
+  handleEdit,
+}: FunctionalAreasListProps) {
   return (
     <EntityList
       rowKey="id"
       columns={columns}
-      mapColumn={(columns) => generateColumns(columns, handleDelete, handleEdit)}
+      mapColumn={(columns): any =>
+        generateColumns(columns, handleDelete, handleEdit)
+      }
       data={data}
       isLoading={isLoading}
-
     />
   );
 }

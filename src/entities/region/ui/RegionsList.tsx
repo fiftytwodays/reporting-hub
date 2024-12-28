@@ -10,15 +10,21 @@ interface RegionsListProps {
   handleDelete: (region: Region) => void;
 }
 
-export default function RegionsList({ data, isLoading, handleDelete, handleEdit }: RegionsListProps) {
+export default function RegionsList({
+  data,
+  isLoading,
+  handleDelete,
+  handleEdit,
+}: RegionsListProps) {
   return (
     <EntityList
       rowKey="id"
       columns={columns}
-      mapColumn={(columns) => generateColumns(columns, handleDelete, handleEdit)}
+      mapColumn={(columns): any =>
+        generateColumns(columns, handleDelete, handleEdit)
+      }
       data={data}
       isLoading={isLoading}
-
     />
   );
 }
