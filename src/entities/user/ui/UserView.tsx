@@ -138,7 +138,13 @@ export default function UserView({
       onOk={onModalOk}
       onCancel={onModalCancel}
     >
-      <Descriptions title="User Info" items={items} column={1} />
+      <Descriptions
+        size="small"
+        bordered
+        title="User Info"
+        items={items}
+        column={1}
+      />
     </Modal>
   );
 }
