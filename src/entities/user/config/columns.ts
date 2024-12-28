@@ -3,9 +3,14 @@ import { Column } from "@/shared/ui/entity-list/config/types";
 
 export const columns: Column[] = [
   {
-    title: "Username",
-    dataIndex: "Username",
-    key: "Username",
+    title: "Given Name",
+    dataIndex: "GivenName",
+    key: "GivenName",
+  },
+  {
+    title: "Family Name",
+    dataIndex: "FamilyName",
+    key: "FamilyName",
   },
   {
     title: "Email",
@@ -19,21 +24,15 @@ export const columns: Column[] = [
     render: (enabled: boolean) => (enabled ? "Yes" : "No"),
   },
   {
+    title: "User Status",
+    dataIndex: "UserStatus",
+    key: "UserStatus",
+  },
+  {
     title: "Created",
     dataIndex: "UserCreateDate",
     key: "UserCreateDate",
     render: (date: string) => formatDate(date),
-  },
-  {
-    title: "Last Modified",
-    dataIndex: "UserLastModifiedDate",
-    key: "UserLastModifiedDate",
-    render: (date: string) => formatDate(date),
-  },
-  {
-    title: "User Status",
-    dataIndex: "UserStatus",
-    key: "UserStatus",
   },
   {
     title: "Actions",
