@@ -1,5 +1,5 @@
-export const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
+export const formatDate = (dateString: string | undefined) => {
+  const date = new Date(dateString ? dateString : "");
   return date.toLocaleString("en-US", {
     year: "numeric",
     month: "short",
@@ -10,3 +10,5 @@ export const formatDate = (dateString: string) => {
     hour12: true, // Display in 12-hour format with AM/PM
   });
 };
+
+export default formatDate;

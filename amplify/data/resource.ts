@@ -1,7 +1,17 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 import { listGroups } from "./groups/list-groups/resource";
-import { listUsers } from "./groups/list-users/resource";
+import { addUserToGroup } from "./groups/add-user-to-group/resource";
+import { removeUserFromGroup } from "./groups/remove-user-from-group/resource";
+import { listUsersInGroup } from "./groups/list-users-in-group/resource";
+import { listUsers } from "./users/list-users/resource";
+import { listGroupsForUser } from "./users/list-groups-for-user/resource";
+import { createUser } from "./users/create-user/resource";
+import { disableUser } from "./users/disable-user/resource";
+import { updateUserAttributes } from "./users/update-user-attributes/resource";
+import { enableUser } from "./users/enable-user/resource";
+import { deleteUser } from "./users/delete-user/resource";
+import { setUserPassword } from "./users/set-user-password/resource";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -17,11 +27,107 @@ const schema = a.schema({
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(listGroups))
     .returns(a.json()),
+  addUserToGroup: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+      groupName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(addUserToGroup))
+    .returns(a.json()),
+  removeUserFromGroup: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+      groupName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(removeUserFromGroup))
+    .returns(a.json()),
+  listUsersInGroup: a
+    .mutation()
+    .arguments({
+      groupName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(listUsersInGroup))
+    .returns(a.json()),
   listUsers: a
     .mutation()
     .arguments({})
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(listUsers))
+    .returns(a.json()),
+  listGroupsForUser: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+    })
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.function(listGroupsForUser))
+    .returns(a.json()),
+  createUser: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+      email: a.string().required(),
+      givenName: a.string().required(),
+      familyName: a.string(),
+      password: a.string().required(),
+      projects: a.string(),
+      clusters: a.string(),
+      regions: a.string(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(createUser))
+    .returns(a.json()),
+  updateUserAttributes: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+      givenName: a.string().required(),
+      familyName: a.string(),
+      projects: a.string(),
+      clusters: a.string(),
+      regions: a.string(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(updateUserAttributes))
+    .returns(a.json()),
+  enableUser: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(enableUser))
+    .returns(a.json()),
+  disableUser: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(disableUser))
+    .returns(a.json()),
+  deleteUser: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(deleteUser))
+    .returns(a.json()),
+  setUserPassword: a
+    .mutation()
+    .arguments({
+      userName: a.string().required(),
+      password: a.string().required(),
+      permanent: a.boolean().required(),
+    })
+    .authorization((allow) => [allow.group("admin")])
+    .handler(a.handler.function(setUserPassword))
     .returns(a.json()),
 
   Todo: a
@@ -73,7 +179,7 @@ const schema = a.schema({
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
-    Project: a
+  Project: a
     .model({
       name: a.string().required(),
       location: a.string().required(),

@@ -1,18 +1,16 @@
 import { formatDate } from "@/shared/lib/format-date";
-import type { User } from "./types";
+import { Column } from "@/shared/ui/entity-list/config/types";
 
-type ColumnConfig<T> = {
-  title: string;
-  dataIndex: keyof T;
-  key: string;
-  render?: (value: any) => string; // Optional render function, taking any type and returning a string
-};
-
-export const columns: ColumnConfig<User>[] = [
+export const columns: Column[] = [
   {
-    title: "Username",
-    dataIndex: "Username",
-    key: "Username",
+    title: "Given name",
+    dataIndex: "GivenName",
+    key: "GivenName",
+  },
+  {
+    title: "Family name",
+    dataIndex: "FamilyName",
+    key: "FamilyName",
   },
   {
     title: "Email",
@@ -26,20 +24,19 @@ export const columns: ColumnConfig<User>[] = [
     render: (enabled: boolean) => (enabled ? "Yes" : "No"),
   },
   {
+    title: "User status",
+    dataIndex: "UserStatus",
+    key: "UserStatus",
+  },
+  {
     title: "Created",
     dataIndex: "UserCreateDate",
     key: "UserCreateDate",
     render: (date: string) => formatDate(date),
   },
   {
-    title: "Last Modified",
-    dataIndex: "UserLastModifiedDate",
-    key: "UserLastModifiedDate",
-    render: (date: string) => formatDate(date),
-  },
-  {
-    title: "User Status",
-    dataIndex: "UserStatus",
-    key: "UserStatus",
+    title: "Actions",
+    actions: ["view", "edit", "reset-password", "disable", "enable", "delete"],
+    key: "actions",
   },
 ];
