@@ -14,7 +14,7 @@ import type { Project } from "@/entities/project/config/types";
 import type { Region } from "@/entities/region/config/types";
 
 interface UserViewProps {
-  userData: User;
+  userData: User | undefined;
   isLoading?: boolean;
   isModalOpen: boolean;
   onModalOk: () => void;
@@ -32,22 +32,22 @@ export default function UserView({
   const projectListKeys = parseStringToArray(userData?.Projects);
   const regionListKeys = parseStringToArray(userData?.Regions);
 
-  const { clusterList }: any = useClusterList({
-    condition: true,
+  const { clusterList, isClusterListLoading }: any = useClusterList({
+    condition: clusterListKeys.length > 0,
     filter: {
       or: clusterListKeys.map((id) => ({ id: { eq: id } })),
     },
   });
 
-  const { projectList }: any = useProjectList({
-    condition: true,
+  const { projectList, isProjectListLoading }: any = useProjectList({
+    condition: projectListKeys.length > 0,
     filter: {
       or: projectListKeys.map((id) => ({ id: { eq: id } })),
     },
   });
 
-  const { regionList }: any = useRegionList({
-    condition: true,
+  const { regionList, isRegionListLoading }: any = useRegionList({
+    condition: regionListKeys.length > 0,
     filter: {
       or: regionListKeys.map((id) => ({ id: { eq: id } })),
     },
@@ -96,21 +96,21 @@ export default function UserView({
     {
       key: "8",
       label: "Projects",
-      children: projectList.map((project: Project) => (
+      children: projectList?.map((project: Project) => (
         <Tag key={project?.name}>{project?.name}</Tag>
       )),
     },
     {
       key: "9",
       label: "Clusters",
-      children: clusterList.map((cluster: Cluster) => (
+      children: clusterList?.map((cluster: Cluster) => (
         <Tag key={cluster?.name}>{cluster?.name}</Tag>
       )),
     },
     {
       key: "10",
       label: "Regions",
-      children: regionList.map((region: Region) => (
+      children: regionList?.map((region: Region) => (
         <Tag key={region?.name}>{region?.name}</Tag>
       )),
     },
@@ -128,7 +128,12 @@ export default function UserView({
 
   return (
     <Modal
-      loading={isLoading}
+      loading={
+        isLoading ||
+        isClusterListLoading ||
+        isProjectListLoading ||
+        isRegionListLoading
+      }
       open={isModalOpen}
       onOk={onModalOk}
       onCancel={onModalCancel}

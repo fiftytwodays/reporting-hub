@@ -1,5 +1,12 @@
-import { Flex, Typography, Tooltip, Button } from "antd";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Flex, Typography, Tooltip, Button, Popconfirm } from "antd";
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  LockOutlined,
+  StopOutlined,
+  CheckOutlined,
+} from "@ant-design/icons";
 import styled from "@emotion/styled";
 
 const { Text } = Typography;
@@ -32,7 +39,7 @@ export default function mapToAntDColumns(columns) {
                 return (
                   <Tooltip key="edit" title="Edit Details">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => column?.onEditAction(record)}
                       icon={<EditOutlined />}
                       type="link"
                     />
@@ -41,11 +48,56 @@ export default function mapToAntDColumns(columns) {
               case "delete":
                 return (
                   <Tooltip key="delete" title="Delete">
+                    <Popconfirm
+                      title="Delete this user?"
+                      description="Are you sure to delete this user?"
+                      onConfirm={() => column?.onDeleteAction(record)}
+                      // onCancel={cancel}
+                      okText="Yes"
+                      cancelText="No"
+                      placement="left"
+                    >
+                      <Button icon={<DeleteOutlined />} type="link" danger />
+                    </Popconfirm>
+                  </Tooltip>
+                );
+
+              case "reset-password":
+                return (
+                  <Tooltip key="reset-password" title="Reset Password">
                     <Button
-                      onClick={() => {}}
-                      icon={<DeleteOutlined />}
+                      onClick={() => column?.onResetPasswordAction(record)}
+                      icon={<LockOutlined />}
                       type="link"
                     />
+                  </Tooltip>
+                );
+              case "disable" || "enable":
+                return (
+                  <Tooltip
+                    key={record?.Enabled ? "disable" : "enable"}
+                    title={record?.Enabled ? "Disable User" : "Enable User"}
+                  >
+                    <Popconfirm
+                      title={`Are you sure you want to ${
+                        record?.Enabled ? "disable" : "enable"
+                      } this record?`}
+                      onConfirm={() =>
+                        record?.Enabled
+                          ? column?.onDisableAction(record)
+                          : column?.onEnableAction(record)
+                      }
+                      okText="Yes"
+                      cancelText="No"
+                      placement="left"
+                    >
+                      <Button
+                        icon={
+                          record.Enabled ? <StopOutlined /> : <CheckOutlined />
+                        }
+                        type="link"
+                      />
+                    </Popconfirm>
                   </Tooltip>
                 );
               default:

@@ -17,15 +17,15 @@ export default function useProjectList({
   condition = true,
   filter = {},
 }: FetchOptions) {
-  const { data, error, isValidating } = useSWR(
-    condition ? ["/api/project-list", filter] : null,
+  const { data, error, isLoading } = useSWR(
+    condition ? ["api/project-list", filter] : null,
     ([, filter]) => fetchProjectList(filter),
     { keepPreviousData: true }
   );
 
   return {
-    projectList: data || [],
-    isProjectListLoading: isValidating,
+    projectList: condition ? data : [],
+    isProjectListLoading: isLoading,
     projectListError: error,
   };
 }

@@ -39,7 +39,7 @@ export default function useUsersList({ condition = true }: FetchOptions) {
   };
 
   const { data, isLoading, error } = useSWR<ApiResponse | null>(
-    condition ? ["api/users"] : null,
+    condition ? ["/api/users"] : null,
     fetcher,
     {
       keepPreviousData: true,

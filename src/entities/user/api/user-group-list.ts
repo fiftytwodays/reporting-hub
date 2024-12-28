@@ -4,7 +4,7 @@ import type { Schema } from "@root/amplify/data/resource";
 
 interface FetchOptions {
   condition?: boolean;
-  userName: string;
+  userName?: string;
 }
 
 export default function useUserGroupList({

@@ -1,33 +1,20 @@
 import type { Schema } from "../../resource";
-import { env } from "$amplify/env/create-user";
+import { env } from "$amplify/env/update-user-attributes";
 import {
-  AdminCreateUserCommand,
+  AdminUpdateUserAttributesCommand,
   CognitoIdentityProviderClient,
-  MessageActionType,
 } from "@aws-sdk/client-cognito-identity-provider";
 
-type Handler = Schema["createUser"]["functionHandler"];
+type Handler = Schema["updateUserAttributes"]["functionHandler"];
 const client = new CognitoIdentityProviderClient();
 
 export const handler: Handler = async (event) => {
-  const {
-    userName,
-    email,
-    givenName,
-    familyName,
-    password,
-    projects,
-    clusters,
-    regions,
-  } = event.arguments;
+  const { userName, givenName, familyName, projects, clusters, regions } =
+    event.arguments;
   const input = {
     UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
     Username: userName,
-    TemporaryPassword: password,
-    MessageAction: MessageActionType.SUPPRESS,
     UserAttributes: [
-      { Name: "email", Value: email },
-      { Name: "email_verified", Value: "true" },
       { Name: "given_name", Value: givenName },
       { Name: "family_name", Value: familyName ? familyName : "" },
       { Name: "custom:projects", Value: projects ? projects : "" },
@@ -35,7 +22,7 @@ export const handler: Handler = async (event) => {
       { Name: "custom:regions", Value: regions ? regions : "" },
     ],
   };
-  const command = new AdminCreateUserCommand(input);
+  const command = new AdminUpdateUserAttributesCommand(input);
   const response = await client.send(command);
   return response;
 };

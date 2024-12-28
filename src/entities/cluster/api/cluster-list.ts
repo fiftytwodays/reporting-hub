@@ -17,15 +17,15 @@ export default function useClusterList({
   condition = true,
   filter = {},
 }: FetchOptions) {
-  const { data, error, isValidating } = useSWR(
+  const { data, error, isLoading } = useSWR(
     condition ? ["clusterList", filter] : null,
     ([, filter]) => fetchClusterList(filter),
     { keepPreviousData: true }
   );
 
   return {
-    clusterList: data || [],
-    isClusterListLoading: isValidating,
+    clusterList: condition ? data : [],
+    isClusterListLoading: isLoading,
     clusterListError: error,
   };
 }
