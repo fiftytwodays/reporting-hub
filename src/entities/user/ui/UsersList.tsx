@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, message } from "antd";
+import { message } from "antd";
 
 import { EntityList } from "@/shared/ui/entity-list";
 
@@ -8,7 +8,6 @@ import type { User } from "../config/types";
 import UserView from "./UserView";
 import { useUserListColumns } from "../lib/use-user-list-columns";
 import UserEdit from "./UserEdit";
-import UserAdd from "./UserAdd";
 import useUserDelete from "../api/delete-user";
 import useUserDisable from "../api/disable-user";
 import useUserEnable from "../api/enable-user";
@@ -22,7 +21,6 @@ interface UserListProps {
 export default function UsersList({ data, isLoading }: UserListProps) {
   const [isUserViewOpen, setIsUserViewOpen] = useState(false);
   const [isUserEditOpen, setIsUserEditOpen] = useState(false);
-  const [isUserAddOpen, setIsUserAddOpen] = useState(false);
   const [isUserResetPasswordOpen, setIsUserResetPasswordOpen] = useState(false);
 
   const [messageApi, contextHolder] = message.useMessage();
@@ -67,15 +65,6 @@ export default function UsersList({ data, isLoading }: UserListProps) {
           setIsUserEditOpen(false);
         }}
       />
-      <UserAdd
-        isModalOpen={isUserAddOpen}
-        onModalCancel={() => {
-          setIsUserAddOpen(false);
-        }}
-        onModalOk={() => {
-          setIsUserAddOpen(false);
-        }}
-      />
 
       <UserResetPassword
         userData={selectedRecord}
@@ -94,17 +83,7 @@ export default function UsersList({ data, isLoading }: UserListProps) {
         columns={userListColumns}
         data={data}
         isLoading={isLoading}
-        showToolbar
-        toolbarExtensions={[
-          <Button
-            type="primary"
-            onClick={() => {
-              setIsUserAddOpen(true);
-            }}
-          >
-            Add user
-          </Button>,
-        ]}
+        showToolbar={false}
       />
     </>
   );

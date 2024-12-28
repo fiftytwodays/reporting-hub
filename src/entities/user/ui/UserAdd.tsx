@@ -1,4 +1,5 @@
-import { Modal, Form, Input, Select, Checkbox, message } from "antd";
+import { useState } from "react";
+import { Modal, Form, Input, Select, Checkbox, message, Button } from "antd";
 import { generateClient } from "aws-amplify/data";
 import { mutate } from "swr";
 
@@ -15,17 +16,19 @@ import useRoleList from "@/entities/role/api/role-list";
 
 interface UserAddProps {
   isLoading?: boolean;
-  isModalOpen: boolean;
-  onModalOk: () => void;
-  onModalCancel: () => void;
 }
 
-export default function UserAdd({
-  isLoading,
-  isModalOpen,
-  onModalOk,
-  onModalCancel,
-}: UserAddProps) {
+export default function UserAdd({ isLoading }: UserAddProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const onModalOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const onModalCancel = () => {
+    setIsModalOpen(false);
+  };
+
   const [form] = Form.useForm();
   const client = generateClient<Schema>();
 
@@ -47,7 +50,7 @@ export default function UserAdd({
 
   const handleOk = () => {
     form.submit();
-    onModalCancel();
+    onModalOk();
   };
 
   const handleFinish = async (values: any) => {
@@ -100,6 +103,14 @@ export default function UserAdd({
   return (
     <>
       {contextHolder}
+      <Button
+        type="primary"
+        onClick={() => {
+          setIsModalOpen(true);
+        }}
+      >
+        Add user
+      </Button>
       <Modal
         title="Add User"
         key={roleList.length}
