@@ -12,6 +12,7 @@ import type { Column } from "../config/types";
 interface EntityListProps {
   componentRef?: React.RefObject<HTMLDivElement> | null;
   columns?: Column[];
+  mapColumn?: (columns: Column[]) => Column[];
   data?: any[];
   rowKey?: string;
   totalCount?: number;
@@ -51,6 +52,7 @@ const EntityList: React.FC<EntityListProps> = ({
   title = "",
   isEditable = false,
   components = false,
+  mapColumn = mapToAntDColumns,
 }) => {
   const visibleColumns = columns.filter((column) => !column?.hidden);
 
@@ -92,7 +94,7 @@ const EntityList: React.FC<EntityListProps> = ({
           title={title ? () => title : undefined}
           loading={isLoading}
           bordered={isBordered}
-          columns={mapToAntDColumns(visibleColumns)}
+          columns={mapColumn(visibleColumns)}
           dataSource={data}
           rowKey={rowKey}
           rowSelection={
