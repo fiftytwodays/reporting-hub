@@ -15,9 +15,9 @@ interface Column<T = any> {
   render?: (value: any, record: any, index: number) => React.ReactNode;
 }
 
-export default function generateColumns<T>(
+export default function generateColumns<T = any>(
   columns: Column[],
-): Column<T>[] {
+): Column<T >[] {
   const { Text } = Typography;
 
   return columns.map((column) => ({
