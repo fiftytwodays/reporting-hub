@@ -9,6 +9,7 @@ import { DeleteTwoTone } from '@ant-design/icons';
 import useCreateYearlyPlan from "../api/create-yearly-form";
 import useCreateQuarterlyPlan from "../api/create-quarter-plan";
 import useCreatePlan from "../api/create-plan";
+import {  useRouter } from "next/navigation";
 // import useProjectsList from "@/entities/project/api/project-list";
 // import useRegionsList from "@/entities/region/api/region-list";
 // import useCreateRegion from "../api/create-yearly-form";
@@ -47,6 +48,7 @@ export default function CreateYearlyFormNew({
   // const [form] = Form.useForm<FormValues>();
   const [form] = Form.useForm();
   const { Option } = Select;
+  const router = useRouter();
 
   const monthsArray = [
     "April",
@@ -115,7 +117,7 @@ export default function CreateYearlyFormNew({
       try {
         yearlyPlanResp = await createYearlyPlan(yearlyPlanPayload);
         if (yearlyPlanResp) {
-          messageApi.success("Yearly Plan has been created successfully.");
+          
           console.log("Saved Yearly Plan Id", yearlyPlanResp.id);
           // form.resetFields();
         }
@@ -171,6 +173,8 @@ export default function CreateYearlyFormNew({
       // message.error("Failed to save data.");
     }
     console.log("Handle save called");
+    messageApi.success("Yearly Plan has been created successfully.");
+    router.push('/yearly-form/my-forms');
   };
 
   const handlePlanChange = (quarter: number, index: number, field: string, value: any) => {
