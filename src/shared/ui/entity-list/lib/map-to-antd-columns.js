@@ -1,4 +1,4 @@
-import { Flex, Typography, Tooltip, Button, Popconfirm } from "antd";
+import { Flex, Typography, Tooltip, Button, Popconfirm, List } from "antd";
 import {
   EyeOutlined,
   EditOutlined,
@@ -13,8 +13,6 @@ const { Text } = Typography;
 
 export default function mapToAntDColumns(columns) {
   return columns.map((column) => {
-    if (column?.render) return column;
-
     return {
       ...column,
       render: (item, record) => {
@@ -110,12 +108,14 @@ export default function mapToAntDColumns(columns) {
 
         if (column?.dataType === "array") {
           return (
-            <Flex gap="middle" vertical>
-              <Text>{item && item[0]}</Text>
-              <Text>{item && item[1]}</Text>
-            </Flex>
+            <List
+              size="small"
+              dataSource={item}
+              renderItem={(tag) => <List.Item style={{ padding: '0px' }}>{tag}</List.Item>}
+            />
           );
         }
+
         if (column?.copyable) {
           return (
             <_Text copyable ellipsis={{ tooltip: item }}>

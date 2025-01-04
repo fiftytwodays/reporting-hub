@@ -60,7 +60,7 @@ const items = [
       {
         key: "reporting-status-report",
         label: (
-          <Link href="/reports/reporting-status-report">
+          <Link href="/reports/reporting-status-reports">
             Reporting status report
           </Link>
         ),
