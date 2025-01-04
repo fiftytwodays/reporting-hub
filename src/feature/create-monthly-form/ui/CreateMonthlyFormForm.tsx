@@ -6,7 +6,11 @@ import {
   functionalAreas,
   nextMonthGoals, // Add this import for the goals for next month
 } from "@/widgets/monthly-forms-list/config/projects";
-import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  MinusOutlined,
+  MinusCircleOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
 import { Form, Input, Row, Col, Select, Button, Space, message } from "antd";
 import { MessageInstance } from "antd/es/message/interface";
@@ -423,20 +427,158 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
             </Form.List>
           </div>
 
+          <div
+            style={{
+              border: "1px solid #d9d9d9",
+              borderRadius: "8px",
+              padding: "16px",
+              marginTop: "24px",
+              marginBottom: "24px",
+            }}
+          >
+            <h3 style={{ marginBottom: "16px" }}>
+              Praise points
+            </h3>
           {/* Praise/Prayer Request Section */}
           <Row gutter={24}>
             <Col xs={24}>
-              <Form.Item
-                label="Praise/Prayer Request"
-                name="praisePrayerRequest"
-              >
-                <Input.TextArea
-                  placeholder="Enter Praise or Prayer Request"
-                  rows={4}
-                />
+              <Form.Item required>
+                <Form.List
+                  name="praisePoints"
+                  initialValue={[{ point: "" }]} // Add initial empty input field
+                  rules={[
+                    {
+                      validator: async (_, fields) => {
+                        if (
+                          !fields ||
+                          fields.length < 1 ||
+                          !fields.some((f) => f.point)
+                        ) {
+                          return Promise.reject(
+                            "At least one praise point is required"
+                          );
+                        }
+                      },
+                    },
+                  ]}
+                >
+                  {(fields, { add, remove }) => (
+                    <>
+                      {fields.map(({ key, fieldKey, name, field }) => (
+                        <Row key={key} gutter={24}>
+                          <Col xs={20}>
+                            <Form.Item
+                              {...field}
+                              name={[name, "point"]}
+                              fieldKey={[fieldKey, "point"]}
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Please input a praise point",
+                                },
+                              ]}
+                            >
+                              <Input placeholder="Enter Praise Point" />
+                            </Form.Item>
+                          </Col>
+                          <Col xs={4}>
+                            <MinusCircleOutlined onClick={() => remove(name)} />
+                          </Col>
+                        </Row>
+                      ))}
+                      <Form.Item>
+                        <Button
+                          type="dashed"
+                          icon={<PlusOutlined />}
+                          onClick={() => add()} // Add another input field
+                        >
+                          Add Praise Point
+                        </Button>
+                      </Form.Item>
+                    </>
+                  )}
+                </Form.List>
               </Form.Item>
             </Col>
           </Row>
+          </div>
+
+
+          {/* Prayer Requests Section */}
+          <div
+            style={{
+              border: "1px solid #d9d9d9",
+              borderRadius: "8px",
+              padding: "16px",
+              marginTop: "24px",
+              marginBottom: "24px",
+            }}
+          >
+            <h3 style={{ marginBottom: "16px" }}>
+              Prayer requests
+            </h3>
+          <Row gutter={24}>
+            <Col xs={24}>
+              <Form.Item required>
+                <Form.List
+                  name="prayerRequests"
+                  initialValue={[{ request: "" }]} // Add initial empty input field
+                  rules={[
+                    {
+                      validator: async (_, fields) => {
+                        if (
+                          !fields ||
+                          fields.length < 1 ||
+                          !fields.some((f) => f.request)
+                        ) {
+                          return Promise.reject(
+                            "At least one prayer request is required"
+                          );
+                        }
+                      },
+                    },
+                  ]}
+                >
+                  {(fields, { add, remove }) => (
+                    <>
+                      {fields.map(({ key, fieldKey, name, field }) => (
+                        <Row key={key} gutter={24}>
+                          <Col xs={20}>
+                            <Form.Item
+                              {...field}
+                              name={[name, "request"]}
+                              fieldKey={[fieldKey, "request"]}
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Please input a prayer request",
+                                },
+                              ]}
+                            >
+                              <Input placeholder="Enter Prayer Request" />
+                            </Form.Item>
+                          </Col>
+                          <Col xs={4}>
+                            <MinusCircleOutlined onClick={() => remove(name)} />
+                          </Col>
+                        </Row>
+                      ))}
+                      <Form.Item>
+                        <Button
+                          type="dashed"
+                          icon={<PlusOutlined />}
+                          onClick={() => add()} // Add another input field
+                        >
+                          Add Prayer Request
+                        </Button>
+                      </Form.Item>
+                    </>
+                  )}
+                </Form.List>
+              </Form.Item>
+            </Col>
+          </Row>
+          </div>
 
           {/* Story/Testimony Section */}
           <Row gutter={24}>
@@ -469,7 +611,9 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
         <Button type="default" onClick={() => form.resetFields()}>
           Reset
         </Button>
-        <Button type="default" href="/monthly-form">Cancel</Button>
+        <Button type="default" href="/monthly-form">
+          Cancel
+        </Button>
         <Button type="primary" htmlType="submit">
           Save
         </Button>
