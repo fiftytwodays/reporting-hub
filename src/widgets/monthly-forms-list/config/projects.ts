@@ -20,51 +20,51 @@ export const projects = [
 export const months = [
     {
         label: "January",
-        value: "january"
+        value: 1
     },
     {
         label: "February",
-        value: "february"
+        value: 2
     },
     {
         label: "March",
-        value: "march"
+        value: 3
     },
     {
         label: "April",
-        value: "april"
+        value: 4
     },
     {
         label: "May",
-        value: "may"
+        value: 5
     },
     {
         label: "June",
-        value: "june"
+        value: 6
     },
     {
         label: "July",
-        value: "july"
+        value: 7
     },
     {
         label: "August",
-        value: "august"
+        value: 8
     },
     {
         label: "September",
-        value: "september"
+        value: 9
     },
     {
         label: "October",
-        value: "october"
+        value: 10
     },
     {
         label: "November",
-        value: "november"
+        value: 11
     },
     {
         label: "December",
-        value: "december"
+        value: 12
     },
 ];
 

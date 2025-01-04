@@ -9,7 +9,13 @@ import {
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 
 import { Form, Input, Row, Col, Select, Button, Space, message } from "antd";
+import { MessageInstance } from "antd/es/message/interface";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 
+interface CreateMonthlyFormProps {
+  messageApi: MessageInstance;
+}
 
 interface Goal {
   goal: string;
@@ -22,16 +28,54 @@ interface FormValues {
   projectName: string;
   month: string;
   goalsList: Goal[];
-  additionalActivities: Array<{ activity: string; functionalArea: string; comments?: string }>;
-  nextMonthGoals: Array<{ activity: string; functionalArea: string; comments?: string }>;
+  additionalActivities: Array<{
+    activity: string;
+    functionalArea: string;
+    comments?: string;
+  }>;
+  nextMonthGoals: Array<{
+    activity: string;
+    functionalArea: string;
+    comments?: string;
+  }>;
   praisePrayerRequest: string;
   storyTestimony: string;
   concernsStruggles: string;
 }
 
+const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
+  messageApi,
+}) => {
+  const [defaultMonth, setDefaultMonth] = useState<number>();
 
-const CreateMonthlyFormForm: React.FC = () => {
   const [form] = Form.useForm();
+
+  const [isGoalsListEnabled, setIsGoalsListEnabled] = useState(false);
+
+  const handleValuesChange = (
+    changedValues: any,
+    allValues: { projectName: any; month: any }
+  ) => {
+    const { projectName, month } = allValues;
+    if (projectName && month) {
+      setIsGoalsListEnabled(true);
+    } else {
+      setIsGoalsListEnabled(false);
+    }
+  };
+
+  useEffect(() => {
+    const currentDate = dayjs();
+    const currentDay = currentDate.date();
+    const currentMonth = currentDate.month() + 1; // dayjs months are 0-indexed
+    const calculatedMonth = currentDay > 25 ? currentMonth : currentMonth - 1;
+
+    // Adjust for January (month 1) when subtracting 1 month
+    const finalMonth = calculatedMonth > 0 ? calculatedMonth : 12;
+
+    setDefaultMonth(finalMonth);
+    form.setFieldValue("month", finalMonth);
+  }, [form]);
 
   const handleSubmit = (values: FormValues) => {
     const incompleteFields = values.goalsList.some(
@@ -46,7 +90,7 @@ const CreateMonthlyFormForm: React.FC = () => {
       );
       return;
     }
-
+    messageApi.success("Monthly form created successfully");
     console.log("Form submitted successfully", values);
   };
 
@@ -66,6 +110,7 @@ const CreateMonthlyFormForm: React.FC = () => {
       onFinish={handleSubmit}
       layout="vertical"
       initialValues={{ goalsList: goals }}
+      onValuesChange={handleValuesChange}
     >
       {/* Project and Month Section */}
       <Row gutter={24}>
@@ -79,352 +124,352 @@ const CreateMonthlyFormForm: React.FC = () => {
           </Form.Item>
         </Col>
         <Col xs={24} sm={6}>
-          <Form.Item
-            label="Month"
-            name="month"
-            rules={[{ required: true, message: "Month is required" }]}
-          >
-            <Select options={months} placeholder="Select Month" />
+          <Form.Item label="Month" name="month">
+            <Select options={months} value={defaultMonth} disabled />
           </Form.Item>
         </Col>
       </Row>
 
-      {/* Boxed Section for Goals */}
-      <div
-        style={{
-          border: "1px solid #d9d9d9",
-          borderRadius: "8px",
-          padding: "16px",
-          marginTop: "24px",
-        }}
-      >
-        <h3 style={{ marginBottom: "16px" }}>
-          Outcomes from the Month Just Ended
-        </h3>
+      {isGoalsListEnabled && (
+        <>
+          {/* Boxed Section for Goals */}
+          <div
+            style={{
+              border: "1px solid #d9d9d9",
+              borderRadius: "8px",
+              padding: "16px",
+              marginTop: "24px",
+            }}
+          >
+            <h3 style={{ marginBottom: "16px" }}>
+              Outcomes from the Month Just Ended
+            </h3>
 
-        {/* Goals Section */}
-        <Form.List name="goalsList">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name }) => (
-                <Row align="middle" gutter={24} key={key}>
-                  <Col xs={24} sm={5}>
-                    <Form.Item
-                      label={name === 0 ? "Goal" : ""}
-                      name={[name, "goal"]}
-                      initialValue={goals[name]?.goal}
-                    >
-                      <Input placeholder="Enter goal" disabled />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={5}>
-                    <Form.Item
-                      label={name === 0 ? "Achieved" : ""}
-                      name={[name, "achieved"]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please select if achieved",
-                        },
-                      ]}
-                    >
-                      <Select
-                        options={achieved}
-                        placeholder="Goal achieved or not"
-                        onChange={(value) => handleAchievedChange(value, name)} // Handle change here
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={5}>
-                    <Form.Item
-                      label={name === 0 ? "Reason for not achieving" : ""}
-                      name={[name, "whyNotAchieved"]}
-                      dependencies={[name, "achieved"]}
-                      rules={[
-                        ({ getFieldValue }) => ({
-                          required:
-                            getFieldValue(["goalsList", name, "achieved"]) ===
-                            false,
-                          message: "Reason is required if goal is not achieved",
-                        }),
-                      ]}
-                    >
-                      <Input
-                        disabled={
-                          form.getFieldValue([
-                            "goalsList",
-                            name,
-                            "achieved",
-                          ]) !== false
-                        }
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={5}>
-                    <Form.Item
-                      label={name === 0 ? "Comments" : ""}
-                      name={[name, "comments"]}
-                    >
-                      <Input placeholder="Add comments" />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              ))}
-            </>
-          )}
-        </Form.List>
-      </div>
+            {/* Goals Section */}
+            <Form.List name="goalsList">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name }) => (
+                    <Row align="middle" gutter={24} key={key}>
+                      <Col xs={24} sm={5}>
+                        <Form.Item
+                          label={name === 0 ? "Goal" : ""}
+                          name={[name, "goal"]}
+                          initialValue={goals[name]?.goal}
+                        >
+                          <Input placeholder="Enter goal" disabled />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={5}>
+                        <Form.Item
+                          label={name === 0 ? "Achieved" : ""}
+                          name={[name, "achieved"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please select if achieved",
+                            },
+                          ]}
+                        >
+                          <Select
+                            options={achieved}
+                            placeholder="Goal achieved or not"
+                            onChange={(value) =>
+                              handleAchievedChange(value, name)
+                            } // Handle change here
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={5}>
+                        <Form.Item
+                          label={name === 0 ? "Reason for not achieving" : ""}
+                          name={[name, "whyNotAchieved"]}
+                          dependencies={[name, "achieved"]}
+                          rules={[
+                            ({ getFieldValue }) => ({
+                              required:
+                                getFieldValue([
+                                  "goalsList",
+                                  name,
+                                  "achieved",
+                                ]) === false,
+                              message:
+                                "Reason is required if goal is not achieved",
+                            }),
+                          ]}
+                        >
+                          <Input
+                            disabled={
+                              form.getFieldValue([
+                                "goalsList",
+                                name,
+                                "achieved",
+                              ]) !== false
+                            }
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={5}>
+                        <Form.Item
+                          label={name === 0 ? "Comments" : ""}
+                          name={[name, "comments"]}
+                        >
+                          <Input placeholder="Add comments" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  ))}
+                </>
+              )}
+            </Form.List>
+          </div>
 
-      {/* Additional Activities Section */}
-      <div
-        style={{
-          border: "1px solid #d9d9d9",
-          borderRadius: "8px",
-          padding: "16px",
-          marginTop: "24px",
-        }}
-      >
-        <h3 style={{ marginBottom: "16px" }}>
-          Additional activities other than that is planned
-        </h3>
+          {/* Additional Activities Section */}
+          <div
+            style={{
+              border: "1px solid #d9d9d9",
+              borderRadius: "8px",
+              padding: "16px",
+              marginTop: "24px",
+            }}
+          >
+            <h3 style={{ marginBottom: "16px" }}>
+              Additional activities other than that is planned
+            </h3>
 
-        {/* Additional Activities Section */}
-        <Form.List name="additionalActivities">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name }) => (
-                <Row align="middle" gutter={24} key={key}>
-                  <Col xs={24} sm={6}>
-                    <Form.Item
-                      label="Activity"
-                      name={[name, "activity"]}
-                      rules={[
-                        { required: true, message: "Activity is required" },
-                      ]}
-                    >
-                      <Input placeholder="Enter activity" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={6}>
-                    <Form.Item
-                      label="Functional Area"
-                      name={[name, "functionalArea"]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Functional Area is required",
-                        },
-                      ]}
-                    >
-                      <Select
-                        placeholder="Select functional area"
-                        options={functionalAreas}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={6}>
-                    <Form.Item label="Comments" name={[name, "comments"]}>
-                      <Input placeholder="Add comments" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={6}>
-                    <Button
-                      onClick={() => remove(name)}
-                      icon={<MinusOutlined />}
-                    />
-                  </Col>
-                </Row>
-              ))}
+            {/* Additional Activities Section */}
+            <Form.List name="additionalActivities">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name }) => (
+                    <Row align="middle" gutter={24} key={key}>
+                      <Col xs={24} sm={6}>
+                        <Form.Item
+                          label="Activity"
+                          name={[name, "activity"]}
+                          rules={[
+                            { required: true, message: "Activity is required" },
+                          ]}
+                        >
+                          <Input placeholder="Enter activity" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={6}>
+                        <Form.Item
+                          label="Functional Area"
+                          name={[name, "functionalArea"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Functional Area is required",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Select functional area"
+                            options={functionalAreas}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={6}>
+                        <Form.Item label="Comments" name={[name, "comments"]}>
+                          <Input placeholder="Add comments" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={6}>
+                        <Button
+                          onClick={() => remove(name)}
+                          icon={<MinusOutlined />}
+                        />
+                      </Col>
+                    </Row>
+                  ))}
 
-              <Button
-                type="dashed"
-                onClick={() => add()}
-                icon={<PlusOutlined />}
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    icon={<PlusOutlined />}
+                  >
+                    Add additional activity
+                  </Button>
+                </>
+              )}
+            </Form.List>
+          </div>
+
+          {/* Goals for Next Month Section */}
+          <div
+            style={{
+              border: "1px solid #d9d9d9",
+              borderRadius: "8px",
+              padding: "16px",
+              marginTop: "24px",
+            }}
+          >
+            <h3 style={{ marginBottom: "16px" }}>Goals for next month</h3>
+
+            {/* Goals for next month Section */}
+            <Form.List name="nextMonthGoals">
+              {(fields) => (
+                <>
+                  {nextMonthGoals.map((goal, index) => (
+                    <Row align="middle" gutter={24} key={index}>
+                      <Col xs={24} sm={6}>
+                        <Form.Item
+                          label={index === 0 ? "Activity" : ""}
+                          name={[index, "activity"]}
+                          initialValue={goal.activity}
+                        >
+                          <Input placeholder="Activity" disabled />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={6}>
+                        <Form.Item
+                          label={index === 0 ? "Functional Area" : ""}
+                          name={[index, "functionalArea"]}
+                          initialValue={goal.functionalArea}
+                        >
+                          <Input placeholder="Functional Area" disabled />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={6}>
+                        <Form.Item
+                          label={index === 0 ? "Comments" : ""}
+                          name={[index, "comments"]}
+                          initialValue={goal.comments}
+                        >
+                          <Input placeholder="Comments" disabled />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  ))}
+                </>
+              )}
+            </Form.List>
+          </div>
+
+          {/* Additional Activities for Next Month Section */}
+          <div
+            style={{
+              border: "1px solid #d9d9d9",
+              borderRadius: "8px",
+              padding: "16px",
+              marginTop: "24px",
+              marginBottom: "24px",
+            }}
+          >
+            <h3 style={{ marginBottom: "16px" }}>
+              Additional activities for next month
+            </h3>
+
+            {/* Additional Activities for Next Month Section */}
+            <Form.List name="additionalActivitiesNextMonth">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name }) => (
+                    <Row align="middle" gutter={24} key={key}>
+                      <Col xs={24} sm={6}>
+                        <Form.Item
+                          label="Activity"
+                          name={[name, "activity"]}
+                          rules={[
+                            { required: true, message: "Activity is required" },
+                          ]}
+                        >
+                          <Input placeholder="Enter activity" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={6}>
+                        <Form.Item
+                          label="Functional Area"
+                          name={[name, "functionalArea"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Functional Area is required",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Select functional area"
+                            options={functionalAreas}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={6}>
+                        <Form.Item label="Comments" name={[name, "comments"]}>
+                          <Input placeholder="Add comments" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={6}>
+                        <Button
+                          type="text"
+                          onClick={() => remove(name)}
+                          icon={<MinusOutlined />}
+                        />
+                      </Col>
+                    </Row>
+                  ))}
+
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    icon={<PlusOutlined />}
+                  >
+                    Add additional activity
+                  </Button>
+                </>
+              )}
+            </Form.List>
+          </div>
+
+          {/* Praise/Prayer Request Section */}
+          <Row gutter={24}>
+            <Col xs={24}>
+              <Form.Item
+                label="Praise/Prayer Request"
+                name="praisePrayerRequest"
               >
-                Add additional activity
-              </Button>
-            </>
-          )}
-        </Form.List>
-      </div>
+                <Input.TextArea
+                  placeholder="Enter Praise or Prayer Request"
+                  rows={4}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
-      {/* Goals for Next Month Section */}
-      <div
-        style={{
-          border: "1px solid #d9d9d9",
-          borderRadius: "8px",
-          padding: "16px",
-          marginTop: "24px",
-        }}
-      >
-        <h3 style={{ marginBottom: "16px" }}>Goals for next month</h3>
+          {/* Story/Testimony Section */}
+          <Row gutter={24}>
+            <Col xs={24}>
+              <Form.Item label="Story/Testimony" name="storyTestimony">
+                <Input.TextArea
+                  placeholder="Enter your Story or Testimony"
+                  rows={4}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
-        {/* Goals for next month Section */}
-        <Form.List name="nextMonthGoals">
-          {(fields) => (
-            <>
-              {nextMonthGoals.map((goal, index) => (
-                <Row align="middle" gutter={24} key={index}>
-                  <Col xs={24} sm={6}>
-                    <Form.Item
-                      label={index === 0 ? "Activity" : ""}
-                      name={[index, "activity"]}
-                      initialValue={goal.activity}
-                    >
-                      <Input placeholder="Activity" disabled />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={6}>
-                    <Form.Item
-                      label={index === 0 ? "Functional Area" : ""}
-                      name={[index, "functionalArea"]}
-                      initialValue={goal.functionalArea}
-                    >
-                      <Input placeholder="Functional Area" disabled />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={6}>
-                    <Form.Item
-                      label={index === 0 ? "Comments" : ""}
-                      name={[index, "comments"]}
-                      initialValue={goal.comments}
-                    >
-                      <Input placeholder="Comments" disabled />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              ))}
-            </>
-          )}
-        </Form.List>
-      </div>
-
-      {/* Additional Activities for Next Month Section */}
-      <div
-        style={{
-          border: "1px solid #d9d9d9",
-          borderRadius: "8px",
-          padding: "16px",
-          marginTop: "24px",
-          marginBottom: "24px",
-        }}
-      >
-        <h3 style={{ marginBottom: "16px" }}>
-          Additional activities for next month
-        </h3>
-
-        {/* Additional Activities for Next Month Section */}
-        <Form.List name="additionalActivitiesNextMonth">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name }) => (
-                <Row align="middle" gutter={24} key={key}>
-                  <Col xs={24} sm={6}>
-                    <Form.Item
-                      label="Activity"
-                      name={[name, "activity"]}
-                      rules={[
-                        { required: true, message: "Activity is required" },
-                      ]}
-                    >
-                      <Input placeholder="Enter activity" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={6}>
-                    <Form.Item
-                      label="Functional Area"
-                      name={[name, "functionalArea"]}
-                      rules={[
-                        {
-                          required: true,
-                          message: "Functional Area is required",
-                        },
-                      ]}
-                    >
-                      <Select
-                        placeholder="Select functional area"
-                        options={functionalAreas}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={6}>
-                    <Form.Item label="Comments" name={[name, "comments"]}>
-                      <Input placeholder="Add comments" />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={6}>
-                    <Button
-                      type="text"
-                      onClick={() => remove(name)}
-                      icon={<MinusOutlined />}
-                    />
-                  </Col>
-                </Row>
-              ))}
-
-              <Button
-                type="dashed"
-                onClick={() => add()}
-                icon={<PlusOutlined />}
-              >
-                Add additional activity
-              </Button>
-            </>
-          )}
-        </Form.List>
-      </div>
-
-      {/* Praise/Prayer Request Section */}
-      <Row gutter={24}>
-        <Col xs={24}>
-          <Form.Item
-            label="Praise/Prayer Request"
-            name="praisePrayerRequest"
-          >
-            <Input.TextArea
-              placeholder="Enter Praise or Prayer Request"
-              rows={4}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      {/* Story/Testimony Section */}
-      <Row gutter={24}>
-        <Col xs={24}>
-          <Form.Item
-            label="Story/Testimony"
-            name="storyTestimony"
-          >
-            <Input.TextArea
-              placeholder="Enter your Story or Testimony"
-              rows={4}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      {/* Concerns/Struggles Section */}
-      <Row gutter={24}>
-        <Col xs={24}>
-          <Form.Item
-            label="Concerns/Struggles"
-            name="concernsStruggles"
-          >
-            <Input.TextArea
-              placeholder="Enter your Concerns or Struggles"
-              rows={4}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
+          {/* Concerns/Struggles Section */}
+          <Row gutter={24}>
+            <Col xs={24}>
+              <Form.Item label="Concerns/Struggles" name="concernsStruggles">
+                <Input.TextArea
+                  placeholder="Enter your Concerns or Struggles"
+                  rows={4}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </>
+      )}
 
       {/* Footer Actions */}
       <Space style={{ marginTop: "24px" }}>
         <Button type="default" onClick={() => form.resetFields()}>
           Reset
         </Button>
-        <Button type="default">Cancel</Button>
+        <Button type="default" href="/monthly-form">Cancel</Button>
         <Button type="primary" htmlType="submit">
           Save
         </Button>

@@ -5,12 +5,11 @@ import { Amplify } from "aws-amplify";
 import { message } from "antd";
 import outputs from "@root/amplify_outputs.json";
 import Page from "@/shared/ui/page/ui/Page";
-import { MonthlyFormsList } from "@/widgets/monthly-forms-list";
-import { CreateMonthlyFormButton } from "@/feature/create-monthly-form";
+import CreateMonthlyFormForm from "@/feature/create-monthly-form/ui/CreateMonthlyFormForm";
 
 Amplify.configure(outputs);
 
-export default function MonthlyFormList() {
+export default function CreateMonthlyFormPage() {
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
   return (
     <>
@@ -18,7 +17,7 @@ export default function MonthlyFormList() {
     <Page
     showPageHeader
       header={{
-        title: "Monthly forms",
+        title: "Create monthly form",
         breadcrumbs: [
           {
             title: "Home",
@@ -27,12 +26,11 @@ export default function MonthlyFormList() {
 
           {
             title: "Monthly forms",
-            href: "/monthly-form",
+            href: "/monthly-form/create",
           },
         ],
-        extra: <CreateMonthlyFormButton />,
       }}
-      content={<MonthlyFormsList />}
+      content={<CreateMonthlyFormForm messageApi={messageApi}/>}
     />
     </>
   );
