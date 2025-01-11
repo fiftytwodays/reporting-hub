@@ -16,6 +16,11 @@ export const columns = [
     key: "project",
   },
   {
+    title: "Facilitator",
+    dataIndex: "facilitator",
+    key: "facilitator",
+  },
+  {
     title: "Cluster",
     dataIndex: "cluster",
     key: "cluster",
@@ -24,11 +29,6 @@ export const columns = [
     title: "Region",
     dataIndex: "region",
     key: "region",
-  },
-  {
-    title: "Facilitator",
-    dataIndex: "facilitator",
-    key: "facilitator",
   },
 
 ] 
