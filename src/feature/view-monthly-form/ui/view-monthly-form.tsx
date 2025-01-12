@@ -62,129 +62,173 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
         </Row>
 
         {/* Goals List */}
-        <h3>Outcomes from the Month Just Ended</h3>
-        {data.goalsList.map((goal, index) => (
-          <Row gutter={24} key={index}>
-            <Col xs={24} sm={6}>
-              <Form.Item label="Goal" name={["goalsList", index, "goal"]}>
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={6}>
-              <Form.Item
-                label="Achieved"
-                name={["goalsList", index, "achieved"]}
-              >
-                <Select>
-                  <Select.Option value={true}>Yes</Select.Option>
-                  <Select.Option value={false}>No</Select.Option>
-                </Select>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={6}>
-              <Form.Item
-                label="Reason for not achieving"
-                name={["goalsList", index, "whyNotAchieved"]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={6}>
-              <Form.Item
-                label="Comments"
-                name={["goalsList", index, "comments"]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-        ))}
+        <div
+          style={{
+            border: "1px solid #d9d9d9",
+            borderRadius: "8px",
+            padding: "10px",
+            marginTop: "16px",
+          }}
+        >
+          <h3>Outcomes from the Month Just Ended</h3>
+          {data.goalsList.map((goal, index) => (
+            <Row gutter={24} key={index}>
+              <Col xs={24} sm={6}>
+                <Form.Item
+                  label={index === 0 ? "Goal" : ""}
+                  name={["goalsList", index, "goal"]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={6}>
+                <Form.Item
+                  label={index === 0 ? "Achieved" : ""}
+                  name={["goalsList", index, "achieved"]}
+                >
+                  <Select>
+                    <Select.Option value={true}>Yes</Select.Option>
+                    <Select.Option value={false}>No</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={6}>
+                <Form.Item
+                  label={index === 0 ? "Reason for not achieving" : ""}
+                  name={["goalsList", index, "whyNotAchieved"]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={6}>
+                <Form.Item
+                  label={index === 0 ? "Comments" : ""}
+                  name={["goalsList", index, "comments"]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+            </Row>
+          ))}
+        </div>
 
         {/* Additional Activities */}
-        <h3>Additional Activities</h3>
-        {data.additionalActivities.map((activity, index) => (
-          <Row gutter={24} key={index}>
-            <Col xs={24} sm={8}>
-              <Form.Item
-                label="Activity"
-                name={["additionalActivities", index, "activity"]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Form.Item
-                label="Functional Area"
-                name={["additionalActivities", index, "functionalArea"]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Form.Item
-                label="Comments"
-                name={["additionalActivities", index, "comments"]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-        ))}
+        <div
+          style={{
+            border: "1px solid #d9d9d9",
+            borderRadius: "8px",
+            padding: "10px",
+            marginTop: "16px",
+          }}
+        >
+          <h3>Additional Activities</h3>
+          {data.additionalActivities.map((activity, index) => (
+            <Row gutter={24} key={index}>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={index === 0 ? "Activity" : ""}
+                  name={["additionalActivities", index, "activity"]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={index === 0 ? "Functional area" : ""}
+                  name={["additionalActivities", index, "functionalArea"]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={index === 0 ? "Comments" : ""}
+                  name={["additionalActivities", index, "comments"]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+            </Row>
+          ))}
+        </div>
 
         {/* Next Month Goals */}
-        <h3>Goals for Next Month</h3>
-        {data.nextMonthGoals.map((goal, index) => (
-          <Row gutter={24} key={index}>
-            <Col xs={24} sm={8}>
-              <Form.Item
-                label="Activity"
-                name={["nextMonthGoals", index, "activity"]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Form.Item
-                label="Functional Area"
-                name={["nextMonthGoals", index, "functionalArea"]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={8}>
-              <Form.Item
-                label="Comments"
-                name={["nextMonthGoals", index, "comments"]}
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
-        ))}
+        <div
+          style={{
+            border: "1px solid #d9d9d9",
+            borderRadius: "8px",
+            padding: "10px",
+            marginTop: "16px",
+          }}
+        >
+          <h3>Goals for Next Month</h3>
+          {data.nextMonthGoals.map((goal, index) => (
+            <Row gutter={24} key={index}>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={index === 0 ? "Activity" : ""}
+                  name={["nextMonthGoals", index, "activity"]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={index === 0 ? "Functional area" : ""}
+                  name={["nextMonthGoals", index, "functionalArea"]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={8}>
+                <Form.Item
+                  label={index === 0 ? "Comments" : ""}
+                  name={["nextMonthGoals", index, "comments"]}
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+            </Row>
+          ))}
+        </div>
 
         {/* Praise Points */}
         <h3>Praise Points</h3>
-        {data.praisePoints.map((point, index) => (
-          <Form.Item
-            label={`Praise Point ${index + 1}`}
-            key={index}
-            name={["praisePoints", index, "point"]}
-          >
-            <Input />
+        <div
+          style={{
+            border: "1px solid #d9d9d9",
+            borderRadius: "8px",
+            padding: "10px",
+            marginTop: "16px",
+          }}
+        >
+          <Form.Item name="praisePoints">
+            <ul>
+              {data.praisePoints.map((point, index) => (
+                <li key={index}>{point.point}</li>
+              ))}
+            </ul>
           </Form.Item>
-        ))}
+        </div>
 
         {/* Prayer Requests */}
-        <h3>Prayer Requests</h3>
-        {data.prayerRequests.map((request, index) => (
-          <Form.Item
-            label={`Prayer Request ${index + 1}`}
-            key={index}
-            name={["prayerRequests", index, "request"]}
-          >
-            <Input />
+        <div
+          style={{
+            border: "1px solid #d9d9d9",
+            borderRadius: "8px",
+            padding: "10px",
+            marginTop: "16px",
+          }}
+        >
+          <h3>Prayer Requests</h3>
+          <Form.Item name="prayerRequests">
+            <ul>
+              {data.prayerRequests.map((request, index) => (
+                <li key={index}>{request.request}</li>
+              ))}
+            </ul>
           </Form.Item>
-        ))}
+        </div>
 
         {/* Story Testimony */}
         <h3>Story Testimony</h3>

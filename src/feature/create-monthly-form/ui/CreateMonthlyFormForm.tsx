@@ -141,8 +141,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
-              padding: "16px",
-              marginTop: "24px",
+              padding: "10px",
+              marginTop: "16px",
             }}
           >
             <h3 style={{ marginBottom: "16px" }}>
@@ -233,8 +233,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
-              padding: "16px",
-              marginTop: "24px",
+              padding: "10px",
+              marginTop: "16px",
             }}
           >
             <h3 style={{ marginBottom: "16px" }}>
@@ -306,8 +306,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
-              padding: "16px",
-              marginTop: "24px",
+              padding: "10px",
+              marginTop: "16px",
             }}
           >
             <h3 style={{ marginBottom: "16px" }}>Goals for next month</h3>
@@ -357,8 +357,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
-              padding: "16px",
-              marginTop: "24px",
+              padding: "10px",
+              marginTop: "16px",
               marginBottom: "24px",
             }}
           >
@@ -431,8 +431,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
-              padding: "16px",
-              marginTop: "24px",
+              padding: "10px",
+              marginTop: "16px",
               marginBottom: "24px",
             }}
           >
@@ -491,8 +491,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
-              padding: "16px",
-              marginTop: "24px",
+              padding: "10px",
+              marginTop: "16px",
               marginBottom: "24px",
             }}
           >
