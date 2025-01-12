@@ -189,6 +189,7 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                           label={name === 0 ? "Reason for not achieving" : ""}
                           name={[name, "whyNotAchieved"]}
                           dependencies={[name, "achieved"]}
+                          required={false}
                           rules={[
                             ({ getFieldValue }) => ({
                               required:
@@ -321,9 +322,6 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                         <Form.Item
                           label={name === 0 ? "Goal" : ""}
                           name={[name, "goal"]}
-                          rules={[
-                            { required: true, message: "Goal is required" },
-                          ]}
                         >
                           <Input disabled />
                         </Form.Item>
@@ -332,12 +330,6 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                         <Form.Item
                           label={name === 0 ? "Functional area" : ""}
                           name={[name, "functionalArea"]}
-                          rules={[
-                            {
-                              required: true,
-                              message: "Functional Area is required",
-                            },
-                          ]}
                         >
                           <Select options={functionalAreas} disabled />
                         </Form.Item>

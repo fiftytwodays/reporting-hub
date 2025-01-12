@@ -189,6 +189,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                           label={name === 0 ? "Reason for not achieving" : ""}
                           name={[name, "whyNotAchieved"]}
                           dependencies={[name, "achieved"]}
+                          required={false}
                           rules={[
                             ({ getFieldValue }) => ({
                               required:
