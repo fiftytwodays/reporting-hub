@@ -25,7 +25,17 @@ const layoutStyle = {
 const items = [
   {
     key: "monthly-form",
-    label: <Link href="/monthly-form">Monthly form</Link>,
+    label: "Monthly form",
+    children: [
+      {
+        key: "my-forms",
+        label: <Link href="/monthly-form/my-forms">My forms</Link>,
+      },
+      {
+        key: "approver-view",
+        label: <Link href="/monthly-form/approver-view">Approver view</Link>,
+      },
+    ]
   },
   {
     key: "yearly-form",

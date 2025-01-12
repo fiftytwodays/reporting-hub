@@ -8,7 +8,7 @@ interface MonthlyFormsListProps {
   isLoading: boolean;
 }
 
-export default function MonthlyFormsList({ data, isLoading }: MonthlyFormsListProps) {
+export default function MonthlyFormsApproverList({ data, isLoading }: MonthlyFormsListProps) {
   return (
     <EntityList
       rowKey="id"

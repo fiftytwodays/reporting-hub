@@ -2,7 +2,7 @@ import { message, Select } from "antd";
 import { useState } from "react";
 import { data } from "@/entities/monthly-form/api/monthly-forms-list";
 import { MonthlyForm } from "@/entities/monthly-form/config/types";
-import { MonthlyFormsList as _MonthlyFormsList } from "@/entities/monthly-form";
+import { MonthlyFormsApproverList as _MonthlyFormsList } from "@/entities/monthly-form -approver";
 import { projects } from "../config/projects";
 
 interface Data {
@@ -12,7 +12,7 @@ interface Data {
   projectDelta: MonthlyForm[];
 }
 
-export default function MonthlyFormsList() {
+export default function MonthlyFormsListApprover() {
   const [messageApi, contextHolder] = message.useMessage({
     maxCount: 1,
     duration: 2,
