@@ -1,4 +1,4 @@
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
 
@@ -16,16 +16,29 @@ const fetchRegionList = async (filter: Record<string, any>) => {
 export default function useRegionList({
   condition = true,
   filter = {},
-}: FetchOptions) {
+}: FetchOptions = {}) {
   const { data, error, isLoading } = useSWR(
-    condition ? ["/api/region-list", filter] : null,
+    condition ? ["/api/regions", filter] : null,
     ([, filter]) => fetchRegionList(filter),
     { keepPreviousData: true }
   );
+
+  const reloadRegionsList = () => {
+    mutate(
+      (keys) =>
+        Array.isArray(keys) &&
+        keys.some((item) => item.startsWith("/api/regions")),
+      undefined,
+      {
+        revalidate: true,
+      }
+    );
+  };
 
   return {
     regionList: condition ? data : [],
     isRegionListLoading: isLoading,
     regionListError: error,
+    reloadRegionsList: reloadRegionsList,
   };
 }
