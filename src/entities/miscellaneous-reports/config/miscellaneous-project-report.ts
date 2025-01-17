@@ -19,20 +19,16 @@ export const years = [
 
 export const miscellaneous = [
     {
-        label: "Prayer request",
-        value: "prayerRequest"
-    },
-    {
-        label: "Praise points",
-        value: "praisePoints"
+        label: "Praise points/Prayer request",
+        value: "Praise points/Prayer request"
     },
     {
         label: "Concerns/Struggles",
-        value: "concerns_struggles"
+        value: "Concerns/Struggles"
     },
     {
         label: "Stories/Testimony",
-        value: "stories_testimony"
+        value: "Stories/Testimony"
     }
 ];
 

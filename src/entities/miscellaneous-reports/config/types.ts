@@ -1,11 +1,10 @@
 export interface MiscellaneousProjectReport {
   id: number;
   project: string;
-  cluster: string;
-  region: string;
   facilitator: string;
-  status: string;
-  type: Array<String>;
+  type?: Array<String>;
+  praisePoints?: Array<String>;
+  prayerRequests?: Array<String>;
 }
 
 export interface ApiResponse {

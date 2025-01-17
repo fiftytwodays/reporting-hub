@@ -17,6 +17,44 @@ export const projects = [
     }
 ];
 
+export const years = [
+    {
+        label: "2024",
+        value: "2024"
+    },
+    {
+        label: "2023",
+        value: "2023"
+    },
+    {
+        label: "2022",
+        value: "2022"
+    },
+    {
+        label: "2021",
+        value: "2021"
+    }
+];
+
+export const clusters = [
+    {
+        label: "Kerala",
+        value: "kerala"
+    },
+    {
+        label: "Himalayan",
+        value: "himalayan"
+    },
+    {
+        label: "Tamilnadu",
+        value: "tamilnadu"
+    },
+    {
+        label: "Karnataka",
+        value: "karnataka"
+    }
+];
+
 export const months = [
     {
         label: "January",

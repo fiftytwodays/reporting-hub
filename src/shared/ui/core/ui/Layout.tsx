@@ -61,7 +61,7 @@ const items = [
         key: "reporting-status-report",
         label: (
           <Link href="/reports/reporting-status-reports">
-            Reporting status report
+            Monthly reports
           </Link>
         ),
       },

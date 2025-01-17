@@ -20,7 +20,7 @@ export default function ProjectReports() {
     <Page
     showPageHeader
       header={{
-        title: "Reporting status report",
+        title: "Monthly report",
         breadcrumbs: [
           {
             title: "Home",
@@ -28,7 +28,7 @@ export default function ProjectReports() {
           },
 
           {
-            title: "Reporting status reports",
+            title: "Monthly report",
             href: "/reports/reporting-status-reports",
           },
         ],

@@ -3,6 +3,7 @@ export interface Column<T = any> {
   title: string;
   dataIndex?: keyof T | undefined;
   hidden?: boolean;
+  width?: string|number;
   render?: (params: T) => any;
   actions?: string[];
   onViewAction?: (params: T) => any;

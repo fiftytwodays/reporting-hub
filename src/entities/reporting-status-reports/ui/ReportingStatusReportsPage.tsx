@@ -1,11 +1,15 @@
 import { Divider, Select, Space } from "antd";
 import { months } from "../config/reporting-status-report";
 import { data } from "../api/reporting-status-reports";
-import { useState } from "react";
+import dayjs from "dayjs";
 import ReportingStatusReportsList from "./ReportingStatusReportsList";
 
 export default function ReportingStatusReportsPage() {
-  const [isMonthSelected, setIsMonthSelected] = useState(false);
+  const currentDate = dayjs();
+  const currentMonth = currentDate.month(); // dayjs months are 0-indexed
+
+  // Adjust for January (month 1) when subtracting 1 month
+  const finalMonth = currentMonth > 0 ? currentMonth : 12;
 
   return (
     <>
@@ -13,11 +17,12 @@ export default function ReportingStatusReportsPage() {
         <Select
           placeholder="Select month"
           options={months}
-          onChange={() => setIsMonthSelected(true)}
+          // onChange={}
+          defaultValue={finalMonth}
         />
       </Space>
       <Divider />
-      {isMonthSelected && <ReportingStatusReportsList data={data} />}
+      <ReportingStatusReportsList data={data} />
     </>
   );
 }
