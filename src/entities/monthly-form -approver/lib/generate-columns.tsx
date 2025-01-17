@@ -2,13 +2,12 @@ import React from "react";
 import { Button } from "antd";
 import styled from "@emotion/styled";
 import { Flex, Space, Typography, Popconfirm } from "antd";
-import { MonthlyForm } from "../config/types";
 
 interface Column<T = any> {
-  key: string;
+  key?: string | undefined;
   title: string;
   type?: string;
-  dataIndex?: string;
+  dataIndex?: string | number | symbol | undefined;
   hidden?: boolean;
   dataType?: string;
   copyable?: boolean;
@@ -16,7 +15,7 @@ interface Column<T = any> {
 }
 
 export default function generateColumns<T>(
-  columns: Column[],
+  columns: Column<any>[],
 ): Column<T>[] {
   const { Text } = Typography;
 
