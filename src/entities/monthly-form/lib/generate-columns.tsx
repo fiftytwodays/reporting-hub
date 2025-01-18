@@ -2,43 +2,34 @@ import React from "react";
 import { Button } from "antd";
 import styled from "@emotion/styled";
 import { Flex, Space, Typography, Popconfirm } from "antd";
-import { MonthlyForm } from "../config/types";
 
 interface Column<T = any> {
-  key: string;
+  key?: string | undefined;
   title: string;
   type?: string;
-  dataIndex?: string;
+  dataIndex?: string | number | symbol | undefined;
   hidden?: boolean;
   dataType?: string;
   copyable?: boolean;
   render?: (value: any, record: any, index: number) => React.ReactNode;
 }
 
-export default function generateColumns<T>(
-  columns: Column[],
-): Column<T>[] {
+export default function generateColumns<T>(columns: Column<any>[]): Column<T>[] {
   const { Text } = Typography;
 
   return columns.map((column) => ({
     ...column,
-    render: (item: any, record: any) => {
+    render: (item: any, record: any, index: number) => {
       if (column.key === "actions") {
         return (
           <div>
             <Space>
               {record.status !== "Approved" && (
-                <_Button
-                  type="link"
-                  href={`/monthly-form/my-forms/abc/edit`}
-                >
+                <_Button type="link" href={`/monthly-form/my-forms/abc/edit`}>
                   Edit
                 </_Button>
               )}
-              <_Button
-                type="link"
-                href={`/monthly-form/my-forms/abc/view`}
-              >
+              <_Button type="link" href={`/monthly-form/my-forms/abc/view`}>
                 View
               </_Button>
             </Space>
@@ -58,8 +49,8 @@ export default function generateColumns<T>(
       if (column?.dataType === "array") {
         return (
           <Flex gap="middle" vertical>
-            <Text>{item && item[0]}</Text>
-            <Text>{item && item[1]}</Text>
+            <Typography.Text>{item[0]}</Typography.Text>
+            <Typography.Text>{item[1]}</Typography.Text>
           </Flex>
         );
       }
