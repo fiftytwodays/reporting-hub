@@ -1,4 +1,4 @@
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
 
@@ -16,16 +16,29 @@ const fetchClusterList = async (filter: Record<string, any>) => {
 export default function useClusterList({
   condition = true,
   filter = {},
-}: FetchOptions) {
+}: FetchOptions = {}) {
   const { data, error, isLoading } = useSWR(
-    condition ? ["clusterList", filter] : null,
+    condition ? ["/api/clusters", filter] : null,
     ([, filter]) => fetchClusterList(filter),
     { keepPreviousData: true }
   );
+
+  const reloadClustersList = () => {
+    mutate(
+      (keys) =>
+        Array.isArray(keys) &&
+        keys.some((item) => item.startsWith("/api/clusters")),
+      undefined,
+      {
+        revalidate: true,
+      }
+    );
+  };
 
   return {
     clusterList: condition ? data : [],
     isClusterListLoading: isLoading,
     clusterListError: error,
+    reloadClustersList: reloadClustersList,
   };
 }

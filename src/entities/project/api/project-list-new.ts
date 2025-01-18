@@ -1,4 +1,4 @@
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
 
@@ -16,16 +16,29 @@ const fetchProjectList = async (filter: Record<string, any>) => {
 export default function useProjectList({
   condition = true,
   filter = {},
-}: FetchOptions) {
+}: FetchOptions = {}) {
   const { data, error, isLoading } = useSWR(
-    condition ? ["api/project-list", filter] : null,
+    condition ? ["/api/projects", filter] : null,
     ([, filter]) => fetchProjectList(filter),
     { keepPreviousData: true }
   );
+
+  const reloadProjectList = () => {
+    mutate(
+      (keys) =>
+        Array.isArray(keys) &&
+        keys.some((item) => item.startsWith("/api/projects")),
+      undefined,
+      {
+        revalidate: true,
+      }
+    );
+  };
 
   return {
     projectList: condition ? data : [],
     isProjectListLoading: isLoading,
     projectListError: error,
+    reloadProjectList: reloadProjectList,
   };
 }
