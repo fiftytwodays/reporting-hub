@@ -36,12 +36,21 @@ export const columns = (miscTitle: string) => {
             dataType: "array",
           },
         ]
+      : miscTitle === "Concerns/Struggles"
+      ? [
+          {
+            title: "Concerns/Struggles",
+            dataIndex: "concerns",
+            key: "concerns",
+            dataType: "string",
+          },
+        ]
       : [
           {
-            title: miscTitle,
-            dataIndex: "type",
-            key: "type",
-            dataType: "array",
+            title: "Stories/Testimony",
+            dataIndex: "story",
+            key: "story",
+            dataType: "string",
           },
         ];
 

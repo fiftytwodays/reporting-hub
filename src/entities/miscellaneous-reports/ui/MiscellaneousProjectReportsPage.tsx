@@ -42,7 +42,7 @@ export default function MiscellaneousProjectReportsPage() {
         </Col>
         <Col>
           {isYearSelected && isMonthSelected && isReportTypeSelected && (
-            <ExportMiscellaneousReportButton data={data} />
+            <ExportMiscellaneousReportButton data={data} miscTitle={miscTitle}/>
           )}
         </Col>
       </Row>

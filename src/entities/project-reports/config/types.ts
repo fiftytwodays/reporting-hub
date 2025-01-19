@@ -30,6 +30,10 @@ export interface ProjectReport {
   additionalActivities: MonthlyGoal[];
   nextMonthGoal: NextMonthGoal[];
   nextMonthAdditional: NextMonthGoal[];
+  praisePoints: string[];
+  prayerRequests: string[];
+  story: string;
+  concerns: string;
 }
 
 

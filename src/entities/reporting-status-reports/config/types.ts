@@ -12,6 +12,10 @@ export interface ReportingStatusReport {
   additionalActivities: MonthlyGoal[];
   nextMonthGoal: NextMonthGoal[];
   nextMonthAdditional: NextMonthGoal[];
+  praisePoints: string[];
+  prayerRequests: string[];
+  story: string;
+  concerns: string;
 }
 
 export interface Goal {

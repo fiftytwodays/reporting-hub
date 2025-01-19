@@ -27,7 +27,7 @@ export default function generateColumns<T>(
         return (
           <div>
             <Space>
-              <_Button type="link" onClick={() => handleExport(item)}>
+              <_Button type="link" onClick={() => handleExport(item.id)}>
                 Export
               </_Button>
             </Space>

@@ -2,9 +2,10 @@ export interface MiscellaneousProjectReport {
   id: number;
   project: string;
   facilitator: string;
-  type?: Array<String>;
-  praisePoints?: Array<String>;
-  prayerRequests?: Array<String>;
+  concerns?: string;
+  story?: string;
+  praisePoints?: Array<string>;
+  prayerRequests?: Array<string>;
 }
 
 export interface ApiResponse {
