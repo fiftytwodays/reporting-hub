@@ -7,11 +7,15 @@ import { MiscellaneousProjectReport } from "@/entities/miscellaneous-reports/con
 interface ExportMiscellaneousReportButtonProps {
   data: MiscellaneousProjectReport[] | undefined;
   miscTitle: string;
+  year: string;
+  month: string;
 }
 
 export default function ExportMiscellaneousReportButton({
   data,
   miscTitle,
+  year,
+  month,
 }: ExportMiscellaneousReportButtonProps) {
   const exportDocument = (projectReports: MiscellaneousProjectReport[]) => {
     console.log("Misc title is ", miscTitle);
@@ -35,6 +39,17 @@ export default function ExportMiscellaneousReportButton({
             bold: true,
           }),
         ],
+      }),
+
+      new Paragraph({
+        text: `Month: ${month}`,
+        spacing: { after: 200 },
+        bullet: { level: 0 },
+      }),
+      new Paragraph({
+        text: `Year: ${year}`,
+        bullet: { level: 0 },
+        spacing: { after: 200 },
       }),
 
       // Loop through projects and create content for each project

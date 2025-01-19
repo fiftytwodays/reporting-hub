@@ -14,6 +14,8 @@ export default function MiscellaneousProjectReportsPage() {
   const [isMonthSelected, setIsMonthSelected] = useState(false);
   const [isReportTypeSelected, setIsReportTypeSelected] = useState(false);
   const [miscTitle, setMiscTitle] = useState<string>("");
+  const [month, setMonth] = useState<string>("");
+  const [year, setYear] = useState<string>("");
 
   return (
     <>
@@ -23,12 +25,18 @@ export default function MiscellaneousProjectReportsPage() {
             <Select
               options={years}
               placeholder="Select year"
-              onChange={() => setIsYearSelected(true)}
+              onChange={(value) => {
+                setIsYearSelected(true);
+                setYear(value);
+              }}
             />
             <Select
               placeholder="Select month"
               options={months}
-              onChange={() => setIsMonthSelected(true)}
+              onChange={(value) => {
+                setIsMonthSelected(true);
+                setMonth(value);
+              }}
             />
             <Select
               placeholder="Select report type"
@@ -42,7 +50,12 @@ export default function MiscellaneousProjectReportsPage() {
         </Col>
         <Col>
           {isYearSelected && isMonthSelected && isReportTypeSelected && (
-            <ExportMiscellaneousReportButton data={data} miscTitle={miscTitle}/>
+            <ExportMiscellaneousReportButton
+              data={data}
+              miscTitle={miscTitle}
+              month={month}
+              year={year}
+            />
           )}
         </Col>
       </Row>
