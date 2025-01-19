@@ -6,12 +6,14 @@ import React from "react";
 import type {
   TablePaginationConfig,
   SorterResult,
+  ExpandableConfig,
 } from "antd/lib/table/interface";
 
 import type { Column } from "../config/types";
 interface EntityListProps {
   componentRef?: React.RefObject<HTMLDivElement> | null;
   columns?: Column<any>[];
+  expandable?: ExpandableConfig<any>;
   mapColumn?: (columns: Column<any>[]) => Column<any>[];
   data?: any[];
   rowKey?: string;
@@ -34,6 +36,7 @@ interface EntityListProps {
 
 const EntityList: React.FC<EntityListProps> = ({
   componentRef = null,
+  expandable = undefined,
   columns = [],
   data = [],
   rowKey = "id",
@@ -93,6 +96,7 @@ const EntityList: React.FC<EntityListProps> = ({
         <Table
           title={title ? () => title : undefined}
           loading={isLoading}
+          expandable={expandable}
           bordered={isBordered}
           columns={mapColumn(visibleColumns)}
           dataSource={data}

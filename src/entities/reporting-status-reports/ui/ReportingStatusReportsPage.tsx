@@ -1,5 +1,5 @@
 import { Divider, Select, Space } from "antd";
-import { months } from "../config/reporting-status-report";
+import { months, years } from "../config/reporting-status-report";
 import { data } from "../api/reporting-status-reports";
 import dayjs from "dayjs";
 import ReportingStatusReportsList from "./ReportingStatusReportsList";
@@ -7,13 +7,19 @@ import ReportingStatusReportsList from "./ReportingStatusReportsList";
 export default function ReportingStatusReportsPage() {
   const currentDate = dayjs();
   const currentMonth = currentDate.month(); // dayjs months are 0-indexed
+  const currentYear = currentMonth == 0? currentDate.year()-1 : currentDate.year();
 
-  // Adjust for January (month 1) when subtracting 1 month
   const finalMonth = currentMonth > 0 ? currentMonth : 12;
 
   return (
     <>
       <Space>
+      <Select
+          placeholder="Select year"
+          options={years}
+          // onChange={}
+          defaultValue={currentYear}
+        />
         <Select
           placeholder="Select month"
           options={months}
