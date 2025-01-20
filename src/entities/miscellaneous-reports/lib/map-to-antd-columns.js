@@ -108,11 +108,19 @@ export default function mapToAntDColumns(columns) {
 
         if (column?.dataType === "array") {
           return (
-            <List
-              size="small"
-              dataSource={item}
-              renderItem={(tag) => <List.Item style={{ padding: '0px' }}>{tag}</List.Item>}
-            />
+            <ul style={{ padding: "0 0 0 20px", margin: "0" }}>
+              {item.map((tag, index) => (
+                <li
+                  key={index}
+                  style={{
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {tag}
+                </li>
+              ))}
+            </ul>
           );
         }
 
