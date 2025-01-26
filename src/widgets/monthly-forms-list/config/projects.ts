@@ -141,21 +141,25 @@ export const functionalAreas = [
 export const nextMonthGoals = [
     {
         activity: "Improve Operational Efficiency",
+        majorGoal: true,
         functionalArea: "learning",
         comments: "No comments"
     },
     {
         activity: "Reduce Customer Churn",
+        majorGoal: false,
         functionalArea: "learning",
         comments: "NA"
     },
     {
         activity: "Improve Operational Efficiency",
+        majorGoal: true,
         functionalArea: "learning",
         comments: "No comments"
     },
     {
         activity: "Reduce Customer Churn",
+        majorGoal: true,
         functionalArea: "learning",
         comments: "NA"
     },

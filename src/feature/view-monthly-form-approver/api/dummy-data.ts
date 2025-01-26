@@ -4,12 +4,14 @@ export const values = {
     "goalsList": [
       {
         "goal": "Complete Module 1",
+        "majorGoal": true,
         "achieved": true,
         "whyNotAchieved": null,
         "comments": "Achieved ahead of schedule."
       },
       {
         "goal": "Fix Critical Bugs",
+        "majorGoal": false,
         "achieved": false,
         "whyNotAchieved": "Limited resources available.",
         "comments": "Need additional support next month."
@@ -18,11 +20,13 @@ export const values = {
     "additionalActivities": [
       {
         "activity": "Team training session",
+        "majorGoal": false,
         "functionalArea": "Development",
         "comments": "Focus on DevOps practices."
       },
       {
         "activity": "Customer demo",
+        "majorGoal": false,
         "functionalArea": "Sales",
         "comments": "Positive feedback received."
       }
@@ -30,11 +34,13 @@ export const values = {
     "nextMonthGoals": [
       {
         "activity": "Launch Beta Version",
+        "majorGoal": false,
         "functionalArea": "Development",
         "comments": "Targeting first week of February."
       },
       {
         "activity": "Complete documentation",
+        "majorGoal": false,
         "functionalArea": "Technical Writing",
         "comments": "Assign to the writing team."
       }
@@ -42,6 +48,7 @@ export const values = {
     "additionalActivitiesNextMonth": [
       {
         "activity": "Stakeholder meeting",
+        "majorGoal": true,
         "functionalArea": "Management",
         "comments": "Discuss Q1 roadmap."
       }
