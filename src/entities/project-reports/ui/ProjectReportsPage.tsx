@@ -73,7 +73,7 @@ export default function ProjectReportsPage() {
             showPageHeader
             header={{
               title: "Project reports",
-              extra: <ExportProjectReportButton data={data} />,
+              extra: <ExportProjectReportButton data={data} isClusterSelected={isClusterSelected} isProjectSelected={isProjectSelected}/>,
             }}
             content={<ProjectReportsList data={data} />}
           />

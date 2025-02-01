@@ -10,6 +10,8 @@ import {
   TableRow,
   AlignmentType,
   WidthType,
+  HeadingLevel,
+  FileChild,
 } from "docx";
 import { saveAs } from "file-saver";
 import { ProjectReport } from "@/entities/project-reports/config/types";
@@ -19,325 +21,319 @@ interface ProjectReportProps {
 }
 
 const createTable = (data: any[], columns: string[]) => {
+  // Ensure there's data to work with
+  if (!data || data.length === 0) {
+    return [
+      new Table({
+        rows: [],
+        width: { size: 100, type: WidthType.PERCENTAGE },
+      }),
+    ]; // Return an empty table if no data
+  }
+
+  // Create table rows for each entry in the data
   const tableRows = data.map((item) => {
     return new TableRow({
       children: columns.map((col) => {
+        // Check for 'majorGoal' and 'achieved' columns and handle boolean conversion
+        const cellValue =
+          col === "majorGoal" || col === "achieved"
+            ? item[col]
+              ? "Yes"
+              : "No"
+            : item[col] || ""; // Default to empty string if value is undefined
+
         return new TableCell({
           children: [
             new Paragraph({
-              text: item[col] || "",
+              children: [
+                new TextRun({
+                  text: cellValue, // Use transformed value
+                  size: 14, // Set font size for content in table
+                }),
+              ],
               alignment: AlignmentType.LEFT,
             }),
           ],
-          width: { size: 25, type: WidthType.PERCENTAGE },
+          width: { size: 20, type: WidthType.PERCENTAGE }, // Adjust width
         });
       }),
     });
   });
 
+  // Create header row with columns
   const headerRow = new TableRow({
     children: columns.map((col) => {
       return new TableCell({
         children: [
           new Paragraph({
-            text: col,
+            children: [
+              new TextRun({
+                text: col.replace(/([A-Z])/g, " $1").toUpperCase(), // Formatting column name for readability
+                bold: true, // Apply bold styling here
+                size: 14, // Set font size for header
+              }),
+            ],
             alignment: AlignmentType.CENTER,
           }),
         ],
-        width: { size: 25, type: WidthType.PERCENTAGE },
+        width: { size: 20, type: WidthType.PERCENTAGE }, // Adjust width
       });
     }),
   });
 
-  return new Table({
-    rows: [headerRow, ...tableRows],
-    width: { size: 100, type: WidthType.PERCENTAGE },
-  });
+  // Return the final table with header row and data rows
+  return [
+    new Table({
+      rows: [headerRow, ...tableRows],
+      width: { size: 100, type: WidthType.PERCENTAGE },
+    }),
+  ];
 };
 
-const exportDocument = (report: ProjectReport) => {
-  const documentContent = [
+const exportDocument = (singleProjectReport: ProjectReport) => {
+  const documentChildren: FileChild[] = []; // Make sure the type is an array of FileChild
+
+  // Add Main Heading
+  documentChildren.push(
     new Paragraph({
-      alignment: AlignmentType.CENTER,
-      heading: "Heading1",
-      spacing: { after: 200 },
       children: [
         new TextRun({
           text: "Project Report",
-          size: 32,
           bold: true,
+          size: 20, // Set font size for the main heading
         }),
       ],
-    }),
-
-    new Paragraph({
-      children: [new TextRun({ text: report.project, size: 24, bold: true })],
+      heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
-      spacing: { after: 200 },
-    }),
+      spacing: { after: 300 },
+    })
+  );
 
+  // Group data by project name (only for the single project)
+  const projectName = singleProjectReport.project;
+  documentChildren.push(
     new Paragraph({
-      text: `Facilitator: ${report.facilitator}`,
+      children: [
+        new TextRun({
+          text: projectName,
+          bold: true,
+          size: 18, // Set font size for the project name
+        }),
+      ],
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 200, after: 100 },
+    })
+  );
+
+  // Group by facilitator (only for the single facilitator of the selected report)
+  const facilitator = singleProjectReport.facilitator;
+  documentChildren.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: `Facilitator: ${facilitator}`,
+          bold: true,
+          size: 16, // Set font size for facilitator
+        }),
+      ],
+      heading: HeadingLevel.HEADING_2,
+      spacing: { before: 200, after: 100 },
+    })
+  );
+
+  // Add status, cluster, and region information
+  documentChildren.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: `Status: ${singleProjectReport.status} | Cluster: ${singleProjectReport.cluster} | Region: ${singleProjectReport.region}`,
+          size: 14, // Set font size for status and region
+        }),
+      ],
       spacing: { after: 100 },
-    }),
-    new Paragraph({
-      text: `Cluster: ${report.cluster}`,
-      bullet: { level: 0 },
-    }),
-    new Paragraph({
-      text: `Region: ${report.region}`,
-      bullet: { level: 0 },
-    }),
-    new Paragraph({
-      text: `Status: ${report.status}`,
-      bullet: { level: 0 },
-    }),
-    new Paragraph({ text: `Date: ${report.date}`, bullet: { level: 0 } }),
-    new Paragraph({
-      text: `Reporting Month: ${report.reportingMonth}`,
-      bullet: { level: 0 },
-    }),
-    new Paragraph({
-      text: `Year: ${report.year}`,
-      bullet: { level: 0 },
-      spacing: { after: 200 },
-    }),
+    })
+  );
 
+  // Add goals for the year and month
+  Object.entries(singleProjectReport.goals).forEach(([year, months]) => {
+    Object.entries(months).forEach(([month, monthlyGoals]) => {
+      documentChildren.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `${month} ${year} Goals`,
+              bold: true,
+              size: 14, // Set font size for goals heading
+            }),
+          ],
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 150, after: 50 },
+        })
+      );
+
+      documentChildren.push(
+        ...createTable(monthlyGoals, [
+          "goal",
+          "majorGoal",
+          "functionalArea",
+          "achieved",
+          "reason",
+          "comments",
+        ])
+      ); // Spread the array of Table returned by createTable
+    });
+  });
+
+  // Next Quarter Goals
+  documentChildren.push(
     new Paragraph({
       children: [
         new TextRun({
-          text: "Outcomes from the month just ended",
-          size: 18,
+          text: "Next Quarter Goals",
           bold: true,
+          size: 14, // Set font size for section title
         }),
       ],
-      heading: "Heading2",
-      spacing: { after: 200 },
-    }),
-
-    createTable(report.goalsFromLastMonth, [
+      spacing: { before: 150, after: 50 },
+    })
+  );
+  documentChildren.push(
+    ...createTable(singleProjectReport.nextMonth.goals, [
       "goal",
-      "functionalArea",
-      "achieved",
-      "reason",
-      "comments",
-    ]),
-
-    new Paragraph({
-      text: "",
-      style: "Line",
-      spacing: { after: 300 },
-    }),
-
-    new Paragraph({
-      children: [
-        new TextRun({
-          text: "Additional activities other than that was planned",
-          size: 18,
-          bold: true,
-        }),
-      ],
-      heading: "Heading2",
-      spacing: { after: 200 },
-    }),
-
-    createTable(report.additionalActivities, [
-      "goal",
-      "functionalArea",
-      "achieved",
-      "reason",
-      "comments",
-    ]),
-
-    new Paragraph({
-      text: "",
-      style: "Line",
-      spacing: { after: 300 },
-    }),
-
-    // Goals for next month section
-
-    new Paragraph({
-      children: [
-        new TextRun({
-          text: "Goals for next month",
-          size: 18,
-          bold: true,
-        }),
-      ],
-      heading: "Heading2",
-      spacing: { after: 200 },
-    }),
-
-    createTable(report.nextMonthGoal, ["goal", "functionalArea", "comments"]),
-
-    new Paragraph({
-      text: "",
-      style: "Line",
-      spacing: { after: 300 },
-    }),
-
-    new Paragraph({
-      children: [
-        new TextRun({
-          text: "Additional activities for next month",
-          size: 18,
-          bold: true,
-        }),
-      ],
-      heading: "Heading2",
-      spacing: { after: 200 },
-    }),
-
-    createTable(report.nextMonthAdditional, [
-      "goal",
+      "majorGoal",
       "functionalArea",
       "comments",
-    ]),
+    ])
+  );
 
-    new Paragraph({
-      text: "",
-      style: "Line",
-      spacing: { after: 300 },
-    }),
-
-    new Paragraph({
-      text: "",
-      style: "Line",
-      spacing: { after: 300 },
-    }),
-
+  // Next Quarter Additional Activities
+  documentChildren.push(
     new Paragraph({
       children: [
         new TextRun({
-          text: "Praise Points / Prayer Requests",
-          size: 18,
+          text: "Next Quarter Additional Activities",
           bold: true,
+          size: 14, // Set font size for section title
         }),
       ],
-      heading: "Heading2",
-      spacing: { after: 300 },
-    }),
+      spacing: { before: 150, after: 50 },
+    })
+  );
+  documentChildren.push(
+    ...createTable(singleProjectReport.nextMonth.additionalActivities, [
+      "goal",
+      "majorGoal",
+      "functionalArea",
+      "comments",
+    ])
+  );
 
+  // Praise Points
+  documentChildren.push(
     new Paragraph({
       children: [
         new TextRun({
-          text: "Praise for",
-          size: 16,
+          text: "Praise Points:",
           bold: true,
+          size: 14, // Set font size for section title
         }),
       ],
-      heading: "Heading3",
-      spacing: { after: 100 },
-    }),
-
-    ...(report.praisePoints && report.praisePoints.length > 0
-      ? report.praisePoints.map(
-          (point, index) =>
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: point,
-                  size: 14,
-                }),
-              ],
-              bullet: { level: 1 },
-              spacing: { after: 100 },
-            })
-        )
-      : [
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: "No praise points available.",
-                size: 14,
-              }),
-            ],
+      spacing: { before: 200, after: 50 },
+    })
+  );
+  singleProjectReport.praisePoints.forEach((point) => {
+    documentChildren.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `- ${point}`,
+            size: 14, // Set font size for praise points
           }),
-        ]),
+        ],
+        spacing: { after: 50 },
+      })
+    );
+  });
 
+  // Prayer Requests
+  documentChildren.push(
     new Paragraph({
       children: [
         new TextRun({
-          text: "Pray for",
-          size: 16,
+          text: "Prayer Requests:",
           bold: true,
+          size: 14, // Set font size for section title
         }),
       ],
-      heading: "Heading3",
-      spacing: { after: 100 },
-    }),
-    ...(report.prayerRequests && report.prayerRequests.length > 0
-      ? report.prayerRequests.map(
-          (request, index) =>
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: request,
-                  size: 14,
-                }),
-              ],
-              bullet: { level: 1 },
-              spacing: { after: 100 },
-            })
-        )
-      : [
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: "No prayer requests available.",
-                size: 14,
-              }),
-            ],
+      spacing: { before: 200, after: 50 },
+    })
+  );
+  singleProjectReport.prayerRequests.forEach((request) => {
+    documentChildren.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `- ${request}`,
+            size: 14, // Set font size for prayer requests
           }),
-        ]),
+        ],
+        spacing: { after: 50 },
+      })
+    );
+  });
 
+  // Story or Testimony
+  documentChildren.push(
     new Paragraph({
       children: [
         new TextRun({
-          text: "Story / Struggles",
-          size: 18,
+          text: "Story/Testimony:",
           bold: true,
+          size: 14, // Set font size for section title
         }),
       ],
-      heading: "Heading2",
-      spacing: { after: 300 },
-    }),
-
+      spacing: { before: 200, after: 50 },
+    })
+  );
+  documentChildren.push(
     new Paragraph({
       children: [
         new TextRun({
-          text: report.story || "No story or testimony available.",
-          size: 14,
+          text: singleProjectReport.story,
+          size: 14, // Set font size for story
         }),
       ],
-      spacing: { after: 300 },
-    }),
+      spacing: { after: 100 },
+    })
+  );
 
+  // Concerns
+  documentChildren.push(
     new Paragraph({
       children: [
         new TextRun({
-          text: "Concerns / Struggles",
-          size: 18,
+          text: "Concerns/Struggles:",
           bold: true,
+          size: 14, // Set font size for section title
         }),
       ],
-      heading: "Heading2",
-      spacing: { after: 300 },
-    }),
-
+      spacing: { before: 200, after: 50 },
+    })
+  );
+  documentChildren.push(
     new Paragraph({
       children: [
         new TextRun({
-          text: report.concerns || "No concerns or struggles available.",
-          size: 14,
+          text: singleProjectReport.concerns,
+          size: 14, // Set font size for concerns
         }),
       ],
-      spacing: { after: 300 },
-    }),
-  ];
+      spacing: { after: 200 },
+    })
+  );
 
-  return documentContent;
+  return documentChildren; // Make sure this returns only a valid array of FileChild[]
 };
 
 const exportData = (report: ProjectReport | undefined) => {
@@ -346,11 +342,12 @@ const exportData = (report: ProjectReport | undefined) => {
     return;
   }
 
+  // Create a document with sections, since the document expects a sections property
   const doc = new Document({
     sections: [
       {
-        properties: {},
-        children: exportDocument(report),
+        properties: {}, // You can leave properties empty if not needed
+        children: exportDocument(report), // Pass the content directly as children
       },
     ],
   });
