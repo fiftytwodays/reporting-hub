@@ -12,6 +12,7 @@ export const data = [
     goalsFromLastMonth: [
       {
         goal: "Increase local engagement",
+        majorGoal: true,
         functionalArea: "Community Outreach",
         achieved: "Yes",
         reason: "Strong volunteer participation",
@@ -19,6 +20,7 @@ export const data = [
       },
       {
         goal: "Host a workshop",
+        majorGoal: false,
         functionalArea: "Education",
         achieved: "No",
         reason: "Scheduling conflicts",
@@ -26,6 +28,7 @@ export const data = [
       },
       {
         goal: "Develop new partnerships",
+        majorGoal: true,
         functionalArea: "Partnerships",
         achieved: "Yes",
         reason: "Effective networking",
@@ -35,6 +38,7 @@ export const data = [
     additionalActivities: [
       {
         goal: "Organize a fundraising event",
+        majorGoal: true,
         functionalArea: "Fundraising",
         achieved: "Yes",
         reason: "High donor turnout",
@@ -42,6 +46,7 @@ export const data = [
       },
       {
         goal: "Launch awareness campaign",
+        majorGoal: true,
         functionalArea: "Marketing",
         achieved: "No",
         reason: "Budget constraints",
@@ -49,6 +54,7 @@ export const data = [
       },
       {
         goal: "Recruit volunteers",
+        majorGoal: false,
         functionalArea: "HR",
         achieved: "Yes",
         reason: "Successful outreach",
@@ -58,16 +64,19 @@ export const data = [
     nextMonthGoal: [
       {
         goal: "Conduct training sessions",
+        majorGoal: true,
         functionalArea: "Education",
         comments: "Focus on digital skills",
       },
       {
         goal: "Improve donor retention",
+        majorGoal: false,
         functionalArea: "Fundraising",
         comments: "Send personalized thank-you notes",
       },
       {
         goal: "Expand social media reach",
+        majorGoal: false,
         functionalArea: "Marketing",
         comments: "Target younger demographics",
       },
@@ -75,16 +84,19 @@ export const data = [
     nextMonthAdditional: [
       {
         goal: "Organize health camp",
+        majorGoal: false,
         functionalArea: "Community Health",
         comments: "Collaborate with local hospitals",
       },
       {
         goal: "Introduce feedback mechanisms",
+        majorGoal: false,
         functionalArea: "Quality Assurance",
         comments: "Deploy online surveys",
       },
       {
         goal: "Host community cleanup drive",
+        majorGoal: false,
         functionalArea: "Environment",
         comments: "Engage local schools",
       },
@@ -115,6 +127,7 @@ export const data = [
     goalsFromLastMonth: [
       {
         goal: "Launch new website",
+        majorGoal: true,
         functionalArea: "IT",
         achieved: "Yes",
         reason: "Met deadlines",
@@ -122,6 +135,7 @@ export const data = [
       },
       {
         goal: "Provide basic education kits",
+        majorGoal: true,
         functionalArea: "Education",
         achieved: "No",
         reason: "Logistical delays",
@@ -129,6 +143,7 @@ export const data = [
       },
       {
         goal: "Train new staff",
+        majorGoal: true,
         functionalArea: "HR",
         achieved: "Yes",
         reason: "Training sessions completed",
@@ -138,6 +153,7 @@ export const data = [
     additionalActivities: [
       {
         goal: "Conduct baseline survey",
+        majorGoal: true,
         functionalArea: "Research",
         achieved: "Yes",
         reason: "Team efforts",
@@ -145,6 +161,7 @@ export const data = [
       },
       {
         goal: "Enhance data security",
+        majorGoal: true,
         functionalArea: "IT",
         achieved: "No",
         reason: "Resource constraints",
@@ -152,6 +169,7 @@ export const data = [
       },
       {
         goal: "Collaborate with NGOs",
+        majorGoal: true,
         functionalArea: "Partnerships",
         achieved: "Yes",
         reason: "Shared objectives",
@@ -161,16 +179,19 @@ export const data = [
     nextMonthGoal: [
       {
         goal: "Initiate teacher training",
+        majorGoal: true,
         functionalArea: "Education",
         comments: "Focus on STEM subjects",
       },
       {
         goal: "Promote environmental awareness",
+        majorGoal: true,
         functionalArea: "Environment",
         comments: "Run workshops in schools",
       },
       {
         goal: "Host inter-department meeting",
+        majorGoal: true,
         functionalArea: "Management",
         comments: "Align goals across teams",
       },
@@ -178,16 +199,19 @@ export const data = [
     nextMonthAdditional: [
       {
         goal: "Plan annual fundraiser",
+        majorGoal: true,
         functionalArea: "Fundraising",
         comments: "Secure venue and sponsors",
       },
       {
         goal: "Upgrade IT infrastructure",
+        majorGoal: true,
         functionalArea: "IT",
         comments: "Replace outdated hardware",
       },
       {
         goal: "Evaluate program impact",
+        majorGoal: true,
         functionalArea: "Quality Assurance",
         comments: "Analyze feedback data",
       },
@@ -218,6 +242,7 @@ export const data = [
     goalsFromLastMonth: [
       {
         goal: "Setup local office",
+        majorGoal: true,
         functionalArea: "Operations",
         achieved: "Yes",
         reason: "Timely planning",
@@ -225,6 +250,7 @@ export const data = [
       },
       {
         goal: "Distribute study material",
+        majorGoal: true,
         functionalArea: "Education",
         achieved: "Yes",
         reason: "Good logistics",
@@ -232,6 +258,7 @@ export const data = [
       },
       {
         goal: "Train volunteers",
+        majorGoal: true,
         functionalArea: "HR",
         achieved: "No",
         reason: "Low attendance",
@@ -241,6 +268,7 @@ export const data = [
     additionalActivities: [
       {
         goal: "Implement new CRM",
+        majorGoal: true,
         functionalArea: "IT",
         achieved: "Yes",
         reason: "Smooth rollout",
@@ -248,6 +276,7 @@ export const data = [
       },
       {
         goal: "Organize sports day",
+        majorGoal: true,
         functionalArea: "Community",
         achieved: "Yes",
         reason: "High turnout",
@@ -255,6 +284,7 @@ export const data = [
       },
       {
         goal: "Improve accessibility",
+        majorGoal: true,
         functionalArea: "Infrastructure",
         achieved: "No",
         reason: "Budget issues",
@@ -264,16 +294,19 @@ export const data = [
     nextMonthGoal: [
       {
         goal: "Launch mobile app",
+        majorGoal: true,
         functionalArea: "IT",
         comments: "Targeting better user experience",
       },
       {
         goal: "Enhance curriculum",
+        majorGoal: true,
         functionalArea: "Education",
         comments: "Include interactive modules",
       },
       {
         goal: "Host recruitment drive",
+        majorGoal: true,
         functionalArea: "HR",
         comments: "Focus on key roles",
       },
@@ -281,16 +314,19 @@ export const data = [
     nextMonthAdditional: [
       {
         goal: "Plan cultural event",
+        majorGoal: true,
         functionalArea: "Community",
         comments: "Promote local traditions",
       },
       {
         goal: "Upgrade training materials",
+        majorGoal: true,
         functionalArea: "Education",
         comments: "Include online resources",
       },
       {
         goal: "Set up grievance cell",
+        majorGoal: true,
         functionalArea: "Operations",
         comments: "Ensure better feedback",
       },
@@ -321,6 +357,7 @@ export const data = [
     goalsFromLastMonth: [
       {
         goal: "Increase volunteer participation",
+        majorGoal: true,
         functionalArea: "Community Outreach",
         achieved: "Yes",
         reason: "Effective engagement strategy",
@@ -328,6 +365,7 @@ export const data = [
       },
       {
         goal: "Set up awareness campaign",
+        majorGoal: true,
         functionalArea: "Marketing",
         achieved: "No",
         reason: "Delay in materials",
@@ -335,6 +373,7 @@ export const data = [
       },
       {
         goal: "Establish new partnerships",
+        majorGoal: true,
         functionalArea: "Partnerships",
         achieved: "Yes",
         reason: "Strong networking efforts",
@@ -344,6 +383,7 @@ export const data = [
     additionalActivities: [
       {
         goal: "Host webinar on community health",
+        majorGoal: true,
         functionalArea: "Community Health",
         achieved: "Yes",
         reason: "High attendance",
@@ -351,6 +391,7 @@ export const data = [
       },
       {
         goal: "Launch digital donation platform",
+        majorGoal: true,
         functionalArea: "Fundraising",
         achieved: "No",
         reason: "Technical delays",
@@ -358,6 +399,7 @@ export const data = [
       },
       {
         goal: "Provide skill-building workshops",
+        majorGoal: true,
         functionalArea: "Education",
         achieved: "Yes",
         reason: "Excellent turnout",
@@ -367,16 +409,19 @@ export const data = [
     nextMonthGoal: [
       {
         goal: "Expand volunteer program",
+        majorGoal: true,
         functionalArea: "HR",
         comments: "Targeting youth engagement",
       },
       {
         goal: "Enhance social media strategy",
+        majorGoal: true,
         functionalArea: "Marketing",
         comments: "Focus on Instagram and TikTok",
       },
       {
         goal: "Improve donor engagement",
+        majorGoal: true,
         functionalArea: "Fundraising",
         comments: "Host a virtual thank-you event",
       },
@@ -384,16 +429,19 @@ export const data = [
     nextMonthAdditional: [
       {
         goal: "Initiate youth leadership program",
+        majorGoal: true,
         functionalArea: "Community Outreach",
         comments: "Develop training materials",
       },
       {
         goal: "Evaluate environmental impact",
+        majorGoal: true,
         functionalArea: "Environment",
         comments: "Conduct baseline assessment",
       },
       {
         goal: "Upgrade website functionality",
+        majorGoal: true,
         functionalArea: "IT",
         comments: "Improve user experience",
       },
@@ -424,6 +472,7 @@ export const data = [
     goalsFromLastMonth: [
       {
         goal: "Launch community health program",
+        majorGoal: true,
         functionalArea: "Community Health",
         achieved: "Yes",
         reason: "Strong partnership with local hospitals",
@@ -431,6 +480,7 @@ export const data = [
       },
       {
         goal: "Provide educational scholarships",
+        majorGoal: true,
         functionalArea: "Education",
         achieved: "No",
         reason: "Delay in approval process",
@@ -438,6 +488,7 @@ export const data = [
       },
       {
         goal: "Set up mental health support group",
+        majorGoal: true,
         functionalArea: "Health",
         achieved: "Yes",
         reason: "Well-received by the community",
@@ -447,6 +498,7 @@ export const data = [
     additionalActivities: [
       {
         goal: "Establish school partnership",
+        majorGoal: true,
         functionalArea: "Education",
         achieved: "Yes",
         reason: "Agreement finalized",
@@ -454,6 +506,7 @@ export const data = [
       },
       {
         goal: "Launch mobile health app",
+        majorGoal: true,
         functionalArea: "IT",
         achieved: "No",
         reason: "App under review",
@@ -461,6 +514,7 @@ export const data = [
       },
       {
         goal: "Organize local talent show",
+        majorGoal: false,
         functionalArea: "Community Engagement",
         achieved: "Yes",
         reason: "Huge success",
@@ -470,16 +524,19 @@ export const data = [
     nextMonthGoal: [
       {
         goal: "Expand scholarship program",
+        majorGoal: false,
         functionalArea: "Education",
         comments: "Targeting students from remote areas",
       },
       {
         goal: "Launch mental health awareness campaign",
+        majorGoal: false,
         functionalArea: "Health",
         comments: "Focus on schools and colleges",
       },
       {
         goal: "Enhance community engagement",
+        majorGoal: false,
         functionalArea: "Community Outreach",
         comments: "Host neighborhood meetups",
       },
@@ -487,16 +544,19 @@ export const data = [
     nextMonthAdditional: [
       {
         goal: "Introduce wellness program",
+        majorGoal: false,
         functionalArea: "Community Health",
         comments: "Partner with fitness trainers",
       },
       {
         goal: "Host leadership workshop",
+        majorGoal: false,
         functionalArea: "HR",
         comments: "Develop training modules",
       },
       {
         goal: "Improve event logistics",
+        majorGoal: false,
         functionalArea: "Operations",
         comments: "Ensure smooth execution",
       },
@@ -527,6 +587,7 @@ export const data = [
     goalsFromLastMonth: [
       {
         goal: "Launch community garden project",
+        majorGoal: false,
         functionalArea: "Environment",
         achieved: "Yes",
         reason: "Community involvement",
@@ -534,6 +595,7 @@ export const data = [
       },
       {
         goal: "Provide access to clean water",
+        majorGoal: false,
         functionalArea: "Community Health",
         achieved: "No",
         reason: "Delayed equipment shipment",
@@ -541,6 +603,7 @@ export const data = [
       },
       {
         goal: "Organize leadership seminar",
+        majorGoal: false,
         functionalArea: "Education",
         achieved: "Yes",
         reason: "High demand",
@@ -550,6 +613,7 @@ export const data = [
     additionalActivities: [
       {
         goal: "Promote sustainable farming practices",
+        majorGoal: false,
         functionalArea: "Agriculture",
         achieved: "Yes",
         reason: "Positive community response",
@@ -557,6 +621,7 @@ export const data = [
       },
       {
         goal: "Develop waste management plan",
+        majorGoal: false,
         functionalArea: "Environment",
         achieved: "No",
         reason: "Budget constraints",
@@ -564,6 +629,7 @@ export const data = [
       },
       {
         goal: "Create youth mentorship program",
+        majorGoal: false,
         functionalArea: "HR",
         achieved: "Yes",
         reason: "Strong mentor interest",
@@ -573,16 +639,19 @@ export const data = [
     nextMonthGoal: [
       {
         goal: "Launch waste segregation initiative",
+        majorGoal: false,
         functionalArea: "Environment",
         comments: "Collaborate with local authorities",
       },
       {
         goal: "Host awareness sessions on clean water",
+        majorGoal: false,
         functionalArea: "Community Health",
         comments: "Partner with NGOs",
       },
       {
         goal: "Expand youth mentorship program",
+        majorGoal: false,
         functionalArea: "HR",
         comments: "Increase mentor recruitment",
       },
@@ -590,16 +659,19 @@ export const data = [
     nextMonthAdditional: [
       {
         goal: "Implement solar energy solutions",
+        majorGoal: false,
         functionalArea: "Environment",
         comments: "Focus on rural areas",
       },
       {
         goal: "Provide vocational training",
+        majorGoal: false,
         functionalArea: "Education",
         comments: "Develop curriculum for trades",
       },
       {
         goal: "Facilitate leadership training",
+        majorGoal: false,
         functionalArea: "Community Outreach",
         comments: "Develop interactive modules",
       },

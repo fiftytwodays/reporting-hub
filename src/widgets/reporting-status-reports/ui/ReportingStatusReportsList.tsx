@@ -1,5 +1,5 @@
-import { ProjectReport } from "@/entities/project-reports/config/types";
 import ReportingStatusReportsPage from "@/entities/reporting-status-reports/ui/ReportingStatusReportsPage";
+import { ReportingStatusReport as ProjectReport } from "@/entities/reporting-status-reports/config/types";
 
 interface ReportingStatusReportsListProps {
   setData: (record: ProjectReport[]) => void;

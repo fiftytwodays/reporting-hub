@@ -21,8 +21,8 @@ import {
 
 interface ExportProjectReportButtonProps {
   data: ProjectReport[] | undefined;
-  isProjectSelected: boolean;
-  isClusterSelected: boolean;
+  isProjectSelected?: boolean;
+  isClusterSelected?: boolean;
 }
 
 // Helper function to create a table from the given data

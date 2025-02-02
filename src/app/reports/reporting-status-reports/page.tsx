@@ -8,8 +8,9 @@ import Page from "@/shared/ui/page/ui/Page";
 import { ReportingStatusReportsList } from "@/widgets/reporting-status-reports";
 import { ExportProjectReportButton } from "@/feature/export-project-reports";
 import { useState } from "react";
-import { ProjectReport } from "@/entities/project-reports/config/types";
-import { data as record } from "@/entities/reporting-status-reports/api/reporting-status-reports";
+import { ReportingStatusReport } from "@/entities/reporting-status-reports/config/types";
+import { data } from "@/entities/reporting-status-reports/api/reporting-status-reports";
+import { ExportMonthlyProjectReportButton } from "@/feature/export-project-monthly-reports";
 Amplify.configure(outputs);
 
 export default function ProjectReports() {
@@ -17,8 +18,8 @@ export default function ProjectReports() {
     maxCount: 1,
     duration: 2,
   });
-  const [data, setData] = useState<ProjectReport[]>();
-  
+  const [data, setData] = useState<ReportingStatusReport[]>();
+
   return (
     <>
       {contextHolder}
@@ -26,9 +27,9 @@ export default function ProjectReports() {
         showPageHeader
         header={{
           title: "Monthly report",
-          extra: <ExportProjectReportButton data={data} />,
+          extra: <ExportMonthlyProjectReportButton data={data} />,
         }}
-        content={<ReportingStatusReportsList setData={setData}/>}
+        content={<ReportingStatusReportsList setData={setData} />}
       />
     </>
   );
