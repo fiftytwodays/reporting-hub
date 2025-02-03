@@ -5,12 +5,14 @@ import { values as data } from "../api/dummy-data";
 interface Goal {
   goal: string;
   achieved: boolean;
+  majorGoal: boolean;
   whyNotAchieved: string | null;
   comments: string;
 }
 
 interface Activity {
   activity: string;
+  majorGoal: boolean;
   functionalArea: string;
   comments: string;
 }
@@ -77,7 +79,7 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
           <h3>Outcomes from the Month Just Ended</h3>
           {data.goalsList.map((goal, index) => (
             <Row gutter={24} key={index}>
-              <Col xs={24} sm={6}>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Goal" : ""}
                   name={["goalsList", index, "goal"]}
@@ -85,7 +87,18 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
                   <Input />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={6}>
+              <Col xs={24} sm={4}>
+                <Form.Item
+                  label={index === 0 ? "Major goal" : ""}
+                  name={["goalsList", index, "majorGoal"]}
+                >
+                  <Select>
+                    <Select.Option value={true}>Yes</Select.Option>
+                    <Select.Option value={false}>No</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Achieved" : ""}
                   name={["goalsList", index, "achieved"]}
@@ -96,7 +109,7 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
                   </Select>
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={6}>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Reason for not achieving" : ""}
                   name={["goalsList", index, "whyNotAchieved"]}
@@ -104,7 +117,7 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
                   <Input />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={6}>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Comments" : ""}
                   name={["goalsList", index, "comments"]}
@@ -128,7 +141,7 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
           <h3>Additional Activities</h3>
           {data.additionalActivities.map((activity, index) => (
             <Row gutter={24} key={index}>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Activity" : ""}
                   name={["additionalActivities", index, "activity"]}
@@ -136,7 +149,18 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
                   <Input />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={4}>
+                <Form.Item
+                  label={index === 0 ? "Major goal" : ""}
+                  name={["goalsList", index, "majorGoal"]}
+                >
+                  <Select>
+                    <Select.Option value={true}>Yes</Select.Option>
+                    <Select.Option value={false}>No</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Functional area" : ""}
                   name={["additionalActivities", index, "functionalArea"]}
@@ -144,7 +168,7 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
                   <Input />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Comments" : ""}
                   name={["additionalActivities", index, "comments"]}
@@ -168,7 +192,7 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
           <h3>Goals for Next Month</h3>
           {data.nextMonthGoals.map((goal, index) => (
             <Row gutter={24} key={index}>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Activity" : ""}
                   name={["nextMonthGoals", index, "activity"]}
@@ -176,7 +200,18 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
                   <Input />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={4}>
+                <Form.Item
+                  label={index === 0 ? "Major goal" : ""}
+                  name={["goalsList", index, "majorGoal"]}
+                >
+                  <Select>
+                    <Select.Option value={true}>Yes</Select.Option>
+                    <Select.Option value={false}>No</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Functional area" : ""}
                   name={["nextMonthGoals", index, "functionalArea"]}
@@ -184,7 +219,7 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
                   <Input />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={4}>
                 <Form.Item
                   label={index === 0 ? "Comments" : ""}
                   name={["nextMonthGoals", index, "comments"]}
@@ -252,7 +287,7 @@ const ViewMonthlyFormApprover: React.FC<ViewMonthlyFormProps> = ({
           Approve
         </Button>
         <Button type="default" onClick={() => setIsModalVisible(true)}>
-          Reject
+          Resend
         </Button>
       </Space>
     </>

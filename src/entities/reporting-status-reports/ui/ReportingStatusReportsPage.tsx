@@ -3,7 +3,7 @@ import { months, years } from "../config/reporting-status-report";
 import { data } from "../api/reporting-status-reports";
 import dayjs from "dayjs";
 import ReportingStatusReportsList from "./ReportingStatusReportsList";
-import { ProjectReport } from "@/entities/project-reports/config/types";
+import { ReportingStatusReport as ProjectReport } from "../config/types";
 
 interface ReportingStatusReportsPageProps {
   setData: (record: ProjectReport[]) => void;
