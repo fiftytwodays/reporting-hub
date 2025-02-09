@@ -9,6 +9,7 @@ import { CreateYearlyFormNew } from "@/feature/create-yearly-form";
 import { MyFormsList } from "@/widgets/myforms-list";
 import { Button, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import useYearlyPlanDetails from "@/entities/yearly-form/api/yearlyplan-details";
 // import {  useRouter } from "next/router";
 
 import outputs from "@root/amplify_outputs.json";
@@ -23,6 +24,7 @@ export default  function MyForms({
   const  id  =  params.id;
   console.log("id",id);
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
+  const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanDetails({ condition: !!id }, id);
   return (
     <>
      {contextHolder}
@@ -37,27 +39,27 @@ export default  function MyForms({
           },
 
           {
-            title: "yearly-form",
+            title: "Yearly form",
             href: "/yearly-form/my-forms",
             menu: {
               items: [
                 {
                   key: '/navigation',
-                  label: 'My Forms',
+                  label: 'My forms',
                 },
               {
                 key: '/general',
-                label: 'Reviewer View',
+                label: 'Reviewer view',
               },
               {
                 key: '/layout',
-                label: 'Approver View',
+                label: 'Approver view',
               },
             ]
             },
           },
           {
-            title: "my-forms",
+            title: "My forms",
             href: "/yearly-form/my-forms",
           },
         ],

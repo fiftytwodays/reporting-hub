@@ -26,6 +26,19 @@ export default function useCreateYearlyPlan() {
   const { data: yearlyPlan } = useSWR("api/yearlyPlan");
 
   const createYearlyPlan = async (key: string, { arg }: { arg: CreateYearlyPlanInput }) => {
+
+    const existingPlan = await client.models.YearlyPlan.list({
+      filter: {
+        and: [
+          { projectId: { eq: arg.projectId } },
+          { user: { eq: arg.user } },
+        ],
+      }
+    });
+
+    if(existingPlan?.data.length > 0)
+      throw new Error("Yearly Plan for this project already exist");
+
     const response = await client.models.YearlyPlan.create({
       user: arg.user,
       projectId: arg.projectId,
