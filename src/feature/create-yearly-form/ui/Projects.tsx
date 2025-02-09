@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Select } from "antd";
 import { FormInstance } from "antd/es/form";
 import useProjectList from "../api/project-list";
@@ -10,10 +10,24 @@ interface Project {
 
 interface ProjectsProps {
   form: FormInstance;
+  id: string | number;
 }
 
-const Projects: React.FC<ProjectsProps> = ({ form }) => {
+const Projects: React.FC<ProjectsProps> = ({ form, id }) => {
   const { projectsData } = useProjectList({ condition: true });
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
+console.log("Project id", id)
+console.log("Project", selectedValue)
+  useEffect(() => {
+    if (projectsData) {
+      const project = projectsData.find(project => project.id === id);
+      setSelectedValue(project?.name);
+    }
+  }, [projectsData, id]);
+
+  if (selectedValue === undefined && id && id != "project") {
+    return null; // Or you can show a loading indicator here
+  }
 
   const handleChange = (value: string | number ) => {
     form.setFieldValue(
@@ -29,13 +43,14 @@ const Projects: React.FC<ProjectsProps> = ({ form }) => {
     })) || [];
   };
 
-  return (
+  return (projectsData &&
     <Select
       showSearch
       dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
       allowClear
       onChange={(value) => handleChange(value)}
       options={transformProjectsData(projectsData)}
+      defaultValue={selectedValue}
     />
   );
 };

@@ -33,7 +33,7 @@ export default function generateColumns<T>(
               </_Button>
               <Popconfirm
                 placement="bottomRight"
-                title="Are you sure you want to delete the region?"
+                title="Are you sure you want to delete the Yearly Plan?"
                 okText="Yes"
                 cancelText="No"
                 onConfirm={() => handleDelete(item)}

@@ -198,7 +198,7 @@ const schema = a.schema({
   YearlyPlan: a
   .model({
     user: a.string().required(),
-    projectId: a.id(),
+    projectId: a.string(),
     project: a.belongsTo("Project", "projectId"),
     // projectFacilitator: a.string().required(),
     comments: a.string(),
