@@ -208,7 +208,7 @@ export default function CreateYearlyFormNew({
         // }
       }
 
-      for (const quarter of [1, 2, 3, 4]) {
+      // for (const quarter of [1, 2, 3, 4]) {
 
         if (yearlyPlanResp) {
           for (const quarter of [1, 2, 3, 4]) {
@@ -252,7 +252,7 @@ export default function CreateYearlyFormNew({
             }
           }
         }
-      }
+      // }
 
       deletePlan({ids: plansToDelete})
     } catch (error) {
