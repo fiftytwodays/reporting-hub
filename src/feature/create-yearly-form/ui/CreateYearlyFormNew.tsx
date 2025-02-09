@@ -178,7 +178,7 @@ export default function CreateYearlyFormNew({
       console.log("qaurter details", quarterPlans)
       let yearlyPlanResp;
       const yearlyPlanPayload = {
-        user: userId,
+        user: yearlyPlanDetail?.user??userId,
         projectId: formValues.project,
         comments: "",
         status: status,
