@@ -2,6 +2,7 @@ import type { Schema } from "@root/amplify/data/resource";
 import useSWRMutation from "swr/mutation";
 import { generateClient } from "aws-amplify/data";
 import useSWR from "swr";
+import { message } from "antd";
 
 interface CreateYearlyPlanInput {
   user: string;
@@ -20,6 +21,11 @@ interface YearlyPlanResponse {
   year: string;
 }
 
+interface CustomError {
+  statusCode: number;
+  message: string;
+}
+
 export default function useCreateYearlyPlan() {
   const client = generateClient<Schema>();
 
@@ -36,8 +42,11 @@ export default function useCreateYearlyPlan() {
       }
     });
 
-    if(existingPlan?.data.length > 0)
-      throw new Error("Yearly Plan for this project already exist");
+    if(existingPlan?.data.length > 0){
+      console.log("After Throw")
+      throw {statusCode: 409, message:"The yearly plan for this project already exist"} as CustomError;
+      console.log("After Throw")
+    }
 
     const response = await client.models.YearlyPlan.create({
       user: arg.user,
@@ -69,7 +78,7 @@ export default function useCreateYearlyPlan() {
      createYearlyPlan: trigger,  // Function to initiate the YearlyPlan creation
      createdYearlyPlan: data,    // The created YearlyPlan data
      isCreatingYearlyPlan: isMutating,  // Loading state
-     createError: error,      // Error state
+     createError: error as CustomError | null,      // Error state
    };
   
 }
