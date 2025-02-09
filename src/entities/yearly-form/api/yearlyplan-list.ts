@@ -38,6 +38,7 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     {
     const clusters = attributes["custom:clusters"];
     const arr = stringToArray(clusters);
+    if(arr.length>0){
       const projects = await client.models.Project.list({
         filter: {
           or: arr.map(clusterId => ({ clusterId: { eq: clusterId } })),
@@ -57,11 +58,13 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
         },
       });
     }
+    }
 
     if(type === "approver")
       {
       const regions = attributes["custom:regions"];
       const arr = stringToArray(regions);
+      if(arr.length > 0){
         const clusters = await client.models.Cluster.list({
           filter: {
             or: arr.map(regionId => ({ regionId: { eq: regionId } })),
@@ -88,6 +91,7 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
             ],
           },
         });
+      }
       }
 
     if (response?.data) {
