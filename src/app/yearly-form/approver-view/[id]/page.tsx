@@ -5,16 +5,23 @@ import { Amplify } from "aws-amplify";
 import { message } from "antd";
 import Page from "@/shared/ui/page/ui/Page";
 // import { CreateYearlyFormModal } from "@/feature/create-yearly-form";
+import { CreateYearlyFormNew } from "@/feature/create-yearly-form";
 import { MyFormsList } from "@/widgets/myforms-list";
 import { Button, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import {  useRouter } from "next/navigation";
+// import {  useRouter } from "next/router";
 
 import outputs from "@root/amplify_outputs.json";
 Amplify.configure(outputs);
 
-export default function ReviewerView() {
-  const router = useRouter();
+export default  function ApproverViewDetail({
+  params,
+}: {
+  params: { id: string }
+}) {
+  // const router = useRouter();
+  const  id  =  params.id;
+  console.log("id",id);
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
   return (
     <>
@@ -22,7 +29,7 @@ export default function ReviewerView() {
     <Page
     showPageHeader
       header={{
-        title: "Reviewer View",
+        title: `${id ? id : "---"}`,
         breadcrumbs: [
           {
             title: "Home",
@@ -30,14 +37,34 @@ export default function ReviewerView() {
           },
 
           {
-            title: "Reviewer View",
-            href: "/yearly-form/reviewer-view",
+            title: "yearly-form",
+            href: "/yearly-form/approver-view",
+            menu: {
+              items: [
+                {
+                  key: '/navigation',
+                  label: 'My Forms',
+                },
+              {
+                key: '/general',
+                label: 'Reviewer View',
+              },
+              {
+                key: '/layout',
+                label: 'Approver View',
+              },
+            ]
+            },
+          },
+          {
+            title: "approver-view",
+            href: "/yearly-form/approver-view",
           },
         ],
         // extra: <Button onClick={() => router.push("/yearly-form/create") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
         // extra: <Button onClick={() => router.push("/yearly-form/new-my-form") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
       }}
-      content={<MyFormsList type="reviewer"/>}
+      content={<CreateYearlyFormNew id={id} messageApi={messageApi} type="approver"/> }
     />
     </>
   );

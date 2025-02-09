@@ -37,7 +37,7 @@ export default function MyForms() {
         // extra: <Button onClick={() => router.push("/yearly-form/create") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
         extra: <Button onClick={() => router.push("/yearly-form/new-my-form") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
       }}
-      content={<MyFormsList />}
+      content={<MyFormsList type="myforms"/>}
     />
     </>
   );

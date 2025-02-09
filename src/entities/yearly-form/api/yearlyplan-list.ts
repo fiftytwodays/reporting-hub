@@ -1,4 +1,4 @@
-import { getCurrentUser } from 'aws-amplify/auth';
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import useSWR, { mutate } from "swr";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
@@ -7,20 +7,28 @@ import type { YearlyPlan } from "../config/types";
 
 interface FetchOptions {
   condition: boolean;
+  type: string;
 }
 
 interface ApiResponse {
   YearlyPlans: YearlyPlan[];
 }
 
-export default function useYearlyPlansList({ condition = true }: FetchOptions) {
+export default function useYearlyPlansList({ condition = true, type }: FetchOptions) {
   const client = generateClient<Schema>();
-
-
-
   const fetcher = async () => {
     const { username, userId, signInDetails } = await getCurrentUser();
+    const attributes = await fetchUserAttributes();
     console.log("User details", username);
+    console.log("Attributes", attributes);
+    const clusters = attributes["custom:clusters"];
+
+    // const projects = await client.models.Project.list({
+    //   filter: {
+    //     or: clusters.map(clusterId => ({ clusterId: { eq: clusterId } })),
+    //   },
+    // })
+
     const response = await client.models.YearlyPlan.list({
       filter: {
         user: { eq: userId },

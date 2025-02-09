@@ -6,6 +6,30 @@ export interface YearlyPlan {
   comments: string;
 }
 
+export interface YearlyPlanDetails {
+  approvedBy: string;
+  comments: string;
+  createdAt: string;
+  id: string;
+  owner: string;
+  projectId: string;
+  reviewedBy: string;
+  status: string;
+  updatedAt: string;
+  user: string;
+  year: string;
+}
+
+export interface QuarterlyPlan {
+  approvedBy: string;
+  quarter: number;
+  yearlyPlanId: string;
+  id: string;
+  reviewedBy: string;
+  status: string;
+  updatedAt: string;
+}
+
 export interface ApiResponse {
   $metadata: {
     httpStatusCode: number;

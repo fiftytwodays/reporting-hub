@@ -5,17 +5,23 @@ import { Amplify } from "aws-amplify";
 import { message } from "antd";
 import Page from "@/shared/ui/page/ui/Page";
 // import { CreateYearlyFormModal } from "@/feature/create-yearly-form";
+import { CreateYearlyFormNew } from "@/feature/create-yearly-form";
 import { MyFormsList } from "@/widgets/myforms-list";
 import { Button, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import {  useRouter } from "next/router";
+// import {  useRouter } from "next/router";
 
 import outputs from "@root/amplify_outputs.json";
 Amplify.configure(outputs);
 
-export default function MyForms() {
-  const router = useRouter();
-  const { id } = router.query;
+export default  function MyForms({
+  params,
+}: {
+  params: { id: string }
+}) {
+  // const router = useRouter();
+  const  id  =  params.id;
+  console.log("id",id);
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
   return (
     <>
@@ -31,14 +37,34 @@ export default function MyForms() {
           },
 
           {
-            title: `${id ? id : "---"}`,
+            title: "yearly-form",
+            href: "/yearly-form/my-forms",
+            menu: {
+              items: [
+                {
+                  key: '/navigation',
+                  label: 'My Forms',
+                },
+              {
+                key: '/general',
+                label: 'Reviewer View',
+              },
+              {
+                key: '/layout',
+                label: 'Approver View',
+              },
+            ]
+            },
+          },
+          {
+            title: "my-forms",
             href: "/yearly-form/my-forms",
           },
         ],
         // extra: <Button onClick={() => router.push("/yearly-form/create") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
-        extra: <Button onClick={() => router.push("/yearly-form/new-my-form") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
+        // extra: <Button onClick={() => router.push("/yearly-form/new-my-form") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
       }}
-      content={<MyFormsList />}
+      content={<CreateYearlyFormNew id={id} messageApi={messageApi} type="myforms"/>}
     />
     </>
   );

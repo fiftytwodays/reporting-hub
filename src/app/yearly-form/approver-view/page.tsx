@@ -13,7 +13,7 @@ import {  useRouter } from "next/navigation";
 import outputs from "@root/amplify_outputs.json";
 Amplify.configure(outputs);
 
-export default function MyForms() {
+export default function ApproverView() {
   const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
   return (
@@ -35,7 +35,7 @@ export default function MyForms() {
           },
         ],
       }}
-      content={<MyFormsList />}
+      content={<MyFormsList type="approver"/>}
     />
     </>
   );

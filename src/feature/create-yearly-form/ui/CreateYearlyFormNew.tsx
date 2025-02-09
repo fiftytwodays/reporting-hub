@@ -4,48 +4,81 @@ import Projects from "./Projects";
 import FunctionalArea from "./FunctionalArea";
 import { getCurrentUser } from 'aws-amplify/auth';
 import QuarterlyPlan from "./QuarterlyPlan";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DeleteTwoTone } from '@ant-design/icons';
 import useCreateYearlyPlan from "../api/create-yearly-form";
 import useCreateQuarterlyPlan from "../api/create-quarter-plan";
 import useCreatePlan from "../api/create-plan";
-import {  useRouter } from "next/navigation";
-// import useProjectsList from "@/entities/project/api/project-list";
-// import useRegionsList from "@/entities/region/api/region-list";
-// import useCreateRegion from "../api/create-yearly-form";
-
+import { useRouter } from "next/navigation";
+import useYearlyPlanDetails from "@/entities/yearly-form/api/yearlyplan-details";
+import useQuarterlyPlanList from "@/entities/yearly-form/api/quarterlyplan-list";
+import useYearlyPlanFullDetails from "@/entities/yearly-form/api/yearlyplan-full";
+import useUpdateYearlyPlan from "../api/update-yearly-form";
+import useUpdateQuarterlyPlan from "../api/update-quarter-plan";
+import useUpdatePlan from "../api/update-plan";
 const { Panel } = Collapse;
 
 interface CreateYearlyFormNewProps {
   // onCreateYearlyFormNewModalClose: () => void;
+  id: string,
+  type: string
   messageApi: {
     success: (message: string) => void;
     error: (message: string) => void;
   };
 }
 
+interface PlanDetails {
+  id: string;
+  quarterlyPlanId: string;
+  activity: string;
+  month: string[];
+  functionalAreaId: string;
+  department?: string;
+  comments?: string;
+}
+
+interface QuarterlyPlanDetails {
+  id: string;
+  yearlyPlanId: string;
+  status?: string;
+  reviewedBy?: string;
+  approvedBy?: string;
+  plans: PlanDetails[];
+}
+
+interface YearlyPlanDetails {
+  id: string;
+  user: string;
+  projectId?: string;
+  comments?: string;
+  status?: string;
+  year?: string;
+  reviewedBy?: string;
+  approvedBy?: string;
+  quarterlyPlans: Record<number, QuarterlyPlanDetails>; // Change: Key is quarter number
+}
+
+
 interface FormValues {
   // year: string;
-  project: string;
+  project: string | undefined;
 
 }
 
-// const CreateYearlyFormNew: React.FC<CreateYearlyFormNewProps> = ({
-//   // onCreateYearlyFormNewModalClose,
-//   messageApi,
-// }) => {
-
 export default function CreateYearlyFormNew({
-  messageApi,
+  messageApi, id, type
 }: CreateYearlyFormNewProps) {
 
   const { createYearlyPlan, isCreatingYearlyPlan } = useCreateYearlyPlan();
   const { createQuarterlyPlan, isCreatingQuarterlyPlan } = useCreateQuarterlyPlan();
   const { createPlan, isCreatingPlan } = useCreatePlan();
-  const [quarterPlans, setQuarterPlans] = useState<Record<number, any[]>>({});
+  const { updateYearlyPlan, isUpdatingYearlyPlan } = useUpdateYearlyPlan();
+  const { updateQuarterlyPlan, isUpdatingQuarterlyPlan } = useUpdateQuarterlyPlan();
+  const { updatePlan, isUpdatingPlan } = useUpdatePlan();
+  const [quarterPlans, setQuarterPlans] = useState<Record<number, QuarterlyPlanDetails>>({});
   let currentYear: number = new Date().getFullYear();
   let nextYear: number = currentYear + 1;
-  // const [form] = Form.useForm<FormValues>();
   const [form] = Form.useForm();
   const { Option } = Select;
   const router = useRouter();
@@ -88,19 +121,54 @@ export default function CreateYearlyFormNew({
     },
   ];
 
-  const handleSaveTest = async () => {
-    console.log("Quarter plans", quarterPlans);
-  }
+  const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanFullDetails({ condition: !!id }, id);
+
+  useEffect(() => {
+    if (id && yearlyPlanDetail) {
+      form.setFieldsValue({
+        year: yearlyPlanDetail.year,
+        project: yearlyPlanDetail.projectId,
+      });
+      const mappedQuarterPlans: Record<number, QuarterlyPlanDetails> = {};
+      Object.entries(yearlyPlanDetail.quarterlyPlans).forEach(([key, quarterData]) => {
+        const quarterKey = Number(key); // Convert key to number
+
+        // Store the entire quarterly plan object, ensuring `plans` is an array
+        mappedQuarterPlans[quarterKey] = {
+          id: quarterData.id,
+          yearlyPlanId: quarterData.yearlyPlanId,
+          status: quarterData.status,
+          reviewedBy: quarterData.reviewedBy,
+          approvedBy: quarterData.approvedBy,
+          plans: quarterData.plans.map((plan) => ({
+            id: plan.id,
+            quarterlyPlanId: plan.quarterlyPlanId,
+            activity: plan.activity,
+            month: plan.month,
+            functionalAreaId: plan.functionalAreaId,
+            department: plan.department,
+            comments: plan.comments,
+          })),
+        };
+      });
+
+      // Update state
+      setQuarterPlans(mappedQuarterPlans);
+    }
+  }, [yearlyPlanDetail]);
+
+
+  // useEffect(() => {
+  //   console.log("Inside UseEffect")
+  //   if (id && yearlyPlanDetail) {
+  //     console.log("Yearly Plan Detail fetched using Yearly plan id", yearlyPlanDetail);
+  //   }
+  // }, [yearlyPlanDetail]);
 
   const handleSave = async (status: string) => {
     try {
       const { username, userId, signInDetails } = await getCurrentUser();
       const formValues = form.getFieldsValue();
-
-
-      console.log("username", username);
-      console.log("user id", userId);
-      console.log("sign-in details", signInDetails);
 
       console.log("form details", formValues);
       console.log("qaurter details", quarterPlans)
@@ -111,15 +179,19 @@ export default function CreateYearlyFormNew({
         comments: "",
         status: status,
         year: formValues.year,
+        ...(yearlyPlanDetail?.id && yearlyPlanDetail?.id !== "" && { id: yearlyPlanDetail.id })
       }
-
-
       try {
-        yearlyPlanResp = await createYearlyPlan(yearlyPlanPayload);
+        if (yearlyPlanDetail?.id && "" != yearlyPlanDetail?.id) {
+          // yearlyPlanPayload
+          console.log("yearlyPlanPayload while updating", yearlyPlanPayload)
+          yearlyPlanResp = await updateYearlyPlan(yearlyPlanPayload);
+        } else {
+          yearlyPlanResp = await createYearlyPlan(yearlyPlanPayload);
+        }
         if (yearlyPlanResp) {
-          
-          console.log("Saved Yearly Plan Id", yearlyPlanResp.id);
-          // form.resetFields();
+
+          console.log("Saved/Updated Yearly Plan Id", yearlyPlanResp.id);
         }
       } catch (error: any) {
         console.log("Yearly Plan save failed");
@@ -135,42 +207,51 @@ export default function CreateYearlyFormNew({
       for (const quarter of [1, 2, 3, 4]) {
 
         if (yearlyPlanResp) {
-          const quarterlyPlanPayload = {
-            yearlyPlanId: yearlyPlanResp.id,
-            quarter: quarter,
-            status: status,
-          }
+          for (const quarter of [1, 2, 3, 4]) {
+            const quarterlyPlanData = quarterPlans[quarter];
 
-          const quarterPlan = await createQuarterlyPlan(quarterlyPlanPayload);
+            if (quarterlyPlanData) {
+              const quarterlyPlanPayload = {
+                id: quarterlyPlanData.id || undefined,
+                yearlyPlanId: yearlyPlanResp.id,
+                quarter: quarter,
+                status: status,
+                ...(quarterlyPlanData?.id && quarterlyPlanData?.id !== "" && { id: quarterlyPlanData.id })
+              };
 
-          if (quarterPlans[quarter]) {
-            for (const plan of quarterPlans[quarter]) {
-              const planPayload = {
-                quarterlyPlanId: quarterPlan.id,
-                activity: plan.activity,
-                month: plan.month,
-                functionalAreaId: plan.functionalArea,
-                department: plan.department,
-                comments: plan.comments,
+              let quarterPlanResp;
+              if (quarterlyPlanData.id) {
+                quarterPlanResp = await updateQuarterlyPlan(quarterlyPlanPayload);
+              } else {
+                quarterPlanResp = await createQuarterlyPlan(quarterlyPlanPayload);
               }
 
-              const planResp = await createPlan(planPayload);
-              //         await DataStore.save(
-              //           new Plan({
-              //             yearlyPlanID: yearlyPlan.id,
-              //             quarterPlanID: quarterPlan.id,
-              //             ...plan,
-              //           })
-              //         );
+              if (quarterPlanResp) {
+                for (const plan of quarterlyPlanData.plans) {
+                  const planPayload = {
+                    quarterlyPlanId: quarterPlanResp.id,
+                    activity: plan.activity,
+                    month: plan.month,
+                    functionalAreaId: plan.functionalAreaId,
+                    department: plan.department ?? "",
+                    comments: plan.comments ?? "",
+                    ...(plan?.id && plan?.id !== "" && { id: plan.id })
+                  };
+                  let planResp;
+                  if (plan.id) {
+                    planResp = await updatePlan(planPayload);
+                  } else {
+                    planResp = await createPlan(planPayload);
+                  }
+                }
+              }
             }
           }
         }
       }
-
-      //   message.success("Data saved successfully.");
     } catch (error) {
       console.error("Error saving data:", error);
-      // message.error("Failed to save data.");
+      messageApi.error("Failed to save data.");
     }
     console.log("Handle save called");
     messageApi.success("Yearly Plan has been created successfully.");
@@ -178,13 +259,16 @@ export default function CreateYearlyFormNew({
   };
 
   const handlePlanChange = (quarter: number, index: number, field: string, value: any) => {
-    console.log("Qauerter", quarter)
-    setQuarterPlans((prev) => {
-      const updatedQuarter = prev[quarter] || [];
-      updatedQuarter[index] = { ...updatedQuarter[index], [field]: value };
-      return { ...prev, [quarter]: updatedQuarter };
-    });
-    console.log("Handle plan change called");
+    setQuarterPlans((prev) => ({
+      ...prev,
+      [quarter]: {
+        ...prev[quarter],
+        plans: prev[quarter]?.plans.map((plan, i) =>
+          i === index ? { ...plan, [field]: value } : plan
+        ),
+      },
+    }));
+    console.log("Handle plan change called", quarterPlans);
   };
 
   const handleDeletePlan = (quarter: number, index: number) => {
@@ -195,12 +279,33 @@ export default function CreateYearlyFormNew({
     });
   };
 
+  const handleAddPlan = (quarter: number) => {
+    setQuarterPlans((prev) => ({
+      ...prev,
+      [quarter]: {
+        ...prev[quarter],
+        plans: [
+          ...(prev[quarter]?.plans || []),
+          {
+            activity: "",
+            month: [],
+            functionalAreaId: "",
+            department: "",
+            comments: "",
+          } as any
+        ],
+      },
+    }));
+  };
+
+  console.log("In create", form.getFieldValue("project"));
   // };
+
 
   return (
     <div>
       <h1>Yearly Planning</h1>
-      <Form form={form} layout="horizontal" initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}` }}>
+      <Form form={form} layout="horizontal" disabled={type !== "myforms"} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: undefined }}>
         <Row gutter={24}>
           <Col xs={24} sm={12}>
             <Form.Item label="Year" name="year">
@@ -215,7 +320,7 @@ export default function CreateYearlyFormNew({
               labelCol={{ span: 12 }}
               wrapperCol={{ span: 12 }}
             >
-              <Projects form={form} />
+              <Projects form={form} id={form.getFieldValue("project") ?? undefined} />
             </Form.Item>
           </Col>
         </Row>
@@ -232,7 +337,7 @@ export default function CreateYearlyFormNew({
                 <Col span={2}></Col>
               </Row>
               <Divider></Divider>
-              {(quarterPlans[quarter.key] || []).map((plan, index) => (
+              {quarterPlans[quarter.key]?.plans?.map((plan, index) => (
                 // <div key={index} style={{ marginBottom: 16, display: "flex" }}>
                 <Row gutter={24}>
                   <Col span={1}>
@@ -248,7 +353,7 @@ export default function CreateYearlyFormNew({
                   </Col>
                   <Col span={4}>
                     <Form.Item >
-                      <FunctionalArea handlePlanChange={handlePlanChange} quarterKey={quarter.key} index={index} />
+                      <FunctionalArea handlePlanChange={handlePlanChange} quarterKey={quarter.key} index={index} functionalAreaId={plan.functionalAreaId} />
                     </Form.Item>
                   </Col>
                   <Col span={3}>
@@ -297,7 +402,7 @@ export default function CreateYearlyFormNew({
               ))}
               <Button
                 type="dashed"
-                onClick={() => handlePlanChange(quarter.key, (quarterPlans[quarter.key] || []).length, {}, {})}
+                onClick={() => handleAddPlan(quarter.key)}
                 block
               >
                 Add Plan
@@ -307,18 +412,45 @@ export default function CreateYearlyFormNew({
           ))}
         </Collapse>
 
-        <Form.Item>
-          <Button type="primary" onClick={() => handleSave("draft")}>
-          {/* <Button type="primary" onClick={() => handleSaveTest()}> */}
-            Save as Draft
-          </Button>
-          {/* <Button style={{ marginLeft: 8 }} type="default" onClick={() => handleSave("waiting for review")}>
-            Send to Review
-          </Button> */}
+        <Form.Item style={{ marginTop: 24 }}>
+          <Space>
+            {type === "myforms" && (
+              <>
+                <Button type="primary" disabled={false} onClick={() => handleSave("draft")}>
+                  Save as Draft
+                </Button>
+                <Button type="primary" disabled={false} onClick={() => handleSave("waiting for review")}>
+                  Send to Review
+                </Button>
+              </>
+            )}
+
+            {type === "reviewer" && (
+              <>
+                <Button type="primary" disabled={false} onClick={() => handleSave("waiting for approval")}>
+                  Send for Approval
+                </Button>
+                <Button type="default" disabled={false} danger onClick={() => handleSave("rejected")}>
+                  Reject
+                </Button>
+              </>
+            )}
+
+            {type === "approver" && (
+              <>
+                <Button type="primary" disabled={false} onClick={() => handleSave("approved")}>
+                  Approve
+                </Button>
+                <Button type="default" disabled={false} danger onClick={() => handleSave("rejected")}>
+                  Reject
+                </Button>
+              </>
+            )}
+            </Space>
         </Form.Item>
       </Form>
     </div>
   );
-};
+}
 
 // export default CreateYearlyFormNew;

@@ -4,9 +4,12 @@ import { YearlyPlan } from "@/entities/yearly-form/config/types";
 import useYearlyPlansList from "@/entities/yearly-form/api/yearlyplan-list";
 // import { EditYearlyPlanModal } from "@/feature/edit-region";
 import { YearlyPlansList as _YearlyPlansList } from "@/entities/yearly-form";
+import { useRouter } from "next/navigation";
 // import useDeleteYearlyPlan from "@/feature/delete-region/delete-region";
 
-export default function YearlyPlansList() {
+
+export default function YearlyPlansList({ type }: { type: string }) {
+  const router = useRouter();
   const [messageApi, contextHolder] = message.useMessage({
     maxCount: 1,
     duration: 2,
@@ -17,11 +20,23 @@ export default function YearlyPlansList() {
   const { yearlyPlansList, isYearlyPlansListLoading } =
     useYearlyPlansList({
       condition: true,
+      type,
     });
 
   const handleEdit = (yearlyPlan: YearlyPlan) => {
+    console.log("Data inside handleEdit", yearlyPlan);
     setSelectedYearlyPlan(yearlyPlan);
-    setIsEditModalVisible(true);
+    // setIsEditModalVisible(true);
+    if(type === "myforms"){
+      router.push('/yearly-form/my-forms/'+yearlyPlan.id);
+    }
+    console.log("After router push")
+      
+    if(type === "approver")
+      router.push('/yearly-form/approver-view/'+yearlyPlan.id);
+    if(type === "reviewer")
+      router.push('/yearly-form/reviewer-view/'+yearlyPlan.id);
+    
   };
 
   // const { deleteYearlyPlan } = useDeleteYearlyPlan();
