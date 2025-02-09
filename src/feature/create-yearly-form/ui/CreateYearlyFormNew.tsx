@@ -21,7 +21,7 @@ const { Panel } = Collapse;
 
 interface CreateYearlyFormNewProps {
   // onCreateYearlyFormNewModalClose: () => void;
-  id: string,
+  id: string | undefined,
   type: string
   messageApi: {
     success: (message: string) => void;
