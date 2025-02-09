@@ -30,7 +30,7 @@ export default function MyForms() {
           },
 
           {
-            title: "My Forms",
+            title: "My forms",
             href: "/yearly-form/my-forms",
           },
         ],

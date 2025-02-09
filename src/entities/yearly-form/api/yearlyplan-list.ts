@@ -22,7 +22,7 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     console.log("User details", username);
     console.log("Attributes", attributes);
     
-    console.log("clusters array", arr)
+    // console.log("clusters array", arr)
     console.log("type", type)
     
     let response;

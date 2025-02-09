@@ -10,7 +10,6 @@ import useCreateYearlyPlan from "../api/create-yearly-form";
 import useCreateQuarterlyPlan from "../api/create-quarter-plan";
 import useCreatePlan from "../api/create-plan";
 import { useRouter } from "next/navigation";
-import useYearlyPlanDetails from "@/entities/yearly-form/api/yearlyplan-details";
 import useQuarterlyPlanList from "@/entities/yearly-form/api/quarterlyplan-list";
 import useYearlyPlanFullDetails from "@/entities/yearly-form/api/yearlyplan-full";
 import useUpdateYearlyPlan from "../api/update-yearly-form";
@@ -275,11 +274,28 @@ export default function CreateYearlyFormNew({
 
   const handleDeletePlan = (quarter: number, index: number) => {
     setQuarterPlans((prev) => {
-      const updatedQuarter = prev[quarter] || [];
-      updatedQuarter.splice(index, 1);
-      return { ...prev, [quarter]: updatedQuarter };
+        const updatedQuarterPlans = { ...prev };
+
+        if (updatedQuarterPlans[quarter] && updatedQuarterPlans[quarter].plans) {
+            // Filter out the plan at the specified index
+            updatedQuarterPlans[quarter] = {
+                ...updatedQuarterPlans[quarter],
+                plans: updatedQuarterPlans[quarter].plans.filter((_, i) => i !== index),
+            };
+        }
+
+        return updatedQuarterPlans;
     });
-  };
+};
+
+
+  // const handleDeletePlan = (quarter: number, index: number) => {
+  //   setQuarterPlans((prev) => {
+  //     const updatedQuarter = prev[quarter] || [];
+  //     updatedQuarter.splice(index, 1);
+  //     return { ...prev, [quarter]: updatedQuarter };
+  //   });
+  // };
 
   const handleAddPlan = (quarter: number) => {
     setQuarterPlans((prev) => ({
@@ -331,11 +347,11 @@ export default function CreateYearlyFormNew({
             <Panel header={`${quarter.label}`} key={quarter.key}>
               <Row gutter={24}>
                 <Col span={1}>Sl. No</Col>
-                <Col span={5}>Activity</Col>
+                <Col span={5}>Activity <span style={{ color: 'red' }}>*</span></Col>
                 <Col span={4}>
                   Functional Area <span style={{ color: 'red' }}>*</span> 
                 </Col>
-                <Col span={3}>Months</Col>
+                <Col span={3}>Months <span style={{ color: 'red' }}>*</span></Col>
                 <Col span={3}>Department</Col>
                 <Col span={6}>Comments</Col>
                 <Col span={2}></Col>
@@ -409,7 +425,7 @@ export default function CreateYearlyFormNew({
                 onClick={() => handleAddPlan(quarter.key)}
                 block
               >
-                Add Plan
+                Add Planned Activities
               </Button>
             </Panel>
 
