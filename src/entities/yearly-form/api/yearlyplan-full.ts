@@ -1,4 +1,4 @@
-import { getCurrentUser } from "aws-amplify/auth";
+import { fetchUserAttributes, getCurrentUser } from "aws-amplify/auth";
 import useSWR from "swr";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
@@ -48,7 +48,7 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
   const fetcher = async (): Promise<ApiResponse | null> => {
     const { username } = await getCurrentUser();
     console.log("User details", username);
-
+    
     const response = await client.models.YearlyPlan.get({ id });
     if (!response?.data) return null;
 

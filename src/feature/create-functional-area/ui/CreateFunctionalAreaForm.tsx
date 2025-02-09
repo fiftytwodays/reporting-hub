@@ -45,6 +45,7 @@ const CreateFunctionalAreaForm: React.FC<CreateFunctionalAreaFormProps> = ({
           "Functional area name already in use. Please try again with a different name."
         );
       } else {
+        console.log("error", error)
         messageApi.error("Unable to create the functional area. Please try again.");
       }
     }

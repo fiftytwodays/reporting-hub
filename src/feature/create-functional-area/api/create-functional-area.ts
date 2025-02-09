@@ -23,7 +23,7 @@ export default function useCreateFunctionalArea() {
       name: arg.name,
       description: arg.description,
     });
-
+console.log("response", response)
     if (response?.data) {
       const newFunctionalArea = {
         id: response.data.id,
