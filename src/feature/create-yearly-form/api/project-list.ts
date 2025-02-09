@@ -1,6 +1,7 @@
 import type { Schema } from "@root/amplify/data/resource";
 import useSWR, { mutate } from "swr";
 import { generateClient } from "aws-amplify/data";
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 
 interface FetchOptions {
   condition: boolean;
@@ -20,10 +21,19 @@ export interface Project {
 export default function useProjectList({ condition = true }: FetchOptions) {
 
   const client = generateClient<Schema>();
+  
 
 
   const fetcher = async () => {
-    const response = await client.models.Project.list();
+    const { username, userId, signInDetails } = await getCurrentUser();
+    const attributes = await fetchUserAttributes();
+    const projects = attributes["custom:projects"];
+    const projectsArray = stringToArray(projects);
+    const response = await client.models.Project.list({
+      filter: {
+        or: projectsArray.map(projectId => ({ id: { eq: projectId } })),
+      },
+    });
     if (response?.data) {
       const projects = await Promise.all(
         response.data.map(async (project) => {
@@ -52,6 +62,19 @@ export default function useProjectList({ condition = true }: FetchOptions) {
     }
   );
 
+  function stringToArray(str: string | undefined) {
+    if(str){
+    const cleanedStr = str.replace(/[\[\]]/g, '').trim();
+    if (!cleanedStr) {
+        return []; 
+    }
+    const arr = cleanedStr.includes(',') ? cleanedStr.split(',').map(item => item.trim()) : [cleanedStr];
+    return arr;
+  }
+  else{
+    return [];
+  }
+  }
   return {
     projectsData: data?.Projects,
     isProjectTypesDataLoading: isLoading,
