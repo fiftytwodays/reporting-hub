@@ -71,7 +71,7 @@ export default function CreateYearlyFormNew({
   messageApi, id, type
 }: CreateYearlyFormNewProps) {
 
-  
+
   const { createYearlyPlan, isCreatingYearlyPlan } = useCreateYearlyPlan();
   const { createQuarterlyPlan, isCreatingQuarterlyPlan } = useCreateQuarterlyPlan();
   const { createPlan, isCreatingPlan } = useCreatePlan();
@@ -332,7 +332,9 @@ export default function CreateYearlyFormNew({
               <Row gutter={24}>
                 <Col span={1}>Sl. No</Col>
                 <Col span={5}>Activity</Col>
-                <Col span={4}>Functional Area</Col>
+                <Col span={4}>
+                  Functional Area <span style={{ color: 'red' }}>*</span> 
+                </Col>
                 <Col span={3}>Months</Col>
                 <Col span={3}>Department</Col>
                 <Col span={6}>Comments</Col>
@@ -448,7 +450,7 @@ export default function CreateYearlyFormNew({
                 </Button>
               </>
             )}
-            </Space>
+          </Space>
         </Form.Item>
       </Form>
     </div>

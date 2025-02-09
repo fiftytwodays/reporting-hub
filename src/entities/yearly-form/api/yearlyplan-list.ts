@@ -21,19 +21,75 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     const attributes = await fetchUserAttributes();
     console.log("User details", username);
     console.log("Attributes", attributes);
+    
+    console.log("clusters array", arr)
+    console.log("type", type)
+    
+    let response;
+    if(type === "myforms"){
+      response = await client.models.YearlyPlan.list({
+        filter: {
+          user: { eq: userId },
+        },
+      });
+    }
+    
+    if(type === "reviewer")
+    {
     const clusters = attributes["custom:clusters"];
+    const arr = stringToArray(clusters);
+      const projects = await client.models.Project.list({
+        filter: {
+          or: arr.map(clusterId => ({ clusterId: { eq: clusterId } })),
+        },
+      })
+      const projectIds = projects?.data.map(project => project.id);
 
-    // const projects = await client.models.Project.list({
-    //   filter: {
-    //     or: clusters.map(clusterId => ({ clusterId: { eq: clusterId } })),
-    //   },
-    // })
 
-    const response = await client.models.YearlyPlan.list({
-      filter: {
-        user: { eq: userId },
-      },
-    });
+      response = await client.models.YearlyPlan.list({
+        filter: {
+          and: [
+            {
+              or: projectIds.map(projectId => ({ projectId: { eq: projectId } })),
+            },
+            { status: { eq: "waiting for review" } }, 
+          ],
+        },
+      });
+    }
+
+    if(type === "approver")
+      {
+      const regions = attributes["custom:regions"];
+      const arr = stringToArray(regions);
+        const clusters = await client.models.Cluster.list({
+          filter: {
+            or: arr.map(regionId => ({ regionId: { eq: regionId } })),
+          },
+        })
+        const clusterIds = clusters?.data.map(cluster => cluster.id);
+
+
+        const projects = await client.models.Project.list({
+        filter: {
+          or: clusterIds.map(clusterId => ({ clusterId: { eq: clusterId } })),
+        },
+      })
+      const projectIds = projects?.data.map(project => project.id);
+  
+  
+        response = await client.models.YearlyPlan.list({
+          filter: {
+            and: [
+              {
+                or: projectIds.map(projectId => ({ projectId: { eq: projectId } })),
+              },
+              { status: { eq: "waiting for approval" } }, 
+            ],
+          },
+        });
+      }
+
     if (response?.data) {
       console.log("The complete response", response, response.data);
       const yearlyPlans = await Promise.all(
@@ -78,6 +134,20 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
         },
       );
     };
+
+    function stringToArray(str: string | undefined) {
+      if(str){
+      const cleanedStr = str.replace(/[\[\]]/g, '').trim();
+      if (!cleanedStr) {
+          return []; 
+      }
+      const arr = cleanedStr.includes(',') ? cleanedStr.split(',').map(item => item.trim()) : [cleanedStr];
+      return arr;
+    }
+    else{
+      return [];
+    }
+    }
 
   const yearlyPlansData = data?.YearlyPlans?.map((yearlyPlan, index) => ({
     key: index,
