@@ -15,6 +15,7 @@ import useYearlyPlanFullDetails from "@/entities/yearly-form/api/yearlyplan-full
 import useUpdateYearlyPlan from "../api/update-yearly-form";
 import useUpdateQuarterlyPlan from "../api/update-quarter-plan";
 import useUpdatePlan from "../api/update-plan";
+import useDeletePlan from "@/feature/delete-plan/delete-plan";
 import useDeleteYearlyForm from "../../delete-yearly-form/delete-yearly-form"
 const { Panel } = Collapse;
 
@@ -77,7 +78,9 @@ export default function CreateYearlyFormNew({
   const { updateYearlyPlan, isUpdatingYearlyPlan } = useUpdateYearlyPlan();
   const { updateQuarterlyPlan, isUpdatingQuarterlyPlan } = useUpdateQuarterlyPlan();
   const { updatePlan, isUpdatingPlan } = useUpdatePlan();
+  const { deletePlan, isDeleting } = useDeletePlan();
   const [quarterPlans, setQuarterPlans] = useState<Record<number, QuarterlyPlanDetails>>({});
+  const [plansToDelete, setPlansToDelete] = useState<string[]>([]);
   let currentYear: number = new Date().getFullYear();
   let nextYear: number = currentYear + 1;
   const [form] = Form.useForm();
@@ -250,6 +253,8 @@ export default function CreateYearlyFormNew({
           }
         }
       }
+
+      deletePlan({ids: plansToDelete})
     } catch (error) {
       console.error("Error saving data:", error);
       messageApi.error("Failed to save data.");
@@ -277,6 +282,12 @@ export default function CreateYearlyFormNew({
         const updatedQuarterPlans = { ...prev };
 
         if (updatedQuarterPlans[quarter] && updatedQuarterPlans[quarter].plans) {
+
+          const planToDelete = updatedQuarterPlans[quarter].plans[index]?.id;
+
+            if (planToDelete) {
+                setPlansToDelete((prevIds) => [...prevIds, planToDelete]);
+            }
             // Filter out the plan at the specified index
             updatedQuarterPlans[quarter] = {
                 ...updatedQuarterPlans[quarter],
