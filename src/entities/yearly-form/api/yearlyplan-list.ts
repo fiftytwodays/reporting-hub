@@ -67,17 +67,17 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     }
   );
 
-  // const reloadYearlyPlansList = () => {
-  //   mutate(
-  //     (keys) =>
-  //       Array.isArray(keys) &&
-  //       keys.some((item) => item.startsWith("api/regions")),
-  //     undefined,
-  //     {
-  //       revalidate: true,
-  //     },
-  //   );
-  // };
+  const reloadYearlyPlansList = () => {
+      mutate(
+        (keys) =>
+          Array.isArray(keys) &&
+          keys.some((item) => item.startsWith("api/yearlyPlans")),
+        undefined,
+        {
+          revalidate: true,
+        },
+      );
+    };
 
   const yearlyPlansData = data?.YearlyPlans?.map((yearlyPlan, index) => ({
     key: index,
@@ -91,6 +91,6 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     yearlyPlansList: yearlyPlansData ?? [],
     isYearlyPlansListLoading: isLoading,
     isYearlyPlansListError: error,
-    // reloadRegionsList
+    reloadYearlyPlansList
   };
 }

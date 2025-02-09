@@ -5,7 +5,7 @@ import useYearlyPlansList from "@/entities/yearly-form/api/yearlyplan-list";
 // import { EditYearlyPlanModal } from "@/feature/edit-region";
 import { YearlyPlansList as _YearlyPlansList } from "@/entities/yearly-form";
 import { useRouter } from "next/navigation";
-// import useDeleteYearlyPlan from "@/feature/delete-region/delete-region";
+import useDeleteYearlyForm from "@/feature/delete-yearly-form/delete-yearly-form"
 
 
 export default function YearlyPlansList({ type }: { type: string }) {
@@ -17,12 +17,13 @@ export default function YearlyPlansList({ type }: { type: string }) {
   const [selectedYearlyPlan, setSelectedYearlyPlan] = useState<YearlyPlan | null>(null);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
-  const { yearlyPlansList, isYearlyPlansListLoading } =
+  const { yearlyPlansList, isYearlyPlansListLoading, reloadYearlyPlansList } =
     useYearlyPlansList({
       condition: true,
       type,
     });
 
+  const {deleteYearlyForm} = useDeleteYearlyForm();
   const handleEdit = (yearlyPlan: YearlyPlan) => {
     console.log("Data inside handleEdit", yearlyPlan);
     setSelectedYearlyPlan(yearlyPlan);
@@ -42,16 +43,18 @@ export default function YearlyPlansList({ type }: { type: string }) {
   // const { deleteYearlyPlan } = useDeleteYearlyPlan();
 
   const handleDelete = async (yearlyPlan: YearlyPlan) => {
+    const payload = { id: yearlyPlan.id };
+    
     // const payload = { id: region.id };
-    // try {
-    //   const data = await deleteYearlyPlan(payload);
-    //   if (data) {
-    //     messageApi.success("YearlyPlan has been deleted successfully.");
-    //     reloadYearlyPlansList();
-    //   }
-    // } catch (error: any) {
-    //   messageApi.error("Unable to delete the region. Please try again.");
-    // }
+    try {
+      const data = await deleteYearlyForm(payload);;
+      if (data) {
+        messageApi.success("YearlyPlan has been deleted successfully.");
+        reloadYearlyPlansList();
+      }
+    } catch (error: any) {
+      messageApi.error("Unable to delete YearlyPlan. Please try again.");
+    }
   };
 
   return (
@@ -62,6 +65,7 @@ export default function YearlyPlansList({ type }: { type: string }) {
         isLoading={isYearlyPlansListLoading}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
+        type={type}
       />
       {/* {isEditModalVisible && selectedYearlyPlan && (
         <EditYearlyPlanModal
