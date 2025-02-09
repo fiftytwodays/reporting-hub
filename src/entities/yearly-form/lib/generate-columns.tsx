@@ -17,7 +17,8 @@ interface Column<T = any> {
 export default function generateColumns<T>(
   columns: Column[],
   handleDelete: (item: T) => void,
-  handleEdit: (item: T) => void
+  handleEdit: (item: T) => void,
+  type:string
 ): Column<T>[] {
   const { Text } = Typography;
 
@@ -31,6 +32,7 @@ export default function generateColumns<T>(
               <_Button type="link" onClick={() => handleEdit(item)}>
                 Edit
               </_Button>
+              {type === "myforms" &&(
               <Popconfirm
                 placement="bottomRight"
                 title="Are you sure you want to delete the Yearly Plan?"
@@ -41,7 +43,9 @@ export default function generateColumns<T>(
                 <_Button type="link" danger>
                   Delete
                 </_Button>
+                
               </Popconfirm>
+              )}
             </Space>
           </div>
         );
