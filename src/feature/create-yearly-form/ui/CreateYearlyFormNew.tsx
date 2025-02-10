@@ -506,7 +506,7 @@ export default function CreateYearlyFormNew({
 
         <Form.Item style={{ marginTop: 24 }}>
           <Space>
-            {type === "myforms" || type === "createNew" && (
+            {(type === "myforms" || type === "createNew") && (
               <>
                 <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected")) || false} onClick={() => showCommentPrompt("draft")}>
                   Save as Draft

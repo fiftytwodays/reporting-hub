@@ -4,7 +4,7 @@ import { Amplify } from "aws-amplify";
 
 import { message } from "antd";
 import Page from "@/shared/ui/page/ui/Page";
-import { CreateYearlyForm } from "@/feature/create-yearly-form";
+import { CreateYearlyFormNew } from "@/feature/create-yearly-form";
 // import { RegionsList } from "@/widgets/regions-list";
 import { Button, Modal } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
