@@ -13,7 +13,7 @@ interface ApiResponse {
   YearlyPlanDetails: YearlyPlanDetails;
 }
 
-export default function useYearlyPlanDetails({ condition = true }: FetchOptions, id: string | undefined) {
+export default function useYearlyPlanDetails({ condition = true }: FetchOptions, id: string) {
   const client = generateClient<Schema>();
 
 

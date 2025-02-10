@@ -43,70 +43,72 @@ interface ApiResponse {
   YearlyPlanDetails: YearlyPlanDetails;
 }
 
-export default function useYearlyPlanFullDetails({ condition = true }: FetchOptions, id: string) {
+export default function useYearlyPlanFullDetails({ condition = true }: FetchOptions, id: string | undefined) {
   const client = generateClient<Schema>();
 
   const fetcher = async (): Promise<ApiResponse | null> => {
-    const { username } = await getCurrentUser();
-    console.log("User details", username);
-    
-    const response = await client.models.YearlyPlan.get({ id });
-    if (!response?.data) return null;
+    if (id) {
+      const { username } = await getCurrentUser();
+      console.log("User details", username);
 
-    const yearlyPlanResp = response.data;
+      const response = await client.models.YearlyPlan.get({ id });
+      if (!response?.data) return null;
 
-    const yearlyPlanDetails: YearlyPlanDetails = {
-      id: yearlyPlanResp.id,
-      user: yearlyPlanResp.user ?? "",
-      userId: yearlyPlanResp.userId,
-      projectId: yearlyPlanResp.projectId ?? "",
-      comments: yearlyPlanResp.comments ?? "",
-      status: yearlyPlanResp.status ?? "",
-      year: yearlyPlanResp.year ?? "",
-      reviewedBy: yearlyPlanResp.reviewedBy ?? "",
-      approvedBy: yearlyPlanResp.approvedBy ?? "",
-      quarterlyPlans: {}, // Change: Use an object instead of an array
-    };
+      const yearlyPlanResp = response.data;
 
-    // Fetch Quarterly Plans
-    const quarterlyPlans = await client.models.QuarterlyPlan.list({
-      filter: { yearlyPlanId: { eq: id } },
-    });
+      const yearlyPlanDetails: YearlyPlanDetails = {
+        id: yearlyPlanResp.id,
+        user: yearlyPlanResp.user ?? "",
+        userId: yearlyPlanResp.userId,
+        projectId: yearlyPlanResp.projectId ?? "",
+        comments: yearlyPlanResp.comments ?? "",
+        status: yearlyPlanResp.status ?? "",
+        year: yearlyPlanResp.year ?? "",
+        reviewedBy: yearlyPlanResp.reviewedBy ?? "",
+        approvedBy: yearlyPlanResp.approvedBy ?? "",
+        quarterlyPlans: {}, // Change: Use an object instead of an array
+      };
 
-    yearlyPlanDetails.quarterlyPlans = Object.fromEntries(
-      await Promise.all(
-        (quarterlyPlans?.data || []).map(async (quarterlyPlan): Promise<[number, QuarterlyPlanDetails]> => {
-          const quarterlyPlanDetails: QuarterlyPlanDetails = {
-            id: quarterlyPlan.id,
-            yearlyPlanId: quarterlyPlan.yearlyPlanId ?? "",
-            status: quarterlyPlan.status ?? "",
-            reviewedBy: quarterlyPlan.reviewedBy ?? "",
-            approvedBy: quarterlyPlan.approvedBy ?? "",
-            plans: [],
-          };
+      // Fetch Quarterly Plans
+      const quarterlyPlans = await client.models.QuarterlyPlan.list({
+        filter: { yearlyPlanId: { eq: id } },
+      });
 
-          // Fetch Plans for each Quarterly Plan
-          const plans = await client.models.Plan.list({
-            filter: { quarterlyPlanId: { eq: quarterlyPlan.id } },
-          });
+      yearlyPlanDetails.quarterlyPlans = Object.fromEntries(
+        await Promise.all(
+          (quarterlyPlans?.data || []).map(async (quarterlyPlan): Promise<[number, QuarterlyPlanDetails]> => {
+            const quarterlyPlanDetails: QuarterlyPlanDetails = {
+              id: quarterlyPlan.id,
+              yearlyPlanId: quarterlyPlan.yearlyPlanId ?? "",
+              status: quarterlyPlan.status ?? "",
+              reviewedBy: quarterlyPlan.reviewedBy ?? "",
+              approvedBy: quarterlyPlan.approvedBy ?? "",
+              plans: [],
+            };
 
-          quarterlyPlanDetails.plans = (plans?.data || []).map((plan): PlanDetails => ({
-            id: plan.id,
-            quarterlyPlanId: plan.quarterlyPlanId ?? "",
-            activity: plan.activity,
-            month: (plan.month || []).map((m) => m ?? ""),
-            functionalAreaId: plan.functionalAreaId ?? "",
-            department: plan.department ?? "",
-            comments: plan.comments ?? "",
-          }));
+            // Fetch Plans for each Quarterly Plan
+            const plans = await client.models.Plan.list({
+              filter: { quarterlyPlanId: { eq: quarterlyPlan.id } },
+            });
 
-          return [quarterlyPlan.quarter ?? 0, quarterlyPlanDetails];
-        })
-      )
-    );
+            quarterlyPlanDetails.plans = (plans?.data || []).map((plan): PlanDetails => ({
+              id: plan.id,
+              quarterlyPlanId: plan.quarterlyPlanId ?? "",
+              activity: plan.activity,
+              month: (plan.month || []).map((m) => m ?? ""),
+              functionalAreaId: plan.functionalAreaId ?? "",
+              department: plan.department ?? "",
+              comments: plan.comments ?? "",
+            }));
 
-    console.log("The Yearly Plan Detail", yearlyPlanDetails);
-    return { YearlyPlanDetails: yearlyPlanDetails };
+            return [quarterlyPlan.quarter ?? 0, quarterlyPlanDetails];
+          })
+        )
+      );
+
+      console.log("The Yearly Plan Detail", yearlyPlanDetails);
+      return { YearlyPlanDetails: yearlyPlanDetails };
+    } return null;
   };
 
   const { data, isLoading, error } = useSWR(

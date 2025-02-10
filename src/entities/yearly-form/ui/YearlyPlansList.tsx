@@ -16,7 +16,7 @@ export default function YearlyPlansList({ data, isLoading, handleDelete, handleE
     <EntityList
       rowKey="id"
       columns={columns}
-      mapColumn={(columns) => generateColumns(columns, handleDelete, handleEdit, type)}
+      mapColumn={(columns): any => generateColumns(columns, handleDelete, handleEdit, type)}
       data={data}
       isLoading={isLoading}
 

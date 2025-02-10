@@ -26,13 +26,15 @@ export default function useUpdateQuarterlyPlan() {
 
   // Function to create a project
   const updateQuarterlyPlan = async (key: string, { arg }: { arg: UpdateQuarterlyPlanInput }) => {
-    const response = await client.models.QuarterlyPlan.update({
+    let response;
+    if(arg.id){
+     response = await client.models.QuarterlyPlan.update({
       yearlyPlanId: arg.yearlyPlanId,
       quarter: arg.quarter,
       status: arg.status,
-      id: arg.id,
+      id: arg?.id,
     });
-
+  }
     if (response?.data) {
       const newQuarterlyPlan = {
         id: response.data.id,
