@@ -29,6 +29,7 @@ interface QuarterlyPlanDetails {
 interface YearlyPlanDetails {
   id: string;
   user: string;
+  userId: string;
   projectId?: string;
   comments?: string;
   status?: string;
@@ -56,7 +57,8 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
 
     const yearlyPlanDetails: YearlyPlanDetails = {
       id: yearlyPlanResp.id,
-      user: yearlyPlanResp.user,
+      user: yearlyPlanResp.user ?? "",
+      userId: yearlyPlanResp.userId,
       projectId: yearlyPlanResp.projectId ?? "",
       comments: yearlyPlanResp.comments ?? "",
       status: yearlyPlanResp.status ?? "",

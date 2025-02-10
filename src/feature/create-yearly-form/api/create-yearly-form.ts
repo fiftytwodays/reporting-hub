@@ -6,8 +6,9 @@ import { message } from "antd";
 
 interface CreateYearlyPlanInput {
   user: string;
+  userId: string;
   projectId: string;
-  comments: string;
+  comments?: string;
   status: string;
   year: string;
 }
@@ -19,6 +20,7 @@ interface YearlyPlanResponse {
   comments: string;
   status: string;
   year: string;
+  userId: string;
 }
 
 interface CustomError {
@@ -32,30 +34,31 @@ export default function useCreateYearlyPlan() {
   const { data: yearlyPlan } = useSWR("api/yearlyPlan");
 
   const createYearlyPlan = async (key: string, { arg }: { arg: CreateYearlyPlanInput }) => {
-
+console.log("arg", arg);
     const existingPlan = await client.models.YearlyPlan.list({
       filter: {
         and: [
           { projectId: { eq: arg.projectId } },
-          { user: { eq: arg.user } },
+          { userId: { eq: arg.userId } },
         ],
       }
     });
 
-    if(existingPlan?.data.length > 0){
+    if (existingPlan?.data.length > 0) {
       console.log("After Throw")
-      throw {statusCode: 409, message:"The yearly plan for this project already exist"} as CustomError;
+      throw { statusCode: 409, message: "The yearly plan for this project already exist" } as CustomError;
       console.log("After Throw")
     }
 
     const response = await client.models.YearlyPlan.create({
       user: arg.user,
+      userId: arg.userId,
       projectId: arg.projectId,
       comments: arg.comments,
       status: arg.status,
       year: arg.year,
     });
-
+    console.log("response in create-yearly-form", response)
     if (response?.data) {
       const newYearlyPlan = {
         id: response.data.id,
@@ -64,6 +67,7 @@ export default function useCreateYearlyPlan() {
         comments: response.data.comments,
         status: response.data.status,
         year: response.data.year,
+        userId: response.data.userId,
       } as YearlyPlanResponse;
 
       return newYearlyPlan;
@@ -72,13 +76,13 @@ export default function useCreateYearlyPlan() {
     throw new Error("Failed to create the Yearly Plan");
   };
   //  Use SWR Mutation to handle the creation request
-   const { trigger, data, isMutating, error } = useSWRMutation("api/create-yearly-form", createYearlyPlan);
+  const { trigger, data, isMutating, error } = useSWRMutation("api/create-yearly-form", createYearlyPlan);
 
-   return {
-     createYearlyPlan: trigger,  // Function to initiate the YearlyPlan creation
-     createdYearlyPlan: data,    // The created YearlyPlan data
-     isCreatingYearlyPlan: isMutating,  // Loading state
-     createError: error as CustomError | null,      // Error state
-   };
-  
+  return {
+    createYearlyPlan: trigger,  // Function to initiate the YearlyPlan creation
+    createdYearlyPlan: data,    // The created YearlyPlan data
+    isCreatingYearlyPlan: isMutating,  // Loading state
+    createError: error as CustomError | null,      // Error state
+  };
+
 }

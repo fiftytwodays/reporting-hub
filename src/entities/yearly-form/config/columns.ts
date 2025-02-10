@@ -16,6 +16,11 @@ export const columns = [
     key: "year",
   },
   {
+    title: "Project Facilitator",
+    dataIndex: "user",
+    key: "user",
+  },
+  {
     title: "Status",
     dataIndex: "status",
     key: "status",

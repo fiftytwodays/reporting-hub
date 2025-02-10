@@ -4,6 +4,7 @@ export interface YearlyPlan {
   year: string;
   status: string;
   comments: string;
+  user: string;
 }
 
 export interface YearlyPlanDetails {

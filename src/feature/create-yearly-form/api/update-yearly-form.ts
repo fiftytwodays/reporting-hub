@@ -6,7 +6,7 @@ import useSWR from "swr";
 interface UpdateYearlyPlanInput {
   user: string;
   projectId: string;
-  comments: string;
+  comments?: string;
   status: string;
   year: string;
   id?: string;

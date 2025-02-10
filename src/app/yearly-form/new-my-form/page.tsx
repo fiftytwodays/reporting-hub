@@ -35,7 +35,7 @@ export default function MyForms() {
           },
         ],
       }}
-      content={<CreateYearlyFormNew id={undefined} messageApi={messageApi} type="myforms" />}
+      content={<CreateYearlyFormNew id={undefined} messageApi={messageApi} type="createNew" />}
     />
     </>
   );

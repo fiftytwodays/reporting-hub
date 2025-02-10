@@ -27,9 +27,21 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     
     let response;
     if(type === "myforms"){
+
+      const clusters = attributes["custom:clusters"];
+    const arr = stringToArray(clusters);
+    if(arr.length>0){
+      const projects = await client.models.Project.list({
+        filter: {
+          or: arr.map(clusterId => ({ clusterId: { eq: clusterId } })),
+        },
+      })
+      const projectIds = projects?.data.map(project => project.id);
+    }
+
       response = await client.models.YearlyPlan.list({
         filter: {
-          user: { eq: userId },
+          userId: { eq: userId },
         },
       });
     }
@@ -105,6 +117,8 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
             year: yearlyPlan.year ?? "",
             status: yearlyPlan.status ?? "",
             comments: yearlyPlan.comments ?? "",
+            user: yearlyPlan.user ?? "",
+            userId: yearlyPlan.userId ?? "",
           };
         })
       );
@@ -160,6 +174,7 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     year: yearlyPlan.year,
     status: yearlyPlan.status,
     comments: yearlyPlan.comments,
+    user: yearlyPlan.user,
   }));
   return {
     yearlyPlansList: yearlyPlansData ?? [],

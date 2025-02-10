@@ -1,10 +1,10 @@
 
-import { Button, Col, Collapse, CollapseProps, Divider, Flex, Form, Input, Row, Select, Space, Spin } from "antd";
+import { Button, Col, Collapse, CollapseProps, Divider, Flex, Form, Input, Modal, Row, Select, Space, Spin } from "antd";
 import Projects from "./Projects";
 import FunctionalArea from "./FunctionalArea";
-import { getCurrentUser } from 'aws-amplify/auth';
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 import QuarterlyPlan from "./QuarterlyPlan";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DeleteTwoTone } from '@ant-design/icons';
 import useCreateYearlyPlan from "../api/create-yearly-form";
 import useCreateQuarterlyPlan from "../api/create-quarter-plan";
@@ -17,6 +17,8 @@ import useUpdateQuarterlyPlan from "../api/update-quarter-plan";
 import useUpdatePlan from "../api/update-plan";
 import useDeletePlan from "@/feature/delete-plan/delete-plan";
 import useDeleteYearlyForm from "../../delete-yearly-form/delete-yearly-form"
+import CommentModal from "@/shared/ui/comment/CommentModal";
+import { AuthUser } from "aws-amplify/auth";
 const { Panel } = Collapse;
 
 interface CreateYearlyFormNewProps {
@@ -51,6 +53,7 @@ interface QuarterlyPlanDetails {
 interface YearlyPlanDetails {
   id: string;
   user: string;
+  userId: string
   projectId?: string;
   comments?: string;
   status?: string;
@@ -87,6 +90,10 @@ export default function CreateYearlyFormNew({
   const { Option } = Select;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [comment, setComment] = useState<string>("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [status, setStatus] = useState("");
+  const [projectFacilitator, setProjectFacilitator] = useState("");
 
   const monthsArray = [
     "April",
@@ -127,15 +134,18 @@ export default function CreateYearlyFormNew({
   ];
 
   const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanFullDetails({ condition: !!id }, id);
-
+  
   useEffect(() => {
     setLoading(true)
+    setUserDetails();
+    console.log("Set loading to true", id, yearlyPlanDetail)
     if (id && yearlyPlanDetail) {
       form.setFieldsValue({
         year: yearlyPlanDetail.year,
         project: yearlyPlanDetail.projectId,
       });
       const mappedQuarterPlans: Record<number, QuarterlyPlanDetails> = {};
+      console.log("mappedQuarterPlans")
       Object.entries(yearlyPlanDetail.quarterlyPlans).forEach(([key, quarterData]) => {
         const quarterKey = Number(key); // Convert key to number
 
@@ -157,34 +167,41 @@ export default function CreateYearlyFormNew({
           })),
         };
       });
+      console.log("mappedQuarterPlans completed")
 
       // Update state
       setQuarterPlans(mappedQuarterPlans);
-      setLoading(false)
+      console.log("set quarter plans completed")
     }
-  }, [yearlyPlanDetail]);
+    setLoading(false)
+  }, [yearlyPlanDetail,projectFacilitator]);
+
+  const showCommentPrompt = (status: string) => {
+    setStatus(status);
+    setModalVisible(true);
+  };
+
+  const setUserDetails = async () => {
+    const attributes = await fetchUserAttributes();
+    setProjectFacilitator(attributes["given_name"] + " " + attributes["family_name"]);
+  };
 
 
-  // useEffect(() => {
-  //   console.log("Inside UseEffect")
-  //   if (id && yearlyPlanDetail) {
-  //     console.log("Yearly Plan Detail fetched using Yearly plan id", yearlyPlanDetail);
-  //   }
-  // }, [yearlyPlanDetail]);
-
-  const handleSave = async (status: string) => {
+  const handleSave = async (status: string, comment: string) => {
     try {
       setLoading(true);
       const { username, userId, signInDetails } = await getCurrentUser();
+      
       const formValues = form.getFieldsValue();
 
-      console.log("form details", formValues);
-      console.log("qaurter details", quarterPlans)
+      console.log("form details", username);
+      console.log("qaurter details", userId);
       let yearlyPlanResp;
       const yearlyPlanPayload = {
-        user: yearlyPlanDetail?.user ?? userId,
+        user: yearlyPlanDetail?.user ?? projectFacilitator,
+        userId: yearlyPlanDetail?.userId ?? userId,
         projectId: formValues.project,
-        comments: "",
+        ...(comment && "" != comment && { comments: comment }),
         status: status,
         year: formValues.year,
         ...(yearlyPlanDetail?.id && yearlyPlanDetail?.id !== "" && { id: yearlyPlanDetail.id })
@@ -342,8 +359,9 @@ export default function CreateYearlyFormNew({
 
   return (
     <div>
+      <CommentModal status={status} isOpen={modalVisible} onClose={() => setModalVisible(false)} onSave={handleSave} />
       <h1>Yearly Planning</h1>
-      <Form form={form} layout="horizontal" disabled={type !== "myforms"} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: undefined }}>
+      <Form form={form} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && yearlyPlanDetail?.status != "draft")} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: undefined }}>
         <Row gutter={24}>
           <Col xs={24} sm={12}>
             <Form.Item label="Year" name="year">
@@ -360,6 +378,20 @@ export default function CreateYearlyFormNew({
             >
               <Projects form={form} id={form.getFieldValue("project") ?? undefined} />
             </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={24}>
+          <Col xs={24} sm={12}>
+            <Form.Item label="Project Facilitator">
+              <Input disabled value={projectFacilitator}/>
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={12}>
+            {yearlyPlanDetail?.comments && (
+              <div style={{ padding: "7px", background: "#f0f2f5", borderRadius: "5px" }}>
+                <strong>Comments:</strong> {yearlyPlanDetail.comments}
+              </div>
+            )}
           </Col>
         </Row>
         <>
@@ -474,12 +506,12 @@ export default function CreateYearlyFormNew({
 
         <Form.Item style={{ marginTop: 24 }}>
           <Space>
-            {type === "myforms" && (
+            {type === "myforms" || type === "createNew" && (
               <>
-                <Button type="primary" disabled={false} onClick={() => handleSave("draft")}>
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected")) || false} onClick={() => showCommentPrompt("draft")}>
                   Save as Draft
                 </Button>
-                <Button type="primary" disabled={false} onClick={() => handleSave("waiting for review")}>
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected")) || false} onClick={() => showCommentPrompt("waiting for review")}>
                   Send to Review
                 </Button>
               </>
@@ -487,10 +519,10 @@ export default function CreateYearlyFormNew({
 
             {type === "reviewer" && (
               <>
-                <Button type="primary" disabled={false} onClick={() => handleSave("waiting for approval")}>
+                <Button type="primary" disabled={false} onClick={() => showCommentPrompt("waiting for approval")}>
                   Send for Approval
                 </Button>
-                <Button type="default" disabled={false} danger onClick={() => handleSave("rejected")}>
+                <Button type="default" disabled={false} danger onClick={() => showCommentPrompt("rejected")}>
                   Reject
                 </Button>
               </>
@@ -498,10 +530,10 @@ export default function CreateYearlyFormNew({
 
             {type === "approver" && (
               <>
-                <Button type="primary" disabled={false} onClick={() => handleSave("approved")}>
+                <Button type="primary" disabled={false} onClick={() => showCommentPrompt("approved")}>
                   Approve
                 </Button>
-                <Button type="default" disabled={false} danger onClick={() => handleSave("rejected")}>
+                <Button type="default" disabled={false} danger onClick={() => showCommentPrompt("rejected")}>
                   Reject
                 </Button>
               </>
