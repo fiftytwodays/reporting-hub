@@ -21,62 +21,29 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     const attributes = await fetchUserAttributes();
     console.log("User details", username);
     console.log("Attributes", attributes);
-    
+
     // console.log("clusters array", arr)
     console.log("type", type)
-    
+
     let response;
-    if(type === "myforms"){
-
+    if (type === "myforms") {
+      let projectIdsByCluster: string[] = [];
+      let projectIdsByRegion: string[] = [];
       const clusters = attributes["custom:clusters"];
-    const arr = stringToArray(clusters);
-    if(arr.length>0){
-      const projects = await client.models.Project.list({
-        filter: {
-          or: arr.map(clusterId => ({ clusterId: { eq: clusterId } })),
-        },
-      })
-      const projectIds = projects?.data.map(project => project.id);
-    }
-
-      response = await client.models.YearlyPlan.list({
-        filter: {
-          userId: { eq: userId },
-        },
-      });
-    }
-    
-    if(type === "reviewer")
-    {
-    const clusters = attributes["custom:clusters"];
-    const arr = stringToArray(clusters);
-    if(arr.length>0){
-      const projects = await client.models.Project.list({
-        filter: {
-          or: arr.map(clusterId => ({ clusterId: { eq: clusterId } })),
-        },
-      })
-      const projectIds = projects?.data.map(project => project.id);
+      const clustersArr = stringToArray(clusters);
+      if (clustersArr.length > 0) {
+        const projects = await client.models.Project.list({
+          filter: {
+            or: clustersArr.map(clusterId => ({ clusterId: { eq: clusterId } })),
+          },
+        })
+        projectIdsByCluster = projects?.data.map(project => project.id);
+      }
 
 
-      response = await client.models.YearlyPlan.list({
-        filter: {
-          and: [
-            {
-              or: projectIds.map(projectId => ({ projectId: { eq: projectId } })),
-            },
-            { status: { eq: "waiting for review" } }, 
-          ],
-        },
-      });
-    }
-    }
-
-    if(type === "approver")
-      {
       const regions = attributes["custom:regions"];
       const arr = stringToArray(regions);
-      if(arr.length > 0){
+      if (arr.length > 0) {
         const clusters = await client.models.Cluster.list({
           filter: {
             or: arr.map(regionId => ({ regionId: { eq: regionId } })),
@@ -86,25 +53,91 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
 
 
         const projects = await client.models.Project.list({
-        filter: {
-          or: clusterIds.map(clusterId => ({ clusterId: { eq: clusterId } })),
-        },
-      })
-      const projectIds = projects?.data.map(project => project.id);
-  
-  
+          filter: {
+            or: clusterIds.map(clusterId => ({ clusterId: { eq: clusterId } })),
+          },
+        })
+        projectIdsByRegion = projects?.data.map(project => project.id);
+      }
+
+      const uniqueProjectIds = Array.from(new Set([...projectIdsByCluster, ...projectIdsByRegion]));
+
+      // Construct filter condition
+      let filter = {};
+
+      if (uniqueProjectIds.length > 0) {
+        filter = {
+          or: [
+            { userId: { eq: userId } },
+            ...uniqueProjectIds.map(projectId => ({ projectId: { eq: projectId } })),
+          ],
+        };
+      } else {
+        filter = { userId: { eq: userId } };
+      }
+
+      response = await client.models.YearlyPlan.list({
+        filter
+      });
+    }
+
+    if (type === "reviewer") {
+      const clusters = attributes["custom:clusters"];
+      const arr = stringToArray(clusters);
+      if (arr.length > 0) {
+        const projects = await client.models.Project.list({
+          filter: {
+            or: arr.map(clusterId => ({ clusterId: { eq: clusterId } })),
+          },
+        })
+        const projectIds = projects?.data.map(project => project.id);
+
+
         response = await client.models.YearlyPlan.list({
           filter: {
             and: [
               {
                 or: projectIds.map(projectId => ({ projectId: { eq: projectId } })),
               },
-              { status: { eq: "waiting for approval" } }, 
+              { status: { eq: "waiting for review" } },
             ],
           },
         });
       }
+    }
+
+    if (type === "approver") {
+      const regions = attributes["custom:regions"];
+      const arr = stringToArray(regions);
+      if (arr.length > 0) {
+        const clusters = await client.models.Cluster.list({
+          filter: {
+            or: arr.map(regionId => ({ regionId: { eq: regionId } })),
+          },
+        })
+        const clusterIds = clusters?.data.map(cluster => cluster.id);
+
+
+        const projects = await client.models.Project.list({
+          filter: {
+            or: clusterIds.map(clusterId => ({ clusterId: { eq: clusterId } })),
+          },
+        })
+        const projectIds = projects?.data.map(project => project.id);
+
+
+        response = await client.models.YearlyPlan.list({
+          filter: {
+            and: [
+              {
+                or: projectIds.map(projectId => ({ projectId: { eq: projectId } })),
+              },
+              { status: { eq: "waiting for approval" } },
+            ],
+          },
+        });
       }
+    }
 
     if (response?.data) {
       console.log("The complete response", response, response.data);
@@ -142,30 +175,30 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
   );
 
   const reloadYearlyPlansList = () => {
-      mutate(
-        (keys) =>
-          Array.isArray(keys) &&
-          keys.some((item) => item.startsWith("api/yearlyPlans")),
-        undefined,
-        {
-          revalidate: true,
-        },
-      );
-    };
+    mutate(
+      (keys) =>
+        Array.isArray(keys) &&
+        keys.some((item) => item.startsWith("api/yearlyPlans")),
+      undefined,
+      {
+        revalidate: true,
+      },
+    );
+  };
 
-    function stringToArray(str: string | undefined) {
-      if(str){
+  function stringToArray(str: string | undefined) {
+    if (str) {
       const cleanedStr = str.replace(/[\[\]]/g, '').trim();
       if (!cleanedStr) {
-          return []; 
+        return [];
       }
       const arr = cleanedStr.includes(',') ? cleanedStr.split(',').map(item => item.trim()) : [cleanedStr];
       return arr;
     }
-    else{
+    else {
       return [];
     }
-    }
+  }
 
   const yearlyPlansData = data?.YearlyPlans?.map((yearlyPlan, index) => ({
     key: index,
