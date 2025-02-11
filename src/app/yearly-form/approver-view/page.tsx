@@ -22,7 +22,7 @@ export default function ApproverView() {
     <Page
     showPageHeader
       header={{
-        title: "Approver View",
+        title: "Approver view",
         breadcrumbs: [
           {
             title: "Home",
@@ -30,7 +30,7 @@ export default function ApproverView() {
           },
 
           {
-            title: "Approver View",
+            title: "Approver view",
             href: "/yearly-form/approver-view",
           },
         ],

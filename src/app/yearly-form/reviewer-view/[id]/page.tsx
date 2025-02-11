@@ -12,6 +12,7 @@ import { PlusOutlined } from "@ant-design/icons";
 // import {  useRouter } from "next/router";
 
 import outputs from "@root/amplify_outputs.json";
+import useYearlyPlanDetails from "@/entities/yearly-form/api/yearlyplan-details";
 Amplify.configure(outputs);
 
 export default  function ReviewerViewDetail({
@@ -23,13 +24,14 @@ export default  function ReviewerViewDetail({
   const  id  =  params.id;
   console.log("id",id);
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
+  const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanDetails({ condition: !!id }, id);
   return (
     <>
      {contextHolder}
     <Page
     showPageHeader
       header={{
-        title: `${id ? id : "---"}`,
+        title: `${yearlyPlanDetail?.projectName + " [" + yearlyPlanDetail?.year + "]"}`,
         breadcrumbs: [
           {
             title: "Home",
@@ -37,27 +39,27 @@ export default  function ReviewerViewDetail({
           },
 
           {
-            title: "yearly-form",
+            title: "Yearly forms",
             href: "/yearly-form/my-forms",
             menu: {
               items: [
                 {
-                  key: '/navigation',
-                  label: 'My Forms',
+                  key: '/yearly-form/my-forms',
+                  label: 'My forms',
                 },
               {
-                key: '/general',
-                label: 'Reviewer View',
+                key: '/yearly-form/reviewer-view',
+                label: 'Reviewer view',
               },
               {
-                key: '/layout',
-                label: 'Approver View',
+                key: '/yearly-form/approver-view',
+                label: 'Approver view',
               },
             ]
             },
           },
           {
-            title: "my-forms",
+            title: "My forms",
             href: "/yearly-form/my-forms",
           },
         ],

@@ -23,27 +23,23 @@ export default function useYearlyPlanDetails({ condition = true }: FetchOptions,
     console.log("User details", username);
     const response = await client.models.YearlyPlan.get({ id: id });
     if (response?.data) {
-      
-      const yearlyPlanResp = response.data;
-      const yearlyPlanDetails = {
-        approvedBy: yearlyPlanResp.approvedBy ?? "",
-        comments: yearlyPlanResp.comments ?? "",
-        createdAt: yearlyPlanResp.createdAt ?? "",
-        id: yearlyPlanResp.id ?? "",
-        owner: yearlyPlanResp.owner ?? "",
-        projectId: yearlyPlanResp.projectId ?? "",
-        reviewedBy: yearlyPlanResp.reviewedBy ?? "",
-        status: yearlyPlanResp.status ?? "",
-        updatedAt: yearlyPlanResp.updatedAt ?? "",
-        user: yearlyPlanResp.user ?? "",
-        year: yearlyPlanResp.year ?? "",
-      }
-      console.log("The Year plan Detail", yearlyPlanDetails);
-      const apiResponse: ApiResponse = {
-        YearlyPlanDetails: yearlyPlanDetails
-      };
 
-      return apiResponse;
+      const yearlyPlanResp = response.data;
+      if (yearlyPlanResp?.projectId) {
+        const proectResponse = await client.models.Project.get({ id: yearlyPlanResp?.projectId });
+        const yearlyPlanDetails = {
+          id: yearlyPlanResp.id ?? "",
+          user: yearlyPlanResp.user ?? "",
+          projectName: proectResponse.data?.name ?? "",
+          year: yearlyPlanResp.year ?? "",
+        }
+        console.log("The Year plan Detail", yearlyPlanDetails);
+        const apiResponse: ApiResponse = {
+          YearlyPlanDetails: yearlyPlanDetails
+        };
+
+        return apiResponse;
+      }
     }
     return null;
   };

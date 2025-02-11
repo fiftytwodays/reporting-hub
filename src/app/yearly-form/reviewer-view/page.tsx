@@ -22,7 +22,7 @@ export default function ReviewerView() {
     <Page
     showPageHeader
       header={{
-        title: "Reviewer View",
+        title: "Reviewer view",
         breadcrumbs: [
           {
             title: "Home",
@@ -30,7 +30,7 @@ export default function ReviewerView() {
           },
 
           {
-            title: "Reviewer View",
+            title: "Reviewer view",
             href: "/yearly-form/reviewer-view",
           },
         ],

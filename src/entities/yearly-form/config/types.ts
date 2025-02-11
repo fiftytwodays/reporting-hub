@@ -8,16 +8,9 @@ export interface YearlyPlan {
 }
 
 export interface YearlyPlanDetails {
-  approvedBy: string;
-  comments: string;
-  createdAt: string;
   id: string;
-  owner: string;
-  projectId: string;
-  reviewedBy: string;
-  status: string;
-  updatedAt: string;
   user: string;
+  projectName: string;
   year: string;
 }
 

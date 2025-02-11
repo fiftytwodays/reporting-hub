@@ -136,7 +136,6 @@ export default function CreateYearlyFormNew({
   const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanFullDetails({ condition: !!id }, id);
   
   useEffect(() => {
-    setLoading(true)
     setUserDetails();
     console.log("Set loading to true", id, yearlyPlanDetail)
     if (id && yearlyPlanDetail) {
@@ -173,8 +172,7 @@ export default function CreateYearlyFormNew({
       setQuarterPlans(mappedQuarterPlans);
       console.log("set quarter plans completed")
     }
-    setLoading(false)
-  }, [yearlyPlanDetail,projectFacilitator]);
+  }, [yearlyPlanDetail]);
 
   const showCommentPrompt = (status: string) => {
     setStatus(status);
@@ -360,7 +358,7 @@ export default function CreateYearlyFormNew({
   return (
     <div>
       <CommentModal status={status} isOpen={modalVisible} onClose={() => setModalVisible(false)} onSave={handleSave} />
-      <h1>Yearly Planning</h1>
+      {/* <h1>Yearly Planning</h1> */}
       <Form form={form} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected"))} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: undefined }}>
         <Row gutter={24}>
           <Col xs={24} sm={12}>
@@ -395,7 +393,7 @@ export default function CreateYearlyFormNew({
           </Col>
         </Row>
         <>
-          {loading ? (
+          {isYearlyPlanDetailLoading || loading ? (
             <div
               style={{
                 position: "fixed",

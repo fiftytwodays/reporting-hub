@@ -31,7 +31,7 @@ export default  function MyForms({
     <Page
     showPageHeader
       header={{
-        title: `${id ? id : "---"}`,
+        title: `${yearlyPlanDetail?.projectName + " [" + yearlyPlanDetail?.year + "]"}`,
         breadcrumbs: [
           {
             title: "Home",
@@ -44,15 +44,15 @@ export default  function MyForms({
             menu: {
               items: [
                 {
-                  key: '/navigation',
+                  key: '/yearly-form/my-forms',
                   label: 'My forms',
                 },
               {
-                key: '/general',
+                key: '/yearly-form/reviewer-view',
                 label: 'Reviewer view',
               },
               {
-                key: '/layout',
+                key: '/yearly-form/approver-view',
                 label: 'Approver view',
               },
             ]
