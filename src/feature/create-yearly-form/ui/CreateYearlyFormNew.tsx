@@ -134,7 +134,7 @@ export default function CreateYearlyFormNew({
   ];
 
   const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanFullDetails({ condition: !!id }, id);
-  
+
   useEffect(() => {
     setUserDetails();
     console.log("Set loading to true", id, yearlyPlanDetail)
@@ -189,7 +189,7 @@ export default function CreateYearlyFormNew({
     try {
       setLoading(true);
       const { username, userId, signInDetails } = await getCurrentUser();
-      
+
       const formValues = form.getFieldsValue();
 
       console.log("form details", username);
@@ -265,11 +265,33 @@ export default function CreateYearlyFormNew({
         }
       }
       // }
-
-      deletePlan({ ids: plansToDelete })
+      if (plansToDelete.length > 0) {
+        deletePlan({ ids: plansToDelete })
+      }
       console.log("Handle save called");
-      messageApi.success("Yearly Plan has been created successfully.");
-      router.push('/yearly-form/my-forms');
+
+      if (status === "waiting for review") {
+        messageApi.success("Yearly Plan submitted for review.");
+      } else if (status === "draft") {
+        messageApi.success("Yearly Plan saved as draft.");
+      } else if (status === "waiting for approval") {
+        messageApi.success("Yearly Plan submitted for approval.");
+      } else if (status === "approved") {
+        messageApi.success("Yearly Plan approved successfully.");
+      } else if (status === "rejected") {
+        messageApi.success("Yearly Plan has been rejected.");
+      }
+
+      if (type === "myforms") {
+        router.push("/yearly-form/my-forms");
+      } else if (type === "approver") {
+        router.push("/yearly-form/approver-view");
+      } else if (type === "reviewer") {
+        router.push("/yearly-form/reviewer-view");
+      } else {
+        router.push("/yearly-form/my-forms");
+      }
+
 
     } catch (error: any) {
       console.error("Error saving data:", error);
@@ -361,29 +383,29 @@ export default function CreateYearlyFormNew({
       {/* <h1>Yearly Planning</h1> */}
       <Form form={form} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected"))} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: undefined }}>
         <Row gutter={24}>
-          <Col xs={24} sm={12}>
-            <Form.Item label="Year" name="year">
-              <Input disabled />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={12}>
+          <Col xs={8}>
             <Form.Item
-              label="Projects"
+              label="Project"
               name="project"
               rules={[{ required: true, message: "Project is required" }]}
-              labelCol={{ span: 12 }}
-              wrapperCol={{ span: 12 }}
             >
               <Projects form={form} id={form.getFieldValue("project") ?? undefined} />
             </Form.Item>
           </Col>
-        </Row>
-        <Row gutter={24}>
-          <Col xs={24} sm={12}>
+          <Col xs={8}>
             <Form.Item label="Project Facilitator">
-              <Input disabled value={projectFacilitator}/>
+              <Input disabled value={projectFacilitator} />
             </Form.Item>
           </Col>
+          <Col xs={8}>
+            <Form.Item label="Year" name="year">
+              <Input disabled />
+            </Form.Item>
+          </Col>
+
+        </Row>
+        <Row gutter={24}>
+
           <Col xs={24} sm={12}>
             {yearlyPlanDetail?.comments && (
               <div style={{ padding: "7px", background: "#f0f2f5", borderRadius: "5px" }}>
@@ -536,6 +558,20 @@ export default function CreateYearlyFormNew({
                 </Button>
               </>
             )}
+            <Button type="primary" disabled={false} onClick={() => {
+              if (type === "myforms") {
+                router.push("/yearly-form/my-forms");
+              } else if (type === "approver") {
+                router.push("/yearly-form/approver-view");
+              } else if (type === "reviewer") {
+                router.push("/yearly-form/reviewer-view");
+              } else {
+                router.push("/yearly-form/my-forms"); // Default fallback
+              }
+            }}>
+              Cancel
+            </Button>
+
           </Space>
         </Form.Item>
       </Form>
