@@ -95,7 +95,7 @@ export default function CreateYearlyFormNew({
   const [status, setStatus] = useState("");
   const [projectFacilitator, setProjectFacilitator] = useState("");
   const [loggedUser, setLoggedUser] = useState("");
-  
+
 
   const monthsArray = [
     "April",
@@ -136,7 +136,14 @@ export default function CreateYearlyFormNew({
   ];
 
   const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanFullDetails({ condition: !!id }, id);
+  const getFutureQuarter = () => {
+    const month = new Date().getMonth() + 1;
 
+    if (month >= 1 && month <= 3) return 1;
+    if (month >= 4 && month <= 6) return 2;
+    if (month >= 7 && month <= 9) return 3;
+    return 4;
+  };
   useEffect(() => {
     setUserDetails();
     console.log("Set loading to true", id, yearlyPlanDetail)
@@ -174,6 +181,7 @@ export default function CreateYearlyFormNew({
       setQuarterPlans(mappedQuarterPlans);
       console.log("set quarter plans completed")
     }
+    console.log("userId", yearlyPlanDetail?.userId)
   }, [yearlyPlanDetail]);
 
   const showCommentPrompt = (status: string) => {
@@ -309,6 +317,7 @@ export default function CreateYearlyFormNew({
       // messageApi.error("Failed to save data.");
     } finally {
       setLoading(false);
+
     }
 
 
@@ -385,7 +394,7 @@ export default function CreateYearlyFormNew({
     <div>
       <CommentModal status={status} isOpen={modalVisible} onClose={() => setModalVisible(false)} onSave={handleSave} />
       {/* <h1>Yearly Planning</h1> */}
-      <Form form={form} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected")) || yearlyPlanDetail?.userId !== loggedUser} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: undefined }}>
+      <Form form={form} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected")) || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: "" }}>
         <Row gutter={24}>
           <Col xs={8}>
             <Form.Item
@@ -408,12 +417,18 @@ export default function CreateYearlyFormNew({
           </Col>
 
         </Row>
-        <Row gutter={24}>
-
-          <Col xs={24} sm={12}>
+        <Row gutter={24} style={{ padding: "10px" }}>
+          <Col xs={8}>
             {yearlyPlanDetail?.comments && (
-              <div style={{ padding: "7px", background: "#f0f2f5", borderRadius: "5px" }}>
-                <strong>Comments:</strong> {yearlyPlanDetail.comments}
+              <div
+                style={{
+                  padding: "7px 7px 7px 0px",
+                  borderRadius: "5px"
+                }}
+              >
+                Comments: <span style={{ background: yearlyPlanDetail.status === "rejected" ? "#ffccc7" : "#f0f2f5", padding: "3px 5px", borderRadius: "3px" }}>
+                  {yearlyPlanDetail.comments}
+                </span>
               </div>
             )}
           </Col>
@@ -437,7 +452,7 @@ export default function CreateYearlyFormNew({
               <Spin size="large" />
             </div>
           ) :
-            <Collapse>
+            <Collapse defaultActiveKey={getFutureQuarter()}>
               {items.map((quarter) => (
                 <Panel header={`${quarter.label}`} key={quarter.key}>
                   <Row gutter={24}>
@@ -447,7 +462,7 @@ export default function CreateYearlyFormNew({
                       Functional Area <span style={{ color: 'red' }}>*</span>
                     </Col>
                     <Col span={3}>Months <span style={{ color: 'red' }}>*</span></Col>
-                    <Col span={3}>Department</Col>
+                    {/* <Col span={3}>Department</Col> */}
                     <Col span={6}>Comments</Col>
                     <Col span={2}></Col>
                   </Row>
@@ -486,14 +501,14 @@ export default function CreateYearlyFormNew({
                           </Select>
                         </Form.Item>
                       </Col>
-                      <Col span={3}>
+                      {/* <Col span={3}>
                         <Form.Item >
                           <Input
                             value={plan.department || ""}
                             onChange={(e) => handlePlanChange(quarter.key, index, "department", e.target.value)}
                           />
                         </Form.Item>
-                      </Col>
+                      </Col> */}
                       <Col span={6}>
                         <Form.Item>
                           <Input
@@ -532,10 +547,10 @@ export default function CreateYearlyFormNew({
           <Space>
             {(type === "myforms" || type === "createNew") && (
               <>
-                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected")) || false || yearlyPlanDetail?.userId !== loggedUser} onClick={() => showCommentPrompt("draft")}>
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("draft")}>
                   Save as Draft
                 </Button>
-                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected")) || false || yearlyPlanDetail?.userId !== loggedUser} onClick={() => showCommentPrompt("waiting for review")}>
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("waiting for review")}>
                   Send to Review
                 </Button>
               </>

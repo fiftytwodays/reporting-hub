@@ -10,11 +10,11 @@ interface Project {
 
 interface ProjectsProps {
   form: FormInstance;
-  id: string | number;
+  id: string;
 }
 
 const Projects: React.FC<ProjectsProps> = ({ form, id }) => {
-  const { projectsData } = useProjectList({ condition: true });
+  const { projectsData } = useProjectList({ condition: true, projectId: id });
   const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
 console.log("Project id", id)
 console.log("Project", selectedValue)

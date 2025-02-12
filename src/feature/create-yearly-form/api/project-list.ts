@@ -5,6 +5,7 @@ import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
 
 interface FetchOptions {
   condition: boolean;
+  projectId: string ;
 }
 
 interface ApiResponse {
@@ -18,7 +19,7 @@ export interface Project {
   // location: String;
 }
 
-export default function useProjectList({ condition = true }: FetchOptions) {
+export default function useProjectList({ condition = true, projectId }: FetchOptions) {
 
   const client = generateClient<Schema>();
 
@@ -29,8 +30,12 @@ export default function useProjectList({ condition = true }: FetchOptions) {
     const attributes = await fetchUserAttributes();
     const projects = attributes["custom:projects"];
     const projectsArray = stringToArray(projects);
-    if (!projectsArray || projectsArray.length === 0) {
+    if (!projectsArray || projectsArray.length === 0 && projectId === "project") {
       return { Projects: [] };
+    }else{
+      if (!projectsArray.includes(projectId)) {
+        projectsArray.push(projectId);
+      }
     }
     const response = await client.models.Project.list({
       filter: {

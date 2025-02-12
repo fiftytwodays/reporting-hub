@@ -18,7 +18,7 @@ export default function generateColumns<T>(
   columns: Column<any>[],
   handleDelete: (item: T) => void,
   handleEdit: (item: T) => void,
-  type:string
+  type: string
 ): Column<T>[] {
   const { Text } = Typography;
 
@@ -29,22 +29,26 @@ export default function generateColumns<T>(
         return (
           <div>
             <Space>
+              {(type === "myforms")? (
               <_Button type="link" onClick={() => handleEdit(item)}>
                 Edit
-              </_Button>
-              {type === "myforms" &&(
-              <Popconfirm
-                placement="bottomRight"
-                title="Are you sure you want to delete the Yearly Plan?"
-                okText="Yes"
-                cancelText="No"
-                onConfirm={() => handleDelete(item)}
-              >
-                <_Button type="link" danger>
-                  Delete
-                </_Button>
-                
-              </Popconfirm>
+              </_Button>):(
+              <_Button type="link" onClick={() => handleEdit(item)}>
+                View
+              </_Button>)}
+              {type === "myforms" && (
+                <Popconfirm
+                  placement="bottomRight"
+                  title="Are you sure you want to delete the Yearly Plan?"
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => handleDelete(item)}
+                >
+                  <_Button type="link" danger>
+                    Delete
+                  </_Button>
+
+                </Popconfirm>
               )}
             </Space>
           </div>
@@ -82,7 +86,7 @@ export default function generateColumns<T>(
   }));
 }
 
-export const _Text = styled(Typography.Text)<{ copyable?: boolean }>`
+export const _Text = styled(Typography.Text) <{ copyable?: boolean }>`
   display: ${(props) => (props.copyable ? "flex !important" : "")};
   width: 90%;
   .ant-typography-copy {
