@@ -21,7 +21,7 @@ export interface Project {
 export default function useProjectList({ condition = true }: FetchOptions) {
 
   const client = generateClient<Schema>();
-  
+
 
 
   const fetcher = async () => {
@@ -29,6 +29,9 @@ export default function useProjectList({ condition = true }: FetchOptions) {
     const attributes = await fetchUserAttributes();
     const projects = attributes["custom:projects"];
     const projectsArray = stringToArray(projects);
+    if (!projectsArray || projectsArray.length === 0) {
+      return { Projects: [] };
+    }
     const response = await client.models.Project.list({
       filter: {
         or: projectsArray.map(projectId => ({ id: { eq: projectId } })),
@@ -43,17 +46,17 @@ export default function useProjectList({ condition = true }: FetchOptions) {
           };
         })
       );
-  
+
       const apiResponse: ApiResponse = {
         Projects: projects
       };
-  
+
       return apiResponse;  // Return the apiResponse instead of response.data to include projectType
     }
     return null;
   };
-  
-  
+
+
   const { data, isLoading, error } = useSWR(
     condition ? ["api/projectTypes"] : null,
     fetcher,
@@ -63,17 +66,17 @@ export default function useProjectList({ condition = true }: FetchOptions) {
   );
 
   function stringToArray(str: string | undefined) {
-    if(str){
-    const cleanedStr = str.replace(/[\[\]]/g, '').trim();
-    if (!cleanedStr) {
-        return []; 
+    if (str) {
+      const cleanedStr = str.replace(/[\[\]]/g, '').trim();
+      if (!cleanedStr) {
+        return [];
+      }
+      const arr = cleanedStr.includes(',') ? cleanedStr.split(',').map(item => item.trim()) : [cleanedStr];
+      return arr;
     }
-    const arr = cleanedStr.includes(',') ? cleanedStr.split(',').map(item => item.trim()) : [cleanedStr];
-    return arr;
-  }
-  else{
-    return [];
-  }
+    else {
+      return [];
+    }
   }
   return {
     projectsData: data?.Projects,

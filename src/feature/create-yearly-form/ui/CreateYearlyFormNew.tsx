@@ -94,6 +94,8 @@ export default function CreateYearlyFormNew({
   const [modalVisible, setModalVisible] = useState(false);
   const [status, setStatus] = useState("");
   const [projectFacilitator, setProjectFacilitator] = useState("");
+  const [loggedUser, setLoggedUser] = useState("");
+  
 
   const monthsArray = [
     "April",
@@ -182,6 +184,8 @@ export default function CreateYearlyFormNew({
   const setUserDetails = async () => {
     const attributes = await fetchUserAttributes();
     setProjectFacilitator(attributes["given_name"] + " " + attributes["family_name"]);
+    const { username, userId, signInDetails } = await getCurrentUser();
+    setLoggedUser(userId);
   };
 
 
@@ -381,7 +385,7 @@ export default function CreateYearlyFormNew({
     <div>
       <CommentModal status={status} isOpen={modalVisible} onClose={() => setModalVisible(false)} onSave={handleSave} />
       {/* <h1>Yearly Planning</h1> */}
-      <Form form={form} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected"))} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: undefined }}>
+      <Form form={form} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected")) || yearlyPlanDetail?.userId !== loggedUser} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: undefined }}>
         <Row gutter={24}>
           <Col xs={8}>
             <Form.Item
@@ -528,10 +532,10 @@ export default function CreateYearlyFormNew({
           <Space>
             {(type === "myforms" || type === "createNew") && (
               <>
-                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected")) || false} onClick={() => showCommentPrompt("draft")}>
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected")) || false || yearlyPlanDetail?.userId !== loggedUser} onClick={() => showCommentPrompt("draft")}>
                   Save as Draft
                 </Button>
-                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected")) || false} onClick={() => showCommentPrompt("waiting for review")}>
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected")) || false || yearlyPlanDetail?.userId !== loggedUser} onClick={() => showCommentPrompt("waiting for review")}>
                   Send to Review
                 </Button>
               </>
