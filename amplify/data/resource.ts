@@ -240,8 +240,9 @@ const schema = a.schema({
     month: a.string().array(),
     functionalAreaId: a.id(),
     functionalArea: a.belongsTo("FunctionalArea", "functionalAreaId"),
-    department: a.string(), 
+    // department: a.string(), 
     comments: a.string(),
+    isMajorGoal: a.boolean(),
   })
   .authorization((allow) => [
     allow.owner(),

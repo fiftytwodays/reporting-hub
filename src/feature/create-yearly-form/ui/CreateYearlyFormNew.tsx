@@ -1,5 +1,5 @@
 
-import { Button, Col, Collapse, CollapseProps, Divider, Flex, Form, Input, Modal, Row, Select, Space, Spin } from "antd";
+import { Button, Checkbox, Col, Collapse, CollapseProps, Divider, Flex, Form, Input, Modal, Row, Select, Space, Spin } from "antd";
 import Projects from "./Projects";
 import FunctionalArea from "./FunctionalArea";
 import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
@@ -39,6 +39,7 @@ interface PlanDetails {
   functionalAreaId: string;
   department?: string;
   comments?: string;
+  isMajorGoal: boolean;
 }
 
 interface QuarterlyPlanDetails {
@@ -170,8 +171,8 @@ export default function CreateYearlyFormNew({
             activity: plan.activity,
             month: plan.month,
             functionalAreaId: plan.functionalAreaId,
-            department: plan.department,
             comments: plan.comments,
+            isMajorGoal: plan.isMajorGoal,
           })),
         };
       });
@@ -263,6 +264,7 @@ export default function CreateYearlyFormNew({
                   functionalAreaId: plan.functionalAreaId,
                   department: plan.department ?? "",
                   comments: plan.comments ?? "",
+                  isMajorGoal: plan.isMajorGoal ?? false,
                   ...(plan?.id && plan?.id !== "" && { id: plan.id })
                 };
                 let planResp;
@@ -312,7 +314,8 @@ export default function CreateYearlyFormNew({
           error.message
         );
       } else {
-        messageApi.error("Unable to create the project. Please try again.");
+        console.log("error in updating yearlyPlan", error)
+        messageApi.error("Unable to create/update the project. Please try again.");
       }
       // messageApi.error("Failed to save data.");
     } finally {
@@ -462,7 +465,7 @@ export default function CreateYearlyFormNew({
                       Functional Area <span style={{ color: 'red' }}>*</span>
                     </Col>
                     <Col span={3}>Months <span style={{ color: 'red' }}>*</span></Col>
-                    {/* <Col span={3}>Department</Col> */}
+                    <Col span={3}>Major Goal</Col>
                     <Col span={6}>Comments</Col>
                     <Col span={2}></Col>
                   </Row>
@@ -501,14 +504,15 @@ export default function CreateYearlyFormNew({
                           </Select>
                         </Form.Item>
                       </Col>
-                      {/* <Col span={3}>
-                        <Form.Item >
-                          <Input
-                            value={plan.department || ""}
-                            onChange={(e) => handlePlanChange(quarter.key, index, "department", e.target.value)}
-                          />
+                      <Col span={3}>
+                        <Form.Item>
+                          <Checkbox
+                            checked={plan.isMajorGoal || false}
+                            onChange={(e) => handlePlanChange(quarter.key, index, "isMajorGoal", e.target.checked)}
+                          >
+                          </Checkbox>
                         </Form.Item>
-                      </Col> */}
+                      </Col>
                       <Col span={6}>
                         <Form.Item>
                           <Input

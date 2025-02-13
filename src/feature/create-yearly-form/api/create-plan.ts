@@ -9,8 +9,8 @@ interface CreatePlanInput {
   activity: string,
   month: string[],
   functionalAreaId: string,
-  department: string,
   comments: string,
+  isMajorGoal: boolean,
 }
 
 interface PlanResponse {
@@ -19,8 +19,8 @@ interface PlanResponse {
   activity: string,
   month: string[],
   functionalAreaId: string,
-  department: string,
   comments: string,
+  isMajorGoal: boolean,
 }
 
 export default function useCreatePlan() {
@@ -38,8 +38,8 @@ export default function useCreatePlan() {
       activity: arg.activity,
       month: arg.month,
       functionalAreaId: arg.functionalAreaId,
-      department: arg.department,
       comments: arg.comments,
+      isMajorGoal: arg.isMajorGoal,
     });
 console.log("response",response)
     if (response?.data) {
@@ -49,8 +49,8 @@ console.log("response",response)
         activity: response.data.activity,
         month: response.data.month,
         functionalAreaId: response.data.functionalAreaId,
-        department: response.data.department,
         comments: response.data.comments,
+        isMajorGoal: response.data.isMajorGoal,
       } as PlanResponse;
 
       return newPlan;

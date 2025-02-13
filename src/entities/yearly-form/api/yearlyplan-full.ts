@@ -13,8 +13,9 @@ interface PlanDetails {
   activity: string;
   month: string[];
   functionalAreaId: string;
-  department?: string;
   comments?: string;
+  isMajorGoal: boolean;
+
 }
 
 interface QuarterlyPlanDetails {
@@ -97,10 +98,9 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
               activity: plan.activity,
               month: (plan.month || []).map((m) => m ?? ""),
               functionalAreaId: plan.functionalAreaId ?? "",
-              department: plan.department ?? "",
               comments: plan.comments ?? "",
+              isMajorGoal: plan.isMajorGoal ?? false,
             }));
-
             return [quarterlyPlan.quarter ?? 0, quarterlyPlanDetails];
           })
         )

@@ -9,9 +9,9 @@ interface UpdatePlanInput {
   activity: string,
   month: string[],
   functionalAreaId: string,
-  department: string,
   comments: string,
   id?: string,
+  isMajorGoal: boolean,
 }
 
 interface PlanResponse {
@@ -20,8 +20,8 @@ interface PlanResponse {
   activity: string,
   month: string[],
   functionalAreaId: string,
-  department: string,
   comments: string,
+  isMajorGoal: boolean,
 }
 
 export default function useUpdatePlan() {
@@ -37,9 +37,10 @@ export default function useUpdatePlan() {
       activity: arg.activity,
       month: arg.month,
       functionalAreaId: arg.functionalAreaId,
-      department: arg.department,
+      // department: arg.department,
       comments: arg.comments,
       id: arg.id ?? "",
+      isMajorGoal: arg.isMajorGoal ?? false,
     });
 console.log("Response from update Plan", response)
     if (response?.data) {
@@ -49,8 +50,8 @@ console.log("Response from update Plan", response)
         activity: response.data.activity,
         month: response.data.month,
         functionalAreaId: response.data.functionalAreaId,
-        department: response.data.department,
         comments: response.data.comments,
+        isMajorGoal: response.data.isMajorGoal,
       } as PlanResponse;
 
       return newPlan;
