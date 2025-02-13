@@ -201,7 +201,6 @@ const schema = a.schema({
     userId: a.string().required(),
     projectId: a.string(),
     project: a.belongsTo("Project", "projectId"),
-    // projectFacilitator: a.string().required(),
     comments: a.string(),
     status: a.string(), 
     year: a.string(),
@@ -229,18 +228,12 @@ const schema = a.schema({
   ]),
   Plan: a
   .model({
-    // yearlyPlanId: a.id(),     may b not required
-    // yearlyPlan: a.belongsTo("YearlyPlan", "yearlyPlanId"),
-    // projectId: a.id(),
-    // project: a.belongsTo("Project", "projectId"),
     quarterlyPlanId: a.id(),
     quarterlyPlan: a.belongsTo("QuarterlyPlan", "quarterlyPlanId"),
     activity: a.string().required(),
-    // projectFacilitator: a.string().required(),
     month: a.string().array(),
     functionalAreaId: a.id(),
     functionalArea: a.belongsTo("FunctionalArea", "functionalAreaId"),
-    // department: a.string(), 
     comments: a.string(),
     isMajorGoal: a.boolean(),
   })
