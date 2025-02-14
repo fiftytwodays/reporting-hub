@@ -70,10 +70,13 @@ interface FormValues {
   project: string | undefined;
 
 }
+<<<<<<< HEAD
 interface CustomError {
   statusCode: number;
   message: string;
 }
+=======
+>>>>>>> a594cf9 (44 implement crud operations on yearly form (#95) (#96))
 
 export default function CreateYearlyFormNew({
   messageApi, id, type
@@ -191,12 +194,16 @@ export default function CreateYearlyFormNew({
 
   const showCommentPrompt = (status: string) => {
     setStatus(status);
+<<<<<<< HEAD
     if (status != "draft") {
 
       setModalVisible(true);
     } else {
       handleSave("draft", "");
     }
+=======
+    setModalVisible(true);
+>>>>>>> a594cf9 (44 implement crud operations on yearly form (#95) (#96))
   };
 
   const setUserDetails = async () => {
@@ -209,6 +216,7 @@ export default function CreateYearlyFormNew({
 
   const handleSave = async (status: string, comment: string) => {
     try {
+<<<<<<< HEAD
       if (!form.getFieldValue("project"))
         messageApi.error("Please select the project")
       else {
@@ -301,11 +309,86 @@ export default function CreateYearlyFormNew({
                   } else {
                     planResp = await createPlan(planPayload);
                   }
+=======
+      setLoading(true);
+      const { username, userId, signInDetails } = await getCurrentUser();
+
+      const formValues = form.getFieldsValue();
+
+      console.log("form details", username);
+      console.log("qaurter details", userId);
+      let yearlyPlanResp;
+      const yearlyPlanPayload = {
+        user: yearlyPlanDetail?.user ?? projectFacilitator,
+        userId: yearlyPlanDetail?.userId ?? userId,
+        projectId: formValues.project,
+        ...(comment && "" != comment && { comments: comment }),
+        status: status,
+        year: formValues.year,
+        ...(yearlyPlanDetail?.id && yearlyPlanDetail?.id !== "" && { id: yearlyPlanDetail.id })
+      }
+      try {
+        if (yearlyPlanDetail?.id && "" != yearlyPlanDetail?.id) {
+          // yearlyPlanPayload
+          console.log("yearlyPlanPayload while updating", yearlyPlanPayload)
+          yearlyPlanResp = await updateYearlyPlan(yearlyPlanPayload);
+        } else {
+          yearlyPlanResp = await createYearlyPlan(yearlyPlanPayload);
+        }
+        if (yearlyPlanResp) {
+
+          console.log("Saved/Updated Yearly Plan Id", yearlyPlanResp.id);
+        }
+      } catch (error: any) {
+        throw error;
+      }
+
+      // for (const quarter of [1, 2, 3, 4]) {
+
+      if (yearlyPlanResp) {
+        for (const quarter of [1, 2, 3, 4]) {
+          const quarterlyPlanData = quarterPlans[quarter];
+
+          if (quarterlyPlanData) {
+            const quarterlyPlanPayload = {
+              id: quarterlyPlanData.id || undefined,
+              yearlyPlanId: yearlyPlanResp.id,
+              quarter: quarter,
+              status: status,
+              ...(quarterlyPlanData?.id && quarterlyPlanData?.id !== "" && { id: quarterlyPlanData.id })
+            };
+
+            let quarterPlanResp;
+            if (quarterlyPlanData.id) {
+              quarterPlanResp = await updateQuarterlyPlan(quarterlyPlanPayload);
+            } else {
+              quarterPlanResp = await createQuarterlyPlan(quarterlyPlanPayload);
+            }
+
+            if (quarterPlanResp) {
+              for (const plan of quarterlyPlanData.plans) {
+                const planPayload = {
+                  quarterlyPlanId: quarterPlanResp.id,
+                  activity: plan.activity,
+                  month: plan.month,
+                  functionalAreaId: plan.functionalAreaId,
+                  department: plan.department ?? "",
+                  comments: plan.comments ?? "",
+                  isMajorGoal: plan.isMajorGoal ?? false,
+                  ...(plan?.id && plan?.id !== "" && { id: plan.id })
+                };
+                let planResp;
+                if (plan.id) {
+                  planResp = await updatePlan(planPayload);
+                } else {
+                  planResp = await createPlan(planPayload);
+>>>>>>> a594cf9 (44 implement crud operations on yearly form (#95) (#96))
                 }
               }
             }
           }
         }
+<<<<<<< HEAD
         // }
         if (plansToDelete.length > 0) {
           deletePlan({ ids: plansToDelete })
@@ -332,6 +415,37 @@ export default function CreateYearlyFormNew({
           router.push("/yearly-form/reviewer-view");
         }
       }
+=======
+      }
+      // }
+      if (plansToDelete.length > 0) {
+        deletePlan({ ids: plansToDelete })
+      }
+      console.log("Handle save called");
+
+      if (status === "waiting for review") {
+        messageApi.success("Yearly Plan submitted for review.");
+      } else if (status === "draft") {
+        messageApi.success("Yearly Plan saved as draft.");
+      } else if (status === "waiting for approval") {
+        messageApi.success("Yearly Plan submitted for approval.");
+      } else if (status === "approved") {
+        messageApi.success("Yearly Plan approved successfully.");
+      } else if (status === "rejected") {
+        messageApi.success("Yearly Plan has been rejected.");
+      }
+
+      if (type === "myforms") {
+        router.push("/yearly-form/my-forms");
+      } else if (type === "approver") {
+        router.push("/yearly-form/approver-view");
+      } else if (type === "reviewer") {
+        router.push("/yearly-form/reviewer-view");
+      } else {
+        router.push("/yearly-form/my-forms");
+      }
+
+>>>>>>> a594cf9 (44 implement crud operations on yearly form (#95) (#96))
 
     } catch (error: any) {
       console.error("Error saving data:", error);
@@ -339,10 +453,13 @@ export default function CreateYearlyFormNew({
         messageApi.error(
           error.message
         );
+<<<<<<< HEAD
       } else if (error?.statusCode === 400) {
         messageApi.error(
           error.message
         );
+=======
+>>>>>>> a594cf9 (44 implement crud operations on yearly form (#95) (#96))
       } else {
         console.log("error in updating yearlyPlan", error)
         messageApi.error("Unable to create/update the project. Please try again.");
@@ -405,6 +522,7 @@ export default function CreateYearlyFormNew({
   // };
 
   const handleAddPlan = (quarter: number) => {
+<<<<<<< HEAD
     if (!form.getFieldValue("project"))
       messageApi.error("Please select the project")
     else {
@@ -425,6 +543,24 @@ export default function CreateYearlyFormNew({
         },
       }));
     }
+=======
+    setQuarterPlans((prev) => ({
+      ...prev,
+      [quarter]: {
+        ...prev[quarter],
+        plans: [
+          ...(prev[quarter]?.plans || []),
+          {
+            activity: "",
+            month: [],
+            functionalAreaId: "",
+            department: "",
+            comments: "",
+          } as any
+        ],
+      },
+    }));
+>>>>>>> a594cf9 (44 implement crud operations on yearly form (#95) (#96))
   };
 
   console.log("In create", form.getFieldValue("project"));
