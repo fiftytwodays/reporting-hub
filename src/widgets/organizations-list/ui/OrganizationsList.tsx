@@ -5,11 +5,13 @@ import { message, Skeleton } from "antd";
 
 interface OrganizationListProps {
   setIsEditing: (status: boolean) => void;
+  setIsEnabled: (status: boolean) => void;
   isEditing: boolean;
 }
 
 export default function OrganizationList({
   setIsEditing,
+  setIsEnabled,
   isEditing,
 }: OrganizationListProps) {
   const [messageApi, contextHolder] = message.useMessage({
@@ -21,12 +23,13 @@ export default function OrganizationList({
     useOrganizationsList({
       condition: true,
     });
+  organizationsList?.name == "" ? setIsEnabled(false) : setIsEnabled(true);
 
   return (
     <>
       {contextHolder} {/* message context should remain at the top */}
       <Skeleton loading={isOrganizationsListLoading} active>
-        {!isOrganizationsListLoading && !organizationsList ? (
+        {!isOrganizationsListLoading && organizationsList?.name == "" ? (
           <CreateOrganizationForm messageApi={messageApi} />
         ) : !isOrganizationsListLoading && organizationsList ? (
           <EditOrganizationForm
