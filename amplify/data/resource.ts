@@ -174,26 +174,74 @@ const schema = a.schema({
     .model({
       name: a.string().required(),
       description: a.string(),
+      plan: a.hasMany("Plan", "functionalAreaId")
     })
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
   Project: a
-    .model({
-      name: a.string().required(),
-      location: a.string().required(),
-      projectTypeId: a.id(),
-      projectType: a.belongsTo("ProjectType", "projectTypeId"), // Belongs to ProjectType
-      clusterId: a.id(), //
-      cluster: a.belongsTo("Cluster", "clusterId"), // Belongs to Cluster
-      description: a.string(),
-    })
-    .authorization((allow) => [
-      allow.authenticated().to(["read"]),
-      allow.groups(["admin"]),
-    ]),
-    Organization: a
+  .model({
+    name: a.string().required(),
+    location: a.string().required(),
+    projectTypeId: a.id(),
+    projectType: a.belongsTo("ProjectType", "projectTypeId"), // Belongs to ProjectType
+    clusterId: a.id(), //
+    cluster: a.belongsTo("Cluster", "clusterId"), // Belongs to Cluster
+    description: a.string(),
+    yearlyPlan: a.hasMany("YearlyPlan", "projectId")
+  })
+  .authorization((allow) => [
+    allow.authenticated().to(["read"]),
+    allow.groups(["admin"]),
+  ]),
+  YearlyPlan: a
+  .model({
+    user: a.string(),
+    userId: a.string().required(),
+    projectId: a.string(),
+    project: a.belongsTo("Project", "projectId"),
+    comments: a.string(),
+    status: a.string(), 
+    year: a.string(),
+    reviewedBy: a.string(), 
+    approvedBy: a.string(),
+    quarterlyPlan: a.hasMany("QuarterlyPlan", "yearlyPlanId")
+  })
+  .authorization((allow) => [
+    allow.owner(),
+    allow.groups(["admin"]),
+  ]),
+  QuarterlyPlan: a
+  .model({
+    yearlyPlanId: a.id(),
+    yearlyPlan: a.belongsTo("YearlyPlan", "yearlyPlanId"),
+    quarter: a.integer(),
+    status: a.string(), 
+    reviewedBy: a.string(), 
+    approvedBy: a.string(),
+    plan: a.hasMany("Plan", "quarterlyPlanId")
+  })
+  .authorization((allow) => [
+    allow.owner(),
+    allow.groups(["admin"]),
+  ]),
+  Plan: a
+  .model({
+    quarterlyPlanId: a.id(),
+    quarterlyPlan: a.belongsTo("QuarterlyPlan", "quarterlyPlanId"),
+    activity: a.string().required(),
+    month: a.string().array(),
+    functionalAreaId: a.id(),
+    functionalArea: a.belongsTo("FunctionalArea", "functionalAreaId"),
+    comments: a.string(),
+    isMajorGoal: a.boolean(),
+  })
+  .authorization((allow) => [
+    allow.owner(),
+    allow.groups(["admin"]),
+  ]),
+  Organization: a
     .model({
       name: a.string().required(),
       website: a.string(),

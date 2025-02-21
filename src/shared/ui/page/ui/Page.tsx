@@ -5,7 +5,7 @@ const { Title } = Typography;
 import styled from "@emotion/styled";
 
 interface HeaderProps {
-  breadcrumbs?: { href: string; title: string }[];
+  breadcrumbs?: { href: string; title: string; menu?: { items: { key: string; label: string}[] } }[];
   title?: string;
   extra?: ReactNode;
 }
