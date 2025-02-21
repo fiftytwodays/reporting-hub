@@ -18,6 +18,7 @@ export default function OrganizationList() {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
 
   return (
     <>
@@ -37,10 +38,13 @@ export default function OrganizationList() {
               href: "/settings/organization",
             },
           ],
-          extra: <EditButton setIsEditing={setIsEditing} />,
+          extra: (
+            <EditButton setIsEditing={setIsEditing} isEnabled={isEnabled} />
+          ),
         }}
         content={
           <OrganizationsList
+            setIsEnabled={setIsEnabled}
             setIsEditing={setIsEditing}
             isEditing={isEditing}
           />
