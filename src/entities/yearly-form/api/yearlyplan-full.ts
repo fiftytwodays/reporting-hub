@@ -91,6 +91,9 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
             const plans = await client.models.Plan.list({
               filter: { quarterlyPlanId: { eq: quarterlyPlan.id } },
             });
+            console.log("List the plans", plans);
+            const sortedPlans = plans?.data.sort((a: any, b: any) => (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()));
+            console.log("List the plans Sorted Plans", sortedPlans);
 
             quarterlyPlanDetails.plans = (plans?.data || []).map((plan): PlanDetails => ({
               id: plan.id,
