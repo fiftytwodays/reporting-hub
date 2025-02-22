@@ -70,6 +70,10 @@ interface FormValues {
   project: string | undefined;
 
 }
+interface CustomError {
+  statusCode: number;
+  message: string;
+}
 
 export default function CreateYearlyFormNew({
   messageApi, id, type
@@ -187,7 +191,12 @@ export default function CreateYearlyFormNew({
 
   const showCommentPrompt = (status: string) => {
     setStatus(status);
-    setModalVisible(true);
+    if (status != "draft") {
+
+      setModalVisible(true);
+    } else {
+      handleSave("draft", "");
+    }
   };
 
   const setUserDetails = async () => {
@@ -200,116 +209,137 @@ export default function CreateYearlyFormNew({
 
   const handleSave = async (status: string, comment: string) => {
     try {
-      setLoading(true);
-      const { username, userId, signInDetails } = await getCurrentUser();
-
-      const formValues = form.getFieldsValue();
-
-      console.log("form details", username);
-      console.log("qaurter details", userId);
-      let yearlyPlanResp;
-      const yearlyPlanPayload = {
-        user: yearlyPlanDetail?.user ?? projectFacilitator,
-        userId: yearlyPlanDetail?.userId ?? userId,
-        projectId: formValues.project,
-        ...(comment && "" != comment && { comments: comment }),
-        status: status,
-        year: formValues.year,
-        ...(yearlyPlanDetail?.id && yearlyPlanDetail?.id !== "" && { id: yearlyPlanDetail.id })
-      }
-      try {
-        if (yearlyPlanDetail?.id && "" != yearlyPlanDetail?.id) {
-          // yearlyPlanPayload
-          console.log("yearlyPlanPayload while updating", yearlyPlanPayload)
-          yearlyPlanResp = await updateYearlyPlan(yearlyPlanPayload);
-        } else {
-          yearlyPlanResp = await createYearlyPlan(yearlyPlanPayload);
-        }
-        if (yearlyPlanResp) {
-
-          console.log("Saved/Updated Yearly Plan Id", yearlyPlanResp.id);
-        }
-      } catch (error: any) {
-        throw error;
-      }
-
-      // for (const quarter of [1, 2, 3, 4]) {
-
-      if (yearlyPlanResp) {
+      if (!form.getFieldValue("project"))
+        messageApi.error("Please select the project")
+      else {
         for (const quarter of [1, 2, 3, 4]) {
           const quarterlyPlanData = quarterPlans[quarter];
-
+          console.log("qaurterlyPlanData",quarterlyPlanData)
           if (quarterlyPlanData) {
-            const quarterlyPlanPayload = {
-              id: quarterlyPlanData.id || undefined,
-              yearlyPlanId: yearlyPlanResp.id,
-              quarter: quarter,
-              status: status,
-              ...(quarterlyPlanData?.id && quarterlyPlanData?.id !== "" && { id: quarterlyPlanData.id })
-            };
-
-            let quarterPlanResp;
-            if (quarterlyPlanData.id) {
-              quarterPlanResp = await updateQuarterlyPlan(quarterlyPlanPayload);
-            } else {
-              quarterPlanResp = await createQuarterlyPlan(quarterlyPlanPayload);
+            for (const plan of quarterlyPlanData.plans) {
+              console.log("Plans inside checking",plan)
+              if (!plan.activity)
+                throw { statusCode: 400, message: "Activity is required" } as CustomError;
+              else if (!plan.functionalAreaId)
+                throw { statusCode: 400, message: "Function area is required" } as CustomError;
+              else if (!(plan.month.length>0))
+                throw { statusCode: 400, message: "Month is required" } as CustomError;
             }
+          }
+        }
+        setLoading(true);
+        const { username, userId, signInDetails } = await getCurrentUser();
 
-            if (quarterPlanResp) {
-              for (const plan of quarterlyPlanData.plans) {
-                const planPayload = {
-                  quarterlyPlanId: quarterPlanResp.id,
-                  activity: plan.activity,
-                  month: plan.month,
-                  functionalAreaId: plan.functionalAreaId,
-                  department: plan.department ?? "",
-                  comments: plan.comments ?? "",
-                  isMajorGoal: plan.isMajorGoal ?? false,
-                  ...(plan?.id && plan?.id !== "" && { id: plan.id })
-                };
-                let planResp;
-                if (plan.id) {
-                  planResp = await updatePlan(planPayload);
-                } else {
-                  planResp = await createPlan(planPayload);
+        const formValues = form.getFieldsValue();
+
+        console.log("form details", username);
+        console.log("qaurter details", userId);
+        let yearlyPlanResp;
+        const yearlyPlanPayload = {
+          user: yearlyPlanDetail?.user ?? projectFacilitator,
+          userId: yearlyPlanDetail?.userId ?? userId,
+          projectId: formValues.project,
+          ...(comment && "" != comment && { comments: comment }),
+          status: status,
+          year: formValues.year,
+          ...(yearlyPlanDetail?.id && yearlyPlanDetail?.id !== "" && { id: yearlyPlanDetail.id })
+        }
+        try {
+          if (yearlyPlanDetail?.id && "" != yearlyPlanDetail?.id) {
+            // yearlyPlanPayload
+            console.log("yearlyPlanPayload while updating", yearlyPlanPayload)
+            yearlyPlanResp = await updateYearlyPlan(yearlyPlanPayload);
+          } else {
+            yearlyPlanResp = await createYearlyPlan(yearlyPlanPayload);
+          }
+          if (yearlyPlanResp) {
+
+            console.log("Saved/Updated Yearly Plan Id", yearlyPlanResp.id);
+          }
+        } catch (error: any) {
+          throw error;
+        }
+
+        // for (const quarter of [1, 2, 3, 4]) {
+
+        if (yearlyPlanResp) {
+          for (const quarter of [1, 2, 3, 4]) {
+            const quarterlyPlanData = quarterPlans[quarter];
+
+            if (quarterlyPlanData) {
+              const quarterlyPlanPayload = {
+                id: quarterlyPlanData.id || undefined,
+                yearlyPlanId: yearlyPlanResp.id,
+                quarter: quarter,
+                status: status,
+                ...(quarterlyPlanData?.id && quarterlyPlanData?.id !== "" && { id: quarterlyPlanData.id })
+              };
+
+              let quarterPlanResp;
+              if (quarterlyPlanData.id) {
+                quarterPlanResp = await updateQuarterlyPlan(quarterlyPlanPayload);
+              } else {
+                quarterPlanResp = await createQuarterlyPlan(quarterlyPlanPayload);
+              }
+
+              if (quarterPlanResp) {
+                console.log("List the plans while saving", quarterlyPlanData.plans);
+                for (const plan of quarterlyPlanData.plans) {
+                  const planPayload = {
+                    quarterlyPlanId: quarterPlanResp.id,
+                    activity: plan.activity,
+                    month: plan.month,
+                    functionalAreaId: plan.functionalAreaId,
+                    department: plan.department ?? "",
+                    comments: plan.comments ?? "",
+                    isMajorGoal: plan.isMajorGoal ?? false,
+                    ...(plan?.id && plan?.id !== "" && { id: plan.id })
+                  };
+                  let planResp;
+                  if (plan.id) {
+                    planResp = await updatePlan(planPayload);
+                  } else {
+                    planResp = await createPlan(planPayload);
+                  }
                 }
               }
             }
           }
         }
-      }
-      // }
-      if (plansToDelete.length > 0) {
-        deletePlan({ ids: plansToDelete })
-      }
-      console.log("Handle save called");
+        // }
+        if (plansToDelete.length > 0) {
+          deletePlan({ ids: plansToDelete })
+        }
+        console.log("Handle save called");
 
-      if (status === "waiting for review") {
-        messageApi.success("Yearly Plan submitted for review.");
-      } else if (status === "draft") {
-        messageApi.success("Yearly Plan saved as draft.");
-      } else if (status === "waiting for approval") {
-        messageApi.success("Yearly Plan submitted for approval.");
-      } else if (status === "approved") {
-        messageApi.success("Yearly Plan approved successfully.");
-      } else if (status === "rejected") {
-        messageApi.success("Yearly Plan has been rejected.");
-      }
+        if (status === "waiting for review") {
+          messageApi.success("Yearly Plan submitted for review.");
+        } else if (status === "draft") {
+          messageApi.success("Yearly Plan saved as draft.");
+        } else if (status === "waiting for approval") {
+          messageApi.success("Yearly Plan submitted for approval.");
+        } else if (status === "approved") {
+          messageApi.success("Yearly Plan approved successfully.");
+        } else if (status === "rejected") {
+          messageApi.success("Yearly Plan has been rejected.");
+        }
 
-      if (type === "myforms") {
-        router.push("/yearly-form/my-forms");
-      } else if (type === "approver") {
-        router.push("/yearly-form/approver-view");
-      } else if (type === "reviewer") {
-        router.push("/yearly-form/reviewer-view");
-      } else {
-        router.push("/yearly-form/my-forms");
+        if (type === "myforms" && status !== "draft") {
+          router.push("/yearly-form/my-forms");
+        } else if (type === "approver") {
+          router.push("/yearly-form/approver-view");
+        } else if (type === "reviewer") {
+          router.push("/yearly-form/reviewer-view");
+        }
       }
-
 
     } catch (error: any) {
       console.error("Error saving data:", error);
       if (error?.statusCode === 409) {
+        messageApi.error(
+          error.message
+        );
+      } else if (error?.statusCode === 400) {
         messageApi.error(
           error.message
         );
@@ -327,16 +357,20 @@ export default function CreateYearlyFormNew({
   };
 
   const handlePlanChange = (quarter: number, index: number, field: string, value: any) => {
-    setQuarterPlans((prev) => ({
-      ...prev,
-      [quarter]: {
-        ...prev[quarter],
-        plans: prev[quarter]?.plans.map((plan, i) =>
-          i === index ? { ...plan, [field]: value } : plan
-        ),
-      },
-    }));
-    console.log("Handle plan change called", quarterPlans);
+    if (!form.getFieldValue("project"))
+      messageApi.error("Please select the project")
+    else {
+      setQuarterPlans((prev) => ({
+        ...prev,
+        [quarter]: {
+          ...prev[quarter],
+          plans: prev[quarter]?.plans.map((plan, i) =>
+            i === index ? { ...plan, [field]: value } : plan
+          ),
+        },
+      }));
+      console.log("Handle plan change called", quarterPlans);
+    } // messageApi.error
   };
 
   const handleDeletePlan = (quarter: number, index: number) => {
@@ -371,22 +405,26 @@ export default function CreateYearlyFormNew({
   // };
 
   const handleAddPlan = (quarter: number) => {
-    setQuarterPlans((prev) => ({
-      ...prev,
-      [quarter]: {
-        ...prev[quarter],
-        plans: [
-          ...(prev[quarter]?.plans || []),
-          {
-            activity: "",
-            month: [],
-            functionalAreaId: "",
-            department: "",
-            comments: "",
-          } as any
-        ],
-      },
-    }));
+    if (!form.getFieldValue("project"))
+      messageApi.error("Please select the project")
+    else {
+      setQuarterPlans((prev) => ({
+        ...prev,
+        [quarter]: {
+          ...prev[quarter],
+          plans: [
+            ...(prev[quarter]?.plans || []),
+            {
+              activity: "",
+              month: [],
+              functionalAreaId: "",
+              department: "",
+              comments: "",
+            } as any
+          ],
+        },
+      }));
+    }
   };
 
   console.log("In create", form.getFieldValue("project"));
