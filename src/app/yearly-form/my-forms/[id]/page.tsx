@@ -22,7 +22,6 @@ export default  function MyForms({
 }) {
   // const router = useRouter();
   const  id  =  params.id;
-  console.log("id",id);
   const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
   const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanDetails({ condition: !!id }, id);
   return (
@@ -39,13 +38,13 @@ export default  function MyForms({
           },
 
           {
-            title: "Yearly form",
+            title: "Yearly Plans",
             href: "/yearly-form/my-forms",
             menu: {
               items: [
                 {
                   key: '/yearly-form/my-forms',
-                  label: 'My forms',
+                  label: 'My Yearly Plans',
                 },
               {
                 key: '/yearly-form/reviewer-view',

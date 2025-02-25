@@ -31,7 +31,6 @@ export default function useUpdatePlan() {
 
   // Function to create a project
   const updatePlan = async (key: string, { arg }: { arg: UpdatePlanInput }) => {
-    console.log("Arguements", arg)
     const response = await client.models.Plan.update({
       quarterlyPlanId: arg.quarterlyPlanId,
       activity: arg.activity,
@@ -42,7 +41,6 @@ export default function useUpdatePlan() {
       id: arg.id ?? "",
       isMajorGoal: arg.isMajorGoal ?? false,
     });
-console.log("Response from update Plan", response)
     if (response?.data) {
       const newPlan = {
         id: response.data.id,

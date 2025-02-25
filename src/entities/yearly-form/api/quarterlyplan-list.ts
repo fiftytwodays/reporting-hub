@@ -20,14 +20,12 @@ export default function useQuarterlyPlanList({ condition = true }: FetchOptions,
 
   const fetcher = async () => {
     const { username, userId, signInDetails } = await getCurrentUser();
-    console.log("User details", username);
     const response = await client.models.QuarterlyPlan.list({
       filter: {
         yearlyPlanId: { eq: id },
       },
     });
     if (response?.data) {
-      console.log("The complete response", response, response.data);
       const quarterlyPlans = await Promise.all(
         response.data.map(async (quarterlyPlan) => {
           return {

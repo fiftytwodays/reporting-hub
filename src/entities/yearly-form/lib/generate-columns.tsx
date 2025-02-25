@@ -29,13 +29,29 @@ export default function generateColumns<T>(
         return (
           <div>
             <Space>
-              {(type === "myforms")? (
-              <_Button type="link" onClick={() => handleEdit(item)}>
-                Edit
-              </_Button>):(
-              <_Button type="link" onClick={() => handleEdit(item)}>
-                View
-              </_Button>)}
+              {(type === "myforms") ? (
+                (item.status === "approved") ? (
+                  <Popconfirm
+                    placement="bottomRight"
+                    title="The yearly plan has already been approved. Are you sure you want to edit it?"
+                    okText="Yes"
+                    cancelText="No"
+                    onConfirm={() => handleEdit(item)}
+                  >
+                    <_Button type="link">
+                      Edit
+                    </_Button>
+
+                  </Popconfirm>
+                ) : (
+                  <_Button type="link" onClick={() => handleEdit(item)}>
+                    Edit
+                  </_Button>)
+
+              ) : (
+                <_Button type="link" onClick={() => handleEdit(item)}>
+                  View
+                </_Button>)}
               {type === "myforms" && (
                 <Popconfirm
                   placement="bottomRight"

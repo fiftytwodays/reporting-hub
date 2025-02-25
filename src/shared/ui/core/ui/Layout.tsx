@@ -39,11 +39,11 @@ const items = [
   },
   {
     key: "yearly-form",
-    label: "Yearly Form",
+    label: "Yearly Plans",
     children: [
       {
         key: "my-forms",
-        label: <Link href="/yearly-form/my-forms">My Forms</Link>,
+        label: <Link href="/yearly-form/my-forms">My Yearly Plans</Link>,
       },
       {
         key: "reviewer-view",

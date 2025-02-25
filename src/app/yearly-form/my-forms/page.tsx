@@ -22,7 +22,7 @@ export default function MyForms() {
     <Page
     showPageHeader
       header={{
-        title: "My Forms",
+        title: "My Yearly Plans",
         breadcrumbs: [
           {
             title: "Home",
@@ -30,7 +30,7 @@ export default function MyForms() {
           },
 
           {
-            title: "My forms",
+            title: "Yearly Plans",
             href: "/yearly-form/my-forms",
           },
         ],
