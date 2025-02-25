@@ -73,6 +73,11 @@ export default function UserAdd({ isLoading }: UserAddProps) {
       messageApi.info("Creating user...");
       const response = await client.mutations.createUser(input);
 
+      // Check for errors in the response
+      if (response.errors && response.errors.length > 0) {
+        throw new Error(response.errors[0].message);
+      }
+
       // Check if password should be set as permanent
       if (values.isPermanent) {
         const setPasswordInput = {
@@ -99,7 +104,14 @@ export default function UserAdd({ isLoading }: UserAddProps) {
       // listUsers(); // Refresh user list after creation
     } catch (error) {
       console.log("Error creating user: ", error);
-      messageApi.error("Error creating user. Please try again.");
+
+      // Check if error is an instance of Error before accessing message
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred. Please try again.";
+
+      messageApi.error(`Error creating user: ${errorMessage}`);
     }
     mutate(["/api/users"]);
   };
