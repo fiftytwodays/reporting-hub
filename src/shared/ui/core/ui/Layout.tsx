@@ -4,16 +4,18 @@ import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { Authenticator } from "@aws-amplify/ui-react";
 import styled from "@emotion/styled";
 import type { MenuProps } from "antd";
+import useUserGroupList from "@/entities/user/api/user-group-list";
+
 import { Avatar, Button, Dropdown, Layout, Menu, Typography } from "antd";
 import { getCurrentUser, signOut } from "aws-amplify/auth";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import useSWR, { mutate } from "swr";
-
 import { Content, Footer, Header } from "antd/lib/layout/layout";
+import { UserGroup } from "@/entities/user/config/types";
 
 interface LayoutProps {
-  children: any;
+  children: React.ReactNode;
 }
 
 const { Text, Title } = Typography;
@@ -22,8 +24,31 @@ const layoutStyle = {
   padding: "0 2rem",
 };
 
-const items = [
+const defaultItems = [
   {
+    key: "monthly-form",
+    label: "Monthly form",
+  },
+  {
+    key: "yearly-form",
+    label: "Yearly Form",
+  },
+  {
+    key: "reports",
+    label: "Reports",
+  },
+  {
+    key: "settings",
+    label: "Settings",
+  },
+  {
+    key: "about-us",
+    label: <Link href="/about-us">About us</Link>,
+  },
+];
+
+const menuConfigurations = {
+  monthlyForm: {
     key: "monthly-form",
     label: "Monthly form",
     children: [
@@ -35,9 +60,9 @@ const items = [
         key: "approver-view",
         label: <Link href="/monthly-form/approver-view">Approver view</Link>,
       },
-    ]
+    ],
   },
-  {
+  yearlyForm: {
     key: "yearly-form",
     label: "Yearly Form",
     children: [
@@ -55,7 +80,7 @@ const items = [
       },
     ],
   },
-  {
+  reports: {
     key: "reports",
     label: "Reports",
     children: [
@@ -74,14 +99,12 @@ const items = [
       {
         key: "reporting-status-report",
         label: (
-          <Link href="/reports/reporting-status-reports">
-            Monthly reports
-          </Link>
+          <Link href="/reports/reporting-status-reports">Monthly reports</Link>
         ),
       },
     ],
   },
-  {
+  settings: {
     key: "settings",
     label: "Settings",
     children: [
@@ -119,11 +142,7 @@ const items = [
       },
     ],
   },
-  {
-    key: "about-us",
-    label: <Link href="/about-us">About us</Link>,
-  },
-];
+};
 
 const useMenuItems: MenuProps["items"] = [
   {
@@ -138,6 +157,46 @@ const AppLayout = ({ children }: LayoutProps) => {
   const pathname = usePathname();
   const menuName = pathname?.split("/")[1];
   const { data: userData } = useSWR(["user-details"], getCurrentUser);
+  const { userGroupList } = useUserGroupList({
+    userName: userData?.signInDetails?.loginId,
+  });
+
+  const groupNames = userGroupList.map((group: UserGroup) => group.GroupName);
+
+  const getMenuItems = () => {
+    const updatedItems = [...defaultItems];
+
+    if (groupNames.includes("admin")) {
+      return updatedItems.map((item) => {
+        switch (item.key) {
+          case "settings":
+            return menuConfigurations.settings;
+          case "reports":
+            return menuConfigurations.reports;
+          case "monthly-form":
+            return menuConfigurations.monthlyForm;
+          case "yearly-form":
+            return menuConfigurations.yearlyForm;
+          default:
+            return item;
+        }
+      });
+    }
+
+    if (groupNames.includes("report-viewer")) {
+      return updatedItems.map((item) =>
+        item.key === "reports" ? menuConfigurations.reports : item
+      );
+    }
+
+    if (groupNames.includes("user")) {
+      return updatedItems.map((item) =>
+        item.key === "yearly-form" ? menuConfigurations.yearlyForm : item
+      );
+    }
+
+    return updatedItems;
+  };
 
   const handleMenuClick = async ({ key }: { key: string }) => {
     if (key === "sign-out") {
@@ -149,7 +208,7 @@ const AppLayout = ({ children }: LayoutProps) => {
 
   return (
     <Authenticator>
-      <Layout className="" style={{ minHeight: "100vh" }}>
+      <Layout style={{ minHeight: "100vh" }}>
         <Header
           style={{
             display: "flex",
@@ -166,11 +225,8 @@ const AppLayout = ({ children }: LayoutProps) => {
             theme="dark"
             mode="horizontal"
             selectedKeys={[menuName]}
-            items={items}
-            style={{
-              flex: 1,
-              minWidth: 0,
-            }}
+            items={getMenuItems()}
+            style={{ flex: 1, minWidth: 0 }}
           />
           {userData ? (
             <Dropdown
@@ -202,11 +258,7 @@ const AppLayout = ({ children }: LayoutProps) => {
           )}
         </Header>
         <Content style={layoutStyle}>{children}</Content>
-        <Footer
-          style={{
-            textAlign: "center",
-          }}
-        >
+        <Footer style={{ textAlign: "center" }}>
           Reporting hub ©{new Date().getFullYear()} Created by Fiftytwodays
         </Footer>
       </Layout>
