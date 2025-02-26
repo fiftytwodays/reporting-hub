@@ -21,6 +21,7 @@ export const columns: Column[] = [
     title: "Enabled",
     dataIndex: "Enabled",
     key: "Enabled",
+    dataType: "boolean",
     render: (enabled: boolean) => (enabled ? "Yes" : "No"),
   },
   {

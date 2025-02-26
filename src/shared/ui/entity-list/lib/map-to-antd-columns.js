@@ -16,6 +16,12 @@ export default function mapToAntDColumns(columns) {
     return {
       ...column,
       render: (item, record) => {
+
+        if(column?.dataType == "boolean")
+        {
+          return item ? "Yes": "No";
+        }
+
         if (!item) {
           return "---";
         }

@@ -6,6 +6,7 @@ export interface Column<T = any> {
   width?: string|number;
   render?: (params: T) => any;
   actions?: string[];
+  dataType?: string;
   onViewAction?: (params: T) => any;
   onEditAction?: (params: T) => any;
   onDeleteAction?: (params: T) => any;
