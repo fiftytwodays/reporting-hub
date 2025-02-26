@@ -207,7 +207,7 @@ const AppLayout = ({ children }: LayoutProps) => {
   };
 
   return (
-    <Authenticator>
+    <Authenticator hideSignUp={true}>
       <Layout style={{ minHeight: "100vh" }}>
         <Header
           style={{
