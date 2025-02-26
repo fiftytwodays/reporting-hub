@@ -37,6 +37,7 @@ const Clusters: React.FC<ClustersProps> = ({ form }) => {
       allowClear
       onChange={(value) => handleChange(value)}
       options={transformClustersData(clustersData)}
+      optionFilterProp="label"
     />
   );
 };

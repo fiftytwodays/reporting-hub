@@ -37,6 +37,7 @@ const Regions: React.FC<RegionsProps> = ({ form }) => {
       allowClear
       onChange={(value) => handleChange(value)}
       options={transformRegionsData(regionsData)}
+      optionFilterProp="label"
     />
   );
 };

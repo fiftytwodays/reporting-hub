@@ -212,6 +212,7 @@ export default function UserAdd({ isLoading }: UserAddProps) {
                 value: project.id,
                 label: project.name,
               }))}
+              optionFilterProp="label"
             />
           </Form.Item>
 
@@ -222,6 +223,7 @@ export default function UserAdd({ isLoading }: UserAddProps) {
                 value: cluster.id,
                 label: cluster.name,
               }))}
+              optionFilterProp="label"
             />
           </Form.Item>
 
@@ -232,6 +234,7 @@ export default function UserAdd({ isLoading }: UserAddProps) {
                 value: region.id,
                 label: region.name,
               }))}
+              optionFilterProp="label"
             />
           </Form.Item>
         </Form>

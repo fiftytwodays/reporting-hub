@@ -36,6 +36,7 @@ const ProjectTypes: React.FC<ProjectTypesProps> = ({ form }) => {
       allowClear
       onChange={(value) => handleChange(value)}
       options={transformProjectTypesData(projectTypesData)}
+      optionFilterProp="label"
     />
   );
 };
