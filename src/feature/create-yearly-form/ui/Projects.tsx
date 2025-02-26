@@ -49,6 +49,7 @@ const Projects: React.FC<ProjectsProps> = ({ form, id }) => {
       onChange={(value) => handleChange(value)}
       options={transformProjectsData(projectsData)}
       defaultValue={selectedValue}
+      optionFilterProp="label"
     />
   );
 };

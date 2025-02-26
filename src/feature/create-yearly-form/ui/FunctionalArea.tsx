@@ -51,6 +51,7 @@ const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined
       onChange={(value) => handleChange(value)}
       options={transformFunctionalAreaData(functionalAreasData)}
       defaultValue={selectedValue}
+      optionFilterProp="label"
     />
   );
 };
