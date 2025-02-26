@@ -33,6 +33,8 @@ export default function useRegionsList({ condition = true }: FetchOptions) {
         })
       );
   
+      regions.sort((a, b) => a.name.localeCompare(b.name));
+
       const apiResponse: ApiResponse = {
         Regions: regions
       };

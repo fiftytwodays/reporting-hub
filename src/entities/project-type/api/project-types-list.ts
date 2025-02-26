@@ -3,7 +3,6 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
 import { ProjectType } from "../config/types";
 
-
 interface FetchOptions {
   condition: boolean;
 }
@@ -12,9 +11,10 @@ interface ApiResponse {
   ProjectTypes: ProjectType[];
 }
 
-export default function useProjectTypesList({ condition = true }: FetchOptions) {
+export default function useProjectTypesList({
+  condition = true,
+}: FetchOptions) {
   const client = generateClient<Schema>();
-
 
   const fetcher = async () => {
     const response = await client.models.ProjectType.list();
@@ -28,17 +28,18 @@ export default function useProjectTypesList({ condition = true }: FetchOptions) 
           };
         })
       );
-  
+
+      projectTypes.sort((a, b) => a.name.localeCompare(b.name));
+
       const apiResponse: ApiResponse = {
-        ProjectTypes: projectTypes
+        ProjectTypes: projectTypes,
       };
-  
-      return apiResponse;  
+
+      return apiResponse;
     }
     return null;
   };
-  
-  
+
   const { data, isLoading, error } = useSWR(
     condition ? ["api/project-types"] : null,
     fetcher,
@@ -55,7 +56,7 @@ export default function useProjectTypesList({ condition = true }: FetchOptions) 
       undefined,
       {
         revalidate: true,
-      },
+      }
     );
   };
 
@@ -69,6 +70,6 @@ export default function useProjectTypesList({ condition = true }: FetchOptions) 
     projectTypesList: projectTypesData ?? [],
     isProjectTypesListLoading: isLoading,
     isProjectTypesListError: error,
-    reloadProjectTypesList
+    reloadProjectTypesList,
   };
 }

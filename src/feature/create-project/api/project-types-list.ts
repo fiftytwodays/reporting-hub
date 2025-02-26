@@ -33,6 +33,8 @@ export default function useProjectTypesList({ condition = true }: FetchOptions) 
         })
       );
   
+      projectTypes.sort((a, b) => a.name.localeCompare(b.name));
+
       const apiResponse: ApiResponse = {
         ProjectTypes: projectTypes
       };

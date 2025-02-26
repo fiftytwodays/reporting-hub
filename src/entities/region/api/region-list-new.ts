@@ -23,6 +23,8 @@ export default function useRegionList({
     { keepPreviousData: true }
   );
 
+  data?.sort((a, b) => a.name.localeCompare(b.name));
+
   return {
     regionList: condition ? data : [],
     isRegionListLoading: isLoading,
