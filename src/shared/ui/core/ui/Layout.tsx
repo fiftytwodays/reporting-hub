@@ -27,19 +27,19 @@ const layoutStyle = {
 const defaultItems = [
   {
     key: "monthly-form",
-    label: "Monthly form",
+    label: "null",
   },
   {
     key: "yearly-form",
-    label: "Yearly Form",
+    label: "null",
   },
   {
     key: "reports",
-    label: "Reports",
+    label: "null",
   },
   {
     key: "settings",
-    label: "Settings",
+    label: "null",
   },
   {
     key: "about-us",
@@ -194,7 +194,6 @@ const AppLayout = ({ children }: LayoutProps) => {
         item.key === "yearly-form" ? menuConfigurations.yearlyForm : item
       );
     }
-
     return updatedItems;
   };
 
@@ -225,7 +224,7 @@ const AppLayout = ({ children }: LayoutProps) => {
             theme="dark"
             mode="horizontal"
             selectedKeys={[menuName]}
-            items={getMenuItems()}
+            items={getMenuItems().filter((item) => item.label !== "null")}
             style={{ flex: 1, minWidth: 0 }}
           />
           {userData ? (
