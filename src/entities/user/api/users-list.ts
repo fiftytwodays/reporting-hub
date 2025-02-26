@@ -63,6 +63,8 @@ export default function useUsersList({ condition = true }: FetchOptions) {
     UserStatus: user.UserStatus,
   }));
 
+  userData?.sort((a, b) => a.GivenName.localeCompare(b.GivenName));
+
   return {
     usersList: userData ?? [],
     isUsersListLoading: isLoading,

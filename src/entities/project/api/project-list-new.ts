@@ -23,6 +23,8 @@ export default function useProjectList({
     { keepPreviousData: true }
   );
 
+  data?.sort((a, b) => a.name.localeCompare(b.name));
+
   return {
     projectList: condition ? data : [],
     isProjectListLoading: isLoading,

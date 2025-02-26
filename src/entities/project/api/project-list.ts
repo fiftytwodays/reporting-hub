@@ -16,15 +16,18 @@ interface ApiResponse {
 export default function useProjectsList({ condition = true }: FetchOptions) {
   const client = generateClient<Schema>();
 
-
   const fetcher = async () => {
     const response = await client.models.Project.list();
     if (response?.data) {
       // Use Promise.all to handle async operations for all projects
       const projects = await Promise.all(
         response.data.map(async (project) => {
-          const projectType = await client.models.ProjectType.get({ id: project.projectTypeId ?? "" });
-          const cluster = await client.models.Cluster.get({ id: project.clusterId ?? "" });
+          const projectType = await client.models.ProjectType.get({
+            id: project.projectTypeId ?? "",
+          });
+          const cluster = await client.models.Cluster.get({
+            id: project.clusterId ?? "",
+          });
           return {
             id: project.id ?? "",
             name: project.name ?? "",
@@ -32,22 +35,23 @@ export default function useProjectsList({ condition = true }: FetchOptions) {
             projectTypeId: project.projectTypeId ?? "",
             clusterId: project.clusterId ?? "",
             location: project.location ?? "",
-            projectType: projectType.data?.name ?? "",  // projectType should be fetched asynchronously
+            projectType: projectType.data?.name ?? "", // projectType should be fetched asynchronously
             cluster: cluster.data?.name ?? "",
           };
         })
       );
-  
+
+      projects.sort((a, b) => a.name.localeCompare(b.name));
+
       const apiResponse: ApiResponse = {
-        Projects: projects
+        Projects: projects,
       };
-  
-      return apiResponse;  // Return the apiResponse instead of response.data to include projectType
+
+      return apiResponse; // Return the apiResponse instead of response.data to include projectType
     }
     return null;
   };
-  
-  
+
   const { data, isLoading, error } = useSWR(
     condition ? ["api/projects"] : null,
     fetcher,
@@ -64,7 +68,7 @@ export default function useProjectsList({ condition = true }: FetchOptions) {
       undefined,
       {
         revalidate: true,
-      },
+      }
     );
   };
 
@@ -77,13 +81,13 @@ export default function useProjectsList({ condition = true }: FetchOptions) {
     cluster: project.cluster,
     location: project.location,
     projectTypeId: project.projectTypeId,
-    clusterId: project.clusterId
+    clusterId: project.clusterId,
     // Actions: project.actions,
   }));
   return {
     projectsList: projectData ?? [],
     isProjectsListLoading: isLoading,
     isProjectsListError: error,
-    reloadProjectList
+    reloadProjectList,
   };
 }
