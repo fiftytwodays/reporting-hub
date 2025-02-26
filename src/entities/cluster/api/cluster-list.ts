@@ -23,6 +23,8 @@ export default function useClusterList({
     { keepPreviousData: true }
   );
 
+  data?.sort((a, b) => a.name.localeCompare(b.name));
+
   return {
     clusterList: condition ? data : [],
     isClusterListLoading: isLoading,

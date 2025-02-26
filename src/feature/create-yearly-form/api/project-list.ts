@@ -52,6 +52,8 @@ export default function useProjectList({ condition = true, projectId }: FetchOpt
         })
       );
 
+      projects.sort((a, b) => a.name.localeCompare(b.name));
+
       const apiResponse: ApiResponse = {
         Projects: projects
       };

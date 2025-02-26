@@ -32,6 +32,8 @@ export default function useClustersList({ condition = true }: FetchOptions) {
           };
         })
       );
+
+      clusters.sort((a, b) => a.name.localeCompare(b.name));
   
       const apiResponse: ApiResponse = {
         Clusters: clusters

@@ -28,7 +28,7 @@ export default function useFunctionalAreasList({ condition = true }: FetchOption
           };
         })
       );
-  
+      functionalAreas.sort((a, b) => a.name.localeCompare(b.name));
       const apiResponse: ApiResponse = {
         FunctionalAreas: functionalAreas
       };
