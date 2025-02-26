@@ -31,7 +31,6 @@ export default function useCreatePlan() {
   // Function to create a project
   const createPlan = async (key: string, { arg }: { arg: CreatePlanInput }) => {
 
-    console.log("arg", arg)
     const response = await client.models.Plan.create({
 
       quarterlyPlanId: arg.quarterlyPlanId,
@@ -41,7 +40,6 @@ export default function useCreatePlan() {
       comments: arg.comments,
       isMajorGoal: arg.isMajorGoal,
     });
-console.log("response",response)
     if (response?.data) {
       const newPlan = {
         id: response.data.id,

@@ -18,11 +18,9 @@ interface FunctionalAreaProps {
 const FunctionalArea: React.FC<FunctionalAreaProps> = ({ handlePlanChange, quarterKey, index, functionalAreaId }) => {
   const { functionalAreasData } = useFunctionalAreaList({ condition: true });
 const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
-console.log("FunctionalAreaId", functionalAreaId);
   useEffect(() => {
     if (functionalAreasData) {
       const functionalArea = functionalAreasData.find(functionalArea => functionalArea.id === functionalAreaId);
-      console.log("functionalArea",functionalArea);
       setSelectedValue(functionalArea?.name);
     }
   }, [functionalAreasData, functionalAreaId]);
@@ -31,8 +29,6 @@ console.log("FunctionalAreaId", functionalAreaId);
     return null; // Or you can show a loading indicator here
   }
   const handleChange = (value: string | number ) => {
-
-    console.log("CHeckign the value inside Functional Area", quarterKey, index)
     handlePlanChange(quarterKey, index, "functionalAreaId", value)
     // form.setFieldValue(
     //   "project",

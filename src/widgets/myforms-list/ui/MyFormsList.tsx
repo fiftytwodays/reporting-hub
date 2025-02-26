@@ -25,13 +25,11 @@ export default function YearlyPlansList({ type }: { type: string }) {
 
   const {deleteYearlyForm} = useDeleteYearlyForm();
   const handleEdit = (yearlyPlan: YearlyPlan) => {
-    console.log("Data inside handleEdit", yearlyPlan);
     setSelectedYearlyPlan(yearlyPlan);
     // setIsEditModalVisible(true);
     if(type === "myforms"){
       router.push('/yearly-form/my-forms/'+yearlyPlan.id);
     }
-    console.log("After router push")
       
     if(type === "approver")
       router.push('/yearly-form/approver-view/'+yearlyPlan.id);

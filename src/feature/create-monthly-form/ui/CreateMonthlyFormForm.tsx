@@ -98,7 +98,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       return;
     }
     messageApi.success("Monthly form created successfully");
-    console.log("Form submitted successfully", values);
   };
 
   const handleAchievedChange = (value: FormValues, index: number) => {

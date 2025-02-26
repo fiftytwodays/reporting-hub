@@ -25,9 +25,9 @@ const QuarterlyPlan: React.FC<QuarterlyPlanProps> = ({ form, quarter }) => {
         <Form form={planForm}>
             <Form.List name="plans">
                 {(fields) => (
-                   
+
                     <>
-                    
+
                         {fields.map((field) => (
                             <Form.Item
                                 {...field}
@@ -35,9 +35,8 @@ const QuarterlyPlan: React.FC<QuarterlyPlanProps> = ({ form, quarter }) => {
                                 name={[field.name, 'activity']}
                                 rules={[{ required: true, message: 'Missing activity' }]}
                             >
-                                 
-                                <Input placeholder="test"/>
-                                {/* {{console.log("Field index: %d, Field name: %d, Field key: %d",fields,field,field.name)}} */}
+
+                                <Input placeholder="test" />
                             </Form.Item>
                         ))
 

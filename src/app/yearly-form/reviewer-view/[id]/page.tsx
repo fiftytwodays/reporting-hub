@@ -39,13 +39,13 @@ export default  function ReviewerViewDetail({
           },
 
           {
-            title: "Yearly forms",
+            title: "Yearly Plans",
             href: "/yearly-form/my-forms",
             menu: {
               items: [
                 {
                   key: '/yearly-form/my-forms',
-                  label: 'My forms',
+                  label: 'My Yearly Plans',
                 },
               {
                 key: '/yearly-form/reviewer-view',
@@ -59,7 +59,7 @@ export default  function ReviewerViewDetail({
             },
           },
           {
-            title: "My forms",
+            title: "Reviewer view",
             href: "/yearly-form/my-forms",
           },
         ],

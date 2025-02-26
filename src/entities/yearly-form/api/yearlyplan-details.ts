@@ -20,7 +20,6 @@ export default function useYearlyPlanDetails({ condition = true }: FetchOptions,
 
   const fetcher = async () => {
     const { username, userId, signInDetails } = await getCurrentUser();
-    console.log("User details", username);
     const response = await client.models.YearlyPlan.get({ id: id });
     if (response?.data) {
 
@@ -33,7 +32,6 @@ export default function useYearlyPlanDetails({ condition = true }: FetchOptions,
           projectName: proectResponse.data?.name ?? "",
           year: yearlyPlanResp.year ?? "",
         }
-        console.log("The Year plan Detail", yearlyPlanDetails);
         const apiResponse: ApiResponse = {
           YearlyPlanDetails: yearlyPlanDetails
         };

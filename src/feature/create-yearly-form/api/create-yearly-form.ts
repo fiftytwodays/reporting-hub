@@ -34,7 +34,6 @@ export default function useCreateYearlyPlan() {
   const { data: yearlyPlan } = useSWR("api/yearlyPlan");
 
   const createYearlyPlan = async (key: string, { arg }: { arg: CreateYearlyPlanInput }) => {
-console.log("arg", arg);
     const existingPlan = await client.models.YearlyPlan.list({
       filter: {
         and: [
@@ -45,9 +44,7 @@ console.log("arg", arg);
     });
 
     if (existingPlan?.data.length > 0) {
-      console.log("After Throw")
       throw { statusCode: 409, message: "The yearly plan for this project already exist" } as CustomError;
-      console.log("After Throw")
     }
 
     const response = await client.models.YearlyPlan.create({
@@ -58,7 +55,6 @@ console.log("arg", arg);
       status: arg.status,
       year: arg.year,
     });
-    console.log("response in create-yearly-form", response)
     if (response?.data) {
       const newYearlyPlan = {
         id: response.data.id,
