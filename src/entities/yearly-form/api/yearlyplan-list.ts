@@ -19,11 +19,6 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
   const fetcher = async () => {
     const { username, userId, signInDetails } = await getCurrentUser();
     const attributes = await fetchUserAttributes();
-    console.log("User details", username);
-    console.log("Attributes", attributes);
-
-    // console.log("clusters array", arr)
-    console.log("type", type)
 
     let response;
     if (type === "myforms") {
@@ -140,7 +135,6 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     }
 
     if (response?.data) {
-      console.log("The complete response", response, response.data);
       const yearlyPlans = await Promise.all(
         response.data.map(async (yearlyPlan) => {
           const projectResp = await client.models.Project.get({ id: yearlyPlan.projectId ?? "" });

@@ -16,8 +16,6 @@ interface ProjectsProps {
 const Projects: React.FC<ProjectsProps> = ({ form, id }) => {
   const { projectsData } = useProjectList({ condition: true, projectId: id });
   const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
-console.log("Project id", id)
-console.log("Project", selectedValue)
   useEffect(() => {
     if (projectsData) {
       const project = projectsData.find(project => project.id === id);

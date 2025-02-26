@@ -1,4 +1,4 @@
-
+// "use client"
 import { Button, Checkbox, Col, Collapse, CollapseProps, Divider, Flex, Form, Input, Modal, Row, Select, Space, Spin } from "antd";
 import Projects from "./Projects";
 import FunctionalArea from "./FunctionalArea";
@@ -9,7 +9,7 @@ import { DeleteTwoTone } from '@ant-design/icons';
 import useCreateYearlyPlan from "../api/create-yearly-form";
 import useCreateQuarterlyPlan from "../api/create-quarter-plan";
 import useCreatePlan from "../api/create-plan";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import useQuarterlyPlanList from "@/entities/yearly-form/api/quarterlyplan-list";
 import useYearlyPlanFullDetails from "@/entities/yearly-form/api/yearlyplan-full";
 import useUpdateYearlyPlan from "../api/update-yearly-form";
@@ -19,7 +19,12 @@ import useDeletePlan from "@/feature/delete-plan/delete-plan";
 import useDeleteYearlyForm from "../../delete-yearly-form/delete-yearly-form"
 import CommentModal from "@/shared/ui/comment/CommentModal";
 import { AuthUser } from "aws-amplify/auth";
+import { generateClient } from "aws-amplify/data";
+import type { Schema } from "@root/amplify/data/resource";
+
+
 const { Panel } = Collapse;
+
 
 interface CreateYearlyFormNewProps {
   // onCreateYearlyFormNewModalClose: () => void;
@@ -103,6 +108,12 @@ export default function CreateYearlyFormNew({
   const [status, setStatus] = useState("");
   const [projectFacilitator, setProjectFacilitator] = useState("");
   const [loggedUser, setLoggedUser] = useState("");
+  const client = generateClient<Schema>();
+  // const [isDirty, setIsDirty] = useState(false);
+  const isDirty = useRef(false);
+  const pathname = usePathname();
+  const [originalPush, setOriginalPush] = useState<((href: string) => void) | null>(null);
+
 
 
   const monthsArray = [
@@ -154,14 +165,12 @@ export default function CreateYearlyFormNew({
   };
   useEffect(() => {
     setUserDetails();
-    console.log("Set loading to true", id, yearlyPlanDetail)
     if (id && yearlyPlanDetail) {
       form.setFieldsValue({
         year: yearlyPlanDetail.year,
         project: yearlyPlanDetail.projectId,
       });
       const mappedQuarterPlans: Record<number, QuarterlyPlanDetails> = {};
-      console.log("mappedQuarterPlans")
       Object.entries(yearlyPlanDetail.quarterlyPlans).forEach(([key, quarterData]) => {
         const quarterKey = Number(key); // Convert key to number
 
@@ -183,15 +192,72 @@ export default function CreateYearlyFormNew({
           })),
         };
       });
-      console.log("mappedQuarterPlans completed")
 
       // Update state
       setQuarterPlans(mappedQuarterPlans);
-      console.log("set quarter plans completed")
     }
-    console.log("userId", yearlyPlanDetail?.userId)
   }, [yearlyPlanDetail]);
+  useEffect(() => {
+    // Warn user before closing or reloading the page
+    const handleWindowClose = (event: BeforeUnloadEvent) => {
+      if (isDirty.current) {
+        event.preventDefault();
+        event.returnValue = "You have unsaved changes. Are you sure you want to leave?";
+      }
+    };
 
+    window.addEventListener("beforeunload", handleWindowClose);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleWindowClose);
+    };
+  }, [isDirty.current]);
+  // useEffect(() => {
+  //   // Override router.push
+    
+  //   if (!originalPush) {
+  //     console.log("Inside originalPsuh")
+  //     setOriginalPush(() => router.push);
+  //     router.push = (href: string) => handleInterceptedNavigation(href);
+  //   }
+
+  //   return () => {
+  //     if (originalPush) {
+  //       router.push = originalPush; // Restore original push function on unmount
+  //     }
+  //   };
+  // }, [router, originalPush, isDirty]);
+
+  
+  // const handleInterceptedNavigation = (href: string) => {
+  //   if (isDirty.current) {
+  //     const confirmLeave = window.confirm("You have unsaved changes. Do you really want to leave?");
+  //     if (!confirmLeave) return; // Stop navigation if user cancels
+  //   }
+  //   console.log("Proceed with navigation", href)
+  //   originalPush?.(href); // Proceed with navigation if confirmed
+  //   console.log("Proceed after roginalPush")
+  // };
+
+  useEffect(() => {
+    const originalPush = router.push; // Capture original push method
+
+    router.push = (href: string) => handleInterceptedNavigation(href, originalPush);
+
+    return () => {
+      router.push = originalPush; // Restore original push when unmounting
+    };
+  }, []);
+
+  const handleInterceptedNavigation = (href: string, originalPush: (url: string) => void) => {
+
+    if (isDirty.current) {
+      const confirmLeave = window.confirm("You have unsaved changes. Do you really want to leave?");
+      if (!confirmLeave) return;
+    }
+
+    originalPush(href); // ✅ Use the correct push method
+  };
   const showCommentPrompt = (status: string) => {
     setStatus(status);
 <<<<<<< HEAD
@@ -222,15 +288,13 @@ export default function CreateYearlyFormNew({
       else {
         for (const quarter of [1, 2, 3, 4]) {
           const quarterlyPlanData = quarterPlans[quarter];
-          console.log("qaurterlyPlanData",quarterlyPlanData)
           if (quarterlyPlanData) {
             for (const plan of quarterlyPlanData.plans) {
-              console.log("Plans inside checking",plan)
               if (!plan.activity)
                 throw { statusCode: 400, message: "Activity is required" } as CustomError;
               else if (!plan.functionalAreaId)
                 throw { statusCode: 400, message: "Function area is required" } as CustomError;
-              else if (!(plan.month.length>0))
+              else if (!(plan.month.length > 0))
                 throw { statusCode: 400, message: "Month is required" } as CustomError;
             }
           }
@@ -239,9 +303,6 @@ export default function CreateYearlyFormNew({
         const { username, userId, signInDetails } = await getCurrentUser();
 
         const formValues = form.getFieldsValue();
-
-        console.log("form details", username);
-        console.log("qaurter details", userId);
         let yearlyPlanResp;
         const yearlyPlanPayload = {
           user: yearlyPlanDetail?.user ?? projectFacilitator,
@@ -254,21 +315,15 @@ export default function CreateYearlyFormNew({
         }
         try {
           if (yearlyPlanDetail?.id && "" != yearlyPlanDetail?.id) {
-            // yearlyPlanPayload
-            console.log("yearlyPlanPayload while updating", yearlyPlanPayload)
             yearlyPlanResp = await updateYearlyPlan(yearlyPlanPayload);
           } else {
             yearlyPlanResp = await createYearlyPlan(yearlyPlanPayload);
           }
           if (yearlyPlanResp) {
-
-            console.log("Saved/Updated Yearly Plan Id", yearlyPlanResp.id);
           }
         } catch (error: any) {
           throw error;
         }
-
-        // for (const quarter of [1, 2, 3, 4]) {
 
         if (yearlyPlanResp) {
           for (const quarter of [1, 2, 3, 4]) {
@@ -291,7 +346,6 @@ export default function CreateYearlyFormNew({
               }
 
               if (quarterPlanResp) {
-                console.log("List the plans while saving", quarterlyPlanData.plans);
                 for (const plan of quarterlyPlanData.plans) {
                   const planPayload = {
                     quarterlyPlanId: quarterPlanResp.id,
@@ -393,7 +447,6 @@ export default function CreateYearlyFormNew({
         if (plansToDelete.length > 0) {
           deletePlan({ ids: plansToDelete })
         }
-        console.log("Handle save called");
 
         if (status === "waiting for review") {
           messageApi.success("Yearly Plan submitted for review.");
@@ -447,6 +500,8 @@ export default function CreateYearlyFormNew({
 
 >>>>>>> a594cf9 (44 implement crud operations on yearly form (#95) (#96))
 
+      isDirty.current = false;
+
     } catch (error: any) {
       console.error("Error saving data:", error);
       if (error?.statusCode === 409) {
@@ -461,12 +516,12 @@ export default function CreateYearlyFormNew({
 =======
 >>>>>>> a594cf9 (44 implement crud operations on yearly form (#95) (#96))
       } else {
-        console.log("error in updating yearlyPlan", error)
         messageApi.error("Unable to create/update the project. Please try again.");
       }
       // messageApi.error("Failed to save data.");
     } finally {
       setLoading(false);
+      isDirty.current = false;
 
     }
 
@@ -486,8 +541,7 @@ export default function CreateYearlyFormNew({
           ),
         },
       }));
-      console.log("Handle plan change called", quarterPlans);
-    } // messageApi.error
+    } 
   };
 
   const handleDeletePlan = (quarter: number, index: number) => {
@@ -526,6 +580,7 @@ export default function CreateYearlyFormNew({
     if (!form.getFieldValue("project"))
       messageApi.error("Please select the project")
     else {
+     checkProjectExist(form.getFieldValue("project"), loggedUser);
       setQuarterPlans((prev) => ({
         ...prev,
         [quarter]: {
@@ -562,16 +617,33 @@ export default function CreateYearlyFormNew({
     }));
 >>>>>>> a594cf9 (44 implement crud operations on yearly form (#95) (#96))
   };
-
-  console.log("In create", form.getFieldValue("project"));
   // };
 
+  const checkProjectExist = async (projectId: string, userId: string) => {
+    const existingPlan = await client.models.YearlyPlan.list({
+      filter: {
+        and: [
+          { projectId: { eq: projectId } },
+          { userId: { eq: userId } },
+        ],
+      }
+    });
+    if (existingPlan?.data.length > 0 && !yearlyPlanDetail && !id) {
+      messageApi.error("The yearly plan for this project already exist")
+      // throw { statusCode: 409, message: "The yearly plan for this project already exist" } as CustomError;
+    }
+  }
+
+  const handleFormChange = () => {
+    // setIsDirty(true);
+    isDirty.current = true;
+  }
 
   return (
     <div>
       <CommentModal status={status} isOpen={modalVisible} onClose={() => setModalVisible(false)} onSave={handleSave} />
       {/* <h1>Yearly Planning</h1> */}
-      <Form form={form} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected")) || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: "" }}>
+      <Form form={form} onChange={handleFormChange} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected" && yearlyPlanDetail?.status != "approved")) || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: "" }}>
         <Row gutter={24}>
           <Col xs={8}>
             <Form.Item
@@ -629,7 +701,8 @@ export default function CreateYearlyFormNew({
               <Spin size="large" />
             </div>
           ) :
-            <Collapse defaultActiveKey={getFutureQuarter()}>
+            // <Collapse>  {/* defaultActiveKey={getFutureQuarter()} */}
+            <Collapse>
               {items.map((quarter) => (
                 <Panel header={`${quarter.label}`} key={quarter.key}>
                   <Row gutter={24}>
@@ -725,11 +798,11 @@ export default function CreateYearlyFormNew({
           <Space>
             {(type === "myforms" || type === "createNew") && (
               <>
-                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("draft")}>
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected" && yearlyPlanDetail?.status !== "approved")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("draft")}>
                   Save as Draft
                 </Button>
-                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("waiting for review")}>
-                  Send to Review
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected" && yearlyPlanDetail?.status !== "approved")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("waiting for review")}>
+                  Send for Review
                 </Button>
               </>
             )}
@@ -740,7 +813,7 @@ export default function CreateYearlyFormNew({
                   Send for Approval
                 </Button>
                 <Button type="default" disabled={false} danger onClick={() => showCommentPrompt("rejected")}>
-                  Reject
+                  Resend
                 </Button>
               </>
             )}

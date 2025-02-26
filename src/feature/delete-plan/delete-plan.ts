@@ -17,20 +17,9 @@ export default function useDeletePlan() {
   const deletePlan = async (key: string, { arg }: { arg: DeletePlanInput }) => {
     try {
       await Promise.all(arg.ids.map(id => client.models.Plan.delete({id: id})));
-      console.log("Successfully deleted all plans");
   } catch (error) {
       console.error("Error deleting plans:", error);
   }
-    
-console.log("deletePlan", deletePlan);
-    // if (deletePlan) {
-    //   return {
-    //     id: response.data.id,
-    //   } as PlanResponse;
-    // }
-    // else{
-    // throw new Error("Failed to delete the plan");
-    // }
   };
 
   const { trigger, data, isMutating, error } = useSWRMutation("api/delete-plan", deletePlan);

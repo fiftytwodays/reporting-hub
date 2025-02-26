@@ -50,8 +50,6 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
   const fetcher = async (): Promise<ApiResponse | null> => {
     if (id) {
       const { username } = await getCurrentUser();
-      console.log("User details", username);
-
       const response = await client.models.YearlyPlan.get({ id });
       if (!response?.data) return null;
 
@@ -91,8 +89,6 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
             const plans = await client.models.Plan.list({
               filter: { quarterlyPlanId: { eq: quarterlyPlan.id } },
             });
-
-            
             const sortedPlans = plans?.data.sort((a: any, b: any) => (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()));
 
             quarterlyPlanDetails.plans = (plans?.data || []).map((plan): PlanDetails => ({
@@ -109,7 +105,6 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
         )
       );
 
-      console.log("The Yearly Plan Detail", yearlyPlanDetails);
       return { YearlyPlanDetails: yearlyPlanDetails };
     } return null;
   };
