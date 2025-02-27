@@ -202,6 +202,7 @@ export default function useYearlyPlansList({ condition = true, type }: FetchOpti
     status: yearlyPlan.status,
     comments: yearlyPlan.comments,
     user: yearlyPlan.user,
+    userId: yearlyPlan.userId,
   }));
   return {
     yearlyPlansList: yearlyPlansData ?? [],
