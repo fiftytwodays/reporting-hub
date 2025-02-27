@@ -6,13 +6,14 @@ import styled from "@emotion/styled";
 import type { MenuProps } from "antd";
 import useUserGroupList from "@/entities/user/api/user-group-list";
 
-import { Avatar, Button, Dropdown, Layout, Menu, Typography } from "antd";
+import { Avatar, Button, Dropdown, Layout, Menu, Spin, Typography } from "antd";
 import { getCurrentUser, signOut } from "aws-amplify/auth";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import useSWR, { mutate } from "swr";
 import { Content, Footer, Header } from "antd/lib/layout/layout";
 import { UserGroup } from "@/entities/user/config/types";
+import { fetchAuthSession } from "aws-amplify/auth";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -157,9 +158,11 @@ const AppLayout = ({ children }: LayoutProps) => {
   const pathname = usePathname();
   const menuName = pathname?.split("/")[1];
   const { data: userData } = useSWR(["user-details"], getCurrentUser);
-  const { userGroupList } = useUserGroupList({
+  const { userGroupList, isUserGroupListLoading } = useUserGroupList({
     userName: userData?.signInDetails?.loginId,
   });
+
+  // const abc = fetchAuthSession();
 
   const groupNames = userGroupList.map((group: UserGroup) => group.GroupName);
 
@@ -206,62 +209,58 @@ const AppLayout = ({ children }: LayoutProps) => {
   };
 
   return (
-    <Authenticator hideSignUp={true}>
-      <Layout style={{ minHeight: "100vh" }}>
-        <Header
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "2rem",
-            padding: "2rem",
-          }}
-        >
-          <Title level={4} style={{ margin: 0, color: "#fff" }}>
-            Reporting Hub
-          </Title>
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            selectedKeys={[menuName]}
-            items={getMenuItems().filter((item) => item.label !== "null")}
-            style={{ flex: 1, minWidth: 0 }}
-          />
-          {userData ? (
-            <Dropdown
-              menu={{
-                items: useMenuItems,
-                onClick: handleMenuClick,
+    <>
+      <Authenticator hideSignUp={true}>
+        {(!groupNames || groupNames.length == 0) && (
+          <Spin tip="Loading, please wait" size="large" spinning fullscreen />
+        )}
+        {!(groupNames.length == 0) && (
+          <Layout style={{ minHeight: "100vh" }}>
+            <Header
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "2rem",
+                padding: "2rem",
               }}
-              placement="bottomLeft"
-              arrow
             >
-              <Button
-                type="text"
-                icon={<_Avatar size="small" icon={<UserOutlined />} />}
+              <Title level={4} style={{ margin: 0, color: "#fff" }}>
+                Reporting Hub
+              </Title>
+              <Menu
+                theme="dark"
+                mode="horizontal"
+                selectedKeys={[menuName]}
+                items={getMenuItems().filter((item) => item.label !== "null")}
+                style={{ flex: 1, minWidth: 0 }}
+              />
+              <Dropdown
+                menu={{
+                  items: useMenuItems,
+                  onClick: handleMenuClick,
+                }}
+                placement="bottomLeft"
+                arrow
               >
-                <Text style={{ color: "#fff" }}>
-                  {userData?.signInDetails?.loginId}
-                </Text>
-              </Button>
-            </Dropdown>
-          ) : (
-            <Link href="/login">
-              <Button
-                type="text"
-                icon={<_Avatar size="small" icon={<UserOutlined />} />}
-              >
-                <Text style={{ color: "#fff" }}>Sign in</Text>
-              </Button>
-            </Link>
-          )}
-        </Header>
-        <Content style={layoutStyle}>{children}</Content>
-        <Footer style={{ textAlign: "center" }}>
-          Reporting hub ©{new Date().getFullYear()} Created by Fiftytwodays
-        </Footer>
-      </Layout>
-    </Authenticator>
+                <Button
+                  type="text"
+                  icon={<_Avatar size="small" icon={<UserOutlined />} />}
+                >
+                  <Text style={{ color: "#fff" }}>
+                    {userData?.signInDetails?.loginId}
+                  </Text>
+                </Button>
+              </Dropdown>
+            </Header>
+            <Content style={layoutStyle}>{children}</Content>
+            <Footer style={{ textAlign: "center" }}>
+              Reporting hub ©{new Date().getFullYear()} Created by Fiftytwodays
+            </Footer>
+          </Layout>
+        )}
+      </Authenticator>
+    </>
   );
 };
 
