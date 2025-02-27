@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "antd";
 import styled from "@emotion/styled";
 import { Flex, Space, Typography, Popconfirm } from "antd";
+import { getCurrentUser, fetchUserAttributes } from 'aws-amplify/auth';
+
 
 interface Column<T = any> {
   key?: string | undefined;
@@ -18,19 +20,34 @@ export default function generateColumns<T>(
   columns: Column<any>[],
   handleDelete: (item: T) => void,
   handleEdit: (item: T) => void,
-  type: string
+  type: string,
+  userId: string
 ): Column<T>[] {
   const { Text } = Typography;
+  // const [userIdTest, setUserId] = useState<string>("");
+
+  // useEffect(() => {
+  //     const fetchUser = async () => {
+  //       try {
+  //         const { userId } = await getCurrentUser();
+  //         setUserId(userId);
+  //       } catch (error) {
+  //         console.error("Error fetching user:", error);
+  //       }
+  //     };
+  //     fetchUser();
+  //   }, []);
+
 
   return columns.map((column) => ({
     ...column,
     render: (item: any) => {
       if (column.key === "actions") {
-        return (
+        return userId != "" && (
           <div>
             <Space>
               {(type === "myforms") ? (
-                (item.status === "approved") ? (
+                (item.status === "approved" && item.userId === userId) ? (
                   <Popconfirm
                     placement="bottomRight"
                     title="The yearly plan has already been approved. Are you sure you want to edit it?"
@@ -43,16 +60,18 @@ export default function generateColumns<T>(
                     </_Button>
 
                   </Popconfirm>
-                ) : (
-                  <_Button type="link" onClick={() => handleEdit(item)}>
-                    Edit
-                  </_Button>)
+                ) : (((item.status === "draft" || item.status === "resent") && item.userId === userId) ? (<_Button type="link" onClick={() => handleEdit(item)}>
+                  Edit
+                </_Button>) : (<_Button type="link" onClick={() => handleEdit(item)}>
+                  View
+                </_Button>)
+                )
 
               ) : (
                 <_Button type="link" onClick={() => handleEdit(item)}>
                   View
                 </_Button>)}
-              {type === "myforms" && (
+              {(type === "myforms") && (item.userId === userId) && (
                 <Popconfirm
                   placement="bottomRight"
                   title="Are you sure you want to delete the Yearly Plan?"

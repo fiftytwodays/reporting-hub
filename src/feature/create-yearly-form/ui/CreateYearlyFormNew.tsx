@@ -110,6 +110,7 @@ export default function CreateYearlyFormNew({
   const isDirty = useRef(false);
   const pathname = usePathname();
   const [originalPush, setOriginalPush] = useState<((href: string) => void) | null>(null);
+  const [draftSaved, setDraftSaved] = useState("");
 
 
 
@@ -211,7 +212,7 @@ export default function CreateYearlyFormNew({
   }, [isDirty.current]);
   // useEffect(() => {
   //   // Override router.push
-    
+
   //   if (!originalPush) {
   //     console.log("Inside originalPsuh")
   //     setOriginalPush(() => router.push);
@@ -225,7 +226,7 @@ export default function CreateYearlyFormNew({
   //   };
   // }, [router, originalPush, isDirty]);
 
-  
+
   // const handleInterceptedNavigation = (href: string) => {
   //   if (isDirty.current) {
   //     const confirmLeave = window.confirm("You have unsaved changes. Do you really want to leave?");
@@ -253,7 +254,7 @@ export default function CreateYearlyFormNew({
       if (!confirmLeave) return;
     }
 
-    originalPush(href); // ✅ Use the correct push method
+    originalPush(href);
   };
   const showCommentPrompt = (status: string) => {
     setStatus(status);
@@ -280,6 +281,7 @@ export default function CreateYearlyFormNew({
       else {
         for (const quarter of [1, 2, 3, 4]) {
           const quarterlyPlanData = quarterPlans[quarter];
+          console.log("quarterlyPlanData", quarterlyPlanData)
           if (quarterlyPlanData) {
             for (const plan of quarterlyPlanData.plans) {
               if (!plan.activity)
@@ -289,6 +291,8 @@ export default function CreateYearlyFormNew({
               else if (!(plan.month.length > 0))
                 throw { statusCode: 400, message: "Month is required" } as CustomError;
             }
+          }else{
+            throw { statusCode: 400, message: "Please add plans for all quarter" } as CustomError;
           }
         }
         setLoading(true);
@@ -303,15 +307,19 @@ export default function CreateYearlyFormNew({
           ...(comment && "" != comment && { comments: comment }),
           status: status,
           year: formValues.year,
-          ...(yearlyPlanDetail?.id && yearlyPlanDetail?.id !== "" && { id: yearlyPlanDetail.id })
+          ...((yearlyPlanDetail?.id && yearlyPlanDetail?.id !== "") && { id: yearlyPlanDetail.id })
         }
         try {
-          if (yearlyPlanDetail?.id && "" != yearlyPlanDetail?.id) {
+          if ((yearlyPlanDetail?.id && "" != yearlyPlanDetail?.id) || draftSaved != "") {
+            yearlyPlanPayload.id = (yearlyPlanDetail?.id && yearlyPlanDetail?.id !== "") ? yearlyPlanDetail.id : draftSaved;
             yearlyPlanResp = await updateYearlyPlan(yearlyPlanPayload);
           } else {
             yearlyPlanResp = await createYearlyPlan(yearlyPlanPayload);
           }
           if (yearlyPlanResp) {
+            if (type === "createNew" && status === "draft") {
+              setDraftSaved(yearlyPlanResp?.id)
+            }
           }
         } catch (error: any) {
           throw error;
@@ -364,20 +372,20 @@ export default function CreateYearlyFormNew({
         if (plansToDelete.length > 0) {
           deletePlan({ ids: plansToDelete })
         }
-
+        isDirty.current = false;
+        setLoading(false)
         if (status === "waiting for review") {
-          messageApi.success("Yearly Plan submitted for review.");
+          await messageApi.success("Yearly Plan submitted for review.");
         } else if (status === "draft") {
-          messageApi.success("Yearly Plan saved as draft.");
+          await messageApi.success("Yearly Plan saved as draft.");
         } else if (status === "waiting for approval") {
-          messageApi.success("Yearly Plan submitted for approval.");
+          await messageApi.success("Yearly Plan submitted for approval.");
         } else if (status === "approved") {
-          messageApi.success("Yearly Plan approved successfully.");
-        } else if (status === "rejected") {
-          messageApi.success("Yearly Plan has been rejected.");
+          await messageApi.success("Yearly Plan approved successfully.");
+        } else if (status === "resent") {
+          await messageApi.success("Yearly Plan has been resent.");
         }
-
-        if (type === "myforms" && status !== "draft") {
+        if ((type === "myforms" || type === "createNew") && status !== "draft") {
           router.push("/yearly-form/my-forms");
         } else if (type === "approver") {
           router.push("/yearly-form/approver-view");
@@ -385,9 +393,6 @@ export default function CreateYearlyFormNew({
           router.push("/yearly-form/reviewer-view");
         }
       }
-
-      isDirty.current = false;
-
     } catch (error: any) {
       console.error("Error saving data:", error);
       if (error?.statusCode === 409) {
@@ -415,6 +420,7 @@ export default function CreateYearlyFormNew({
     if (!form.getFieldValue("project"))
       messageApi.error("Please select the project")
     else {
+      handleFormChange();
       setQuarterPlans((prev) => ({
         ...prev,
         [quarter]: {
@@ -424,7 +430,7 @@ export default function CreateYearlyFormNew({
           ),
         },
       }));
-    } 
+    }
   };
 
   const handleDeletePlan = (quarter: number, index: number) => {
@@ -462,7 +468,7 @@ export default function CreateYearlyFormNew({
     if (!form.getFieldValue("project"))
       messageApi.error("Please select the project")
     else {
-     checkProjectExist(form.getFieldValue("project"), loggedUser);
+      checkProjectExist(form.getFieldValue("project"), loggedUser);
       setQuarterPlans((prev) => ({
         ...prev,
         [quarter]: {
@@ -507,7 +513,7 @@ export default function CreateYearlyFormNew({
     <div>
       <CommentModal status={status} isOpen={modalVisible} onClose={() => setModalVisible(false)} onSave={handleSave} />
       {/* <h1>Yearly Planning</h1> */}
-      <Form form={form} onChange={handleFormChange} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "rejected" && yearlyPlanDetail?.status != "approved")) || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: "" }}>
+      <Form form={form} onChange={handleFormChange} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "resent" && yearlyPlanDetail?.status != "approved")) || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: "" }}>
         <Row gutter={24}>
           <Col xs={8}>
             <Form.Item
@@ -515,7 +521,7 @@ export default function CreateYearlyFormNew({
               name="project"
               rules={[{ required: true, message: "Project is required" }]}
             >
-              <Projects form={form} id={form.getFieldValue("project") ?? undefined} />
+              <Projects form={form} setLoading={setLoading} id={form.getFieldValue("project") ?? undefined} />
             </Form.Item>
           </Col>
           <Col xs={8}>
@@ -539,7 +545,7 @@ export default function CreateYearlyFormNew({
                   borderRadius: "5px"
                 }}
               >
-                Comments: <span style={{ background: yearlyPlanDetail.status === "rejected" ? "#ffccc7" : "#f0f2f5", padding: "3px 5px", borderRadius: "3px" }}>
+                Comments: <span style={{ background: yearlyPlanDetail.status === "resent" ? "#ffccc7" : "#f0f2f5", padding: "3px 5px", borderRadius: "3px" }}>
                   {yearlyPlanDetail.comments}
                 </span>
               </div>
@@ -662,10 +668,10 @@ export default function CreateYearlyFormNew({
           <Space>
             {(type === "myforms" || type === "createNew") && (
               <>
-                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected" && yearlyPlanDetail?.status !== "approved")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("draft")}>
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "resent" && yearlyPlanDetail?.status !== "approved")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("draft")}>
                   Save as Draft
                 </Button>
-                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "rejected" && yearlyPlanDetail?.status !== "approved")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("waiting for review")}>
+                <Button type="primary" disabled={(type !== "createNew" && (yearlyPlanDetail?.status !== "draft" && yearlyPlanDetail?.status !== "resent" && yearlyPlanDetail?.status !== "approved")) || false || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} onClick={() => showCommentPrompt("waiting for review")}>
                   Send for Review
                 </Button>
               </>
@@ -676,7 +682,7 @@ export default function CreateYearlyFormNew({
                 <Button type="primary" disabled={false} onClick={() => showCommentPrompt("waiting for approval")}>
                   Send for Approval
                 </Button>
-                <Button type="default" disabled={false} danger onClick={() => showCommentPrompt("rejected")}>
+                <Button type="default" disabled={false} danger onClick={() => showCommentPrompt("resent")}>
                   Resend
                 </Button>
               </>
@@ -687,8 +693,8 @@ export default function CreateYearlyFormNew({
                 <Button type="primary" disabled={false} onClick={() => showCommentPrompt("approved")}>
                   Approve
                 </Button>
-                <Button type="default" disabled={false} danger onClick={() => showCommentPrompt("rejected")}>
-                  Reject
+                <Button type="default" disabled={false} danger onClick={() => showCommentPrompt("resent")}>
+                  Resend
                 </Button>
               </>
             )}

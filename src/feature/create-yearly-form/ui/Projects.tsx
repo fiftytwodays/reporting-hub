@@ -11,17 +11,19 @@ interface Project {
 interface ProjectsProps {
   form: FormInstance;
   id: string;
+  setLoading: (loading: boolean) => void;
 }
 
-const Projects: React.FC<ProjectsProps> = ({ form, id }) => {
-  const { projectsData } = useProjectList({ condition: true, projectId: id });
+const Projects: React.FC<ProjectsProps> = ({ form, id, setLoading }) => {
+  const { projectsData, isProjectTypesDataLoading } = useProjectList({ condition: true, projectId: id });
   const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (projectsData) {
       const project = projectsData.find(project => project.id === id);
       setSelectedValue(project?.name);
     }
-  }, [projectsData, id]);
+    setLoading(isProjectTypesDataLoading)
+  }, [isProjectTypesDataLoading, projectsData, id]);
 
   if (selectedValue === undefined && id && id != "project") {
     return null; // Or you can show a loading indicator here
