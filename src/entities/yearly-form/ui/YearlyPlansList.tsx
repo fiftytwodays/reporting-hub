@@ -7,16 +7,17 @@ interface YearlyPlansListProps {
   data: YearlyPlan[];
   isLoading: boolean;
   type: string;
+  userId: string;
   handleEdit: (yearlyPlan: YearlyPlan) => void;
   handleDelete: (yearlyPlan: YearlyPlan) => void;
 }
 
-export default function YearlyPlansList({ data, isLoading, handleDelete, handleEdit, type }: YearlyPlansListProps) {
+export default function YearlyPlansList({ data, isLoading, handleDelete, handleEdit, type, userId }: YearlyPlansListProps) {
   return (
     <EntityList
       rowKey="id"
       columns={columns}
-      mapColumn={(columns): any => generateColumns(columns, handleDelete, handleEdit, type)}
+      mapColumn={(columns): any => generateColumns(columns, handleDelete, handleEdit, type, userId)}
       data={data}
       isLoading={isLoading}
 
