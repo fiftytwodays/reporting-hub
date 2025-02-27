@@ -13,8 +13,8 @@ const CommentModal: React.FC<CommentModalProps> = ({ status, isOpen, onClose, on
   const [comment, setComment] = useState<string>("");
 
   const handleSubmit = () => {
-    if (status === "rejected" && !comment.trim()) {
-      message.error("A comment is required for rejection.");
+    if (status === "resent" && !comment.trim()) {
+      message.error("A comment is required for resending.");
       return;
     }
     onSave(status, comment);
@@ -25,7 +25,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ status, isOpen, onClose, on
   return (
     <Modal
       open={isOpen}
-      title={status === "rejected" ? "Provide a Reason for Rejection" : "Add Comments (Optional)"}
+      title={status === "resent" ? "Provide a Reason for Resending" : "Add Comments (Optional)"}
       onCancel={onClose}
       onOk={handleSubmit}
       okText="Submit"
@@ -33,7 +33,7 @@ const CommentModal: React.FC<CommentModalProps> = ({ status, isOpen, onClose, on
     >
       <Input.TextArea
         rows={4}
-        placeholder={status === "rejected" ? "Please enter a reason for rejection" : "Enter comments here (optional)"}
+        placeholder={status === "resent" ? "Please enter a reason for Resending" : "Enter comments here (optional)"}
         value={comment}
         onChange={(e) => setComment(e.target.value)}
       />

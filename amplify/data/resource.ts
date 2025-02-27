@@ -209,6 +209,7 @@ const schema = a.schema({
     quarterlyPlan: a.hasMany("QuarterlyPlan", "yearlyPlanId")
   })
   .authorization((allow) => [
+    allow.authenticated().to(["read", "update"]),
     allow.owner(),
     allow.groups(["admin"]),
   ]),
@@ -223,6 +224,7 @@ const schema = a.schema({
     plan: a.hasMany("Plan", "quarterlyPlanId")
   })
   .authorization((allow) => [
+    allow.authenticated().to(["read", "update"]),
     allow.owner(),
     allow.groups(["admin"]),
   ]),
@@ -238,6 +240,7 @@ const schema = a.schema({
     isMajorGoal: a.boolean(),
   })
   .authorization((allow) => [
+    allow.authenticated().to(["read", "update"]),
     allow.owner(),
     allow.groups(["admin"]),
   ]),

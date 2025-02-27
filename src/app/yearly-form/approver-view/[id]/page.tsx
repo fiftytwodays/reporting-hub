@@ -22,7 +22,7 @@ export default  function ApproverViewDetail({
 }) {
   // const router = useRouter();
   const  id  =  params.id;
-  const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
+  const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 3 });
   const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanDetails({ condition: !!id }, id);
   return (
     <>

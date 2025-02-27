@@ -15,7 +15,7 @@ Amplify.configure(outputs);
 
 export default function MyForms() {
   const router = useRouter();
-  const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
+  const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 3 });
   return (
     <>
      {contextHolder}
@@ -35,7 +35,7 @@ export default function MyForms() {
           },
         ],
         // extra: <Button onClick={() => router.push("/yearly-form/create") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
-        extra: <Button onClick={() => router.push("/yearly-form/new-my-form") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
+        extra: <Button onClick={() => router.push("/yearly-form/new-my-form") } type="primary" icon={<PlusOutlined />} > Create Yearly Plan  </Button>,
       }}
       content={<MyFormsList type="myforms"/>}
     />
