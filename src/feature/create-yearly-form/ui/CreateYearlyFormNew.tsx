@@ -293,7 +293,7 @@ export default function CreateYearlyFormNew({
             }
           }else{
             if(status === "waiting for review")
-            throw { statusCode: 400, message: "Please add plans for all quarter" } as CustomError;
+              throw { statusCode: 400, message: "Please add plans for all quarter" } as CustomError;
           }
         }
         setLoading(true);
