@@ -292,6 +292,7 @@ export default function CreateYearlyFormNew({
                 throw { statusCode: 400, message: "Month is required" } as CustomError;
             }
           }else{
+            if(status === "waiting for review")
             throw { statusCode: 400, message: "Please add plans for all quarter" } as CustomError;
           }
         }
