@@ -1,4 +1,5 @@
 export interface YearlyPlan {
+  userId: string;
   id: string;
   project: string;
   year: string;
