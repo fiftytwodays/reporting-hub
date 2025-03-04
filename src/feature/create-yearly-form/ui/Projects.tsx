@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Select } from "antd";
 import { FormInstance } from "antd/es/form";
 import useProjectList from "../api/project-list";
+import useProjectsList from "../api/full-project-list";
 
 interface Project {
   id: string | number;
@@ -11,48 +12,62 @@ interface Project {
 interface ProjectsProps {
   form: FormInstance;
   id: string;
+  status: string | undefined;
+  type: string;
   setLoading: (loading: boolean) => void;
 }
 
-const Projects: React.FC<ProjectsProps> = ({ form, id, setLoading }) => {
-  const { projectsData, isProjectTypesDataLoading } = useProjectList({ condition: true, projectId: id });
+const Projects: React.FC<ProjectsProps> = ({ form, id, status, type, setLoading }) => {
+  const projectListData = useProjectList({
+    condition: true,
+    projectId: id,
+  });
+
+  const fullProjectListData = useProjectsList({
+    condition: true,
+  });
+
+  // Decide which data to use
+  const projectsData = (type !== "createNew" && type !== "myforms") || (type === "myforms" && (status != "draft" && status != "resent" && status != "approved")) ? fullProjectListData.projectsList : projectListData.projectsData;
+  const isProjectTypesDataLoading = (type !== "createNew" && type !== "myforms") || (type === "myforms" && (status != "draft" && status != "resent" && status != "approved")) ? fullProjectListData.isProjectsListLoading : projectListData.isProjectTypesDataLoading;
+
   const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
+
   useEffect(() => {
     if (projectsData) {
-      const project = projectsData.find(project => project.id === id);
+      const project = projectsData.find((project) => project.id === id);
       setSelectedValue(project?.name);
     }
-    setLoading(isProjectTypesDataLoading)
-  }, [isProjectTypesDataLoading, projectsData, id]);
+    setLoading(isProjectTypesDataLoading);
+  }, [isProjectTypesDataLoading, projectsData, id, setLoading]);
 
-  if (selectedValue === undefined && id && id != "project") {
-    return null; // Or you can show a loading indicator here
+  if (!selectedValue && id && id !== "project") {
+    return null; // Optionally, show a loading indicator instead
   }
 
-  const handleChange = (value: string | number ) => {
-    form.setFieldValue(
-      "project",
-      value
-    );
+  const handleChange = (value: string | number) => {
+    form.setFieldsValue({ project: value });
   };
 
-  const transformProjectsData = (data?: Project[]) => {
-    return data?.map((item) => ({
-      label: item.name, // Use "label" instead of "title" for Ant Design Select.
+  const transformProjectsData = (data?: Project[]) =>
+    data?.map((item) => ({
+      label: item.name, // Use "label" for Ant Design Select
       value: item.id,
     })) || [];
-  };
 
-  return (!isProjectTypesDataLoading && projectsData &&
-    <Select
-      showSearch
-      dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
-      allowClear
-      onChange={(value) => handleChange(value)}
-      options={transformProjectsData(projectsData)}
-      defaultValue={selectedValue}
-      optionFilterProp="label"
-    />
+  return (
+    !isProjectTypesDataLoading &&
+    projectsData && (
+      <Select
+        showSearch
+        dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
+        allowClear
+        onChange={handleChange}
+        options={transformProjectsData(projectsData)}
+        value={selectedValue} // Changed from defaultValue to value
+        optionFilterProp="label"
+      />
+    )
   );
 };
 

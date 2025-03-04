@@ -162,7 +162,9 @@ export default function CreateYearlyFormNew({
     return 4;
   };
   useEffect(() => {
+    if (!id) {
     setUserDetails();
+    }
     if (id && yearlyPlanDetail) {
       setProjectFacilitator(yearlyPlanDetail.user);
       form.setFieldsValue({
@@ -523,7 +525,7 @@ export default function CreateYearlyFormNew({
               name="project"
               rules={[{ required: true, message: "Project is required" }]}
             >
-              <Projects form={form} setLoading={setLoading} id={form.getFieldValue("project") ?? undefined} />
+              <Projects form={form} status={yearlyPlanDetail?.status} type={type} setLoading={setLoading} id={form.getFieldValue("project") ?? undefined} />
             </Form.Item>
           </Col>
           <Col xs={8}>
