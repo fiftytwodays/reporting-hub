@@ -7,13 +7,14 @@ import type { MenuProps } from "antd";
 import useUserGroupList from "@/entities/user/api/user-group-list";
 
 import { Avatar, Button, Dropdown, Layout, Menu, Spin, Typography } from "antd";
-import { getCurrentUser, signOut } from "aws-amplify/auth";
+import { fetchUserAttributes, getCurrentUser, signOut } from "aws-amplify/auth";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import useSWR, { mutate } from "swr";
 import { Content, Footer, Header } from "antd/lib/layout/layout";
 import { UserGroup } from "@/entities/user/config/types";
 import { fetchAuthSession } from "aws-amplify/auth";
+import { useEffect, useState } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -154,6 +155,27 @@ const useMenuItems: MenuProps["items"] = [
 ];
 
 const AppLayout = ({ children }: LayoutProps) => {
+  const [userDetails, setUserDetails] = useState({
+    givenName: "",
+    familyName: "",
+  });
+  useEffect(() => {
+    const getUserDetails = async () => {
+      try {
+        const attributes = await fetchUserAttributes();
+        setUserDetails({
+          givenName: attributes.given_name || "",
+          familyName: attributes.family_name || "",
+        });
+        console.log("the attributes are ", attributes);
+      } catch (error) {
+        console.error("Error fetching user attributes:", error);
+      }
+    };
+
+    getUserDetails();
+  }, []);
+
   const router = useRouter();
   const pathname = usePathname();
   const menuName = pathname?.split("/")[1];
@@ -162,10 +184,7 @@ const AppLayout = ({ children }: LayoutProps) => {
     userName: userData?.signInDetails?.loginId,
   });
 
-  // const abc = fetchAuthSession();
-
   const groupNames = userGroupList.map((group: UserGroup) => group.GroupName);
-
   const getMenuItems = () => {
     const updatedItems = [...defaultItems];
 
@@ -253,7 +272,17 @@ const AppLayout = ({ children }: LayoutProps) => {
                 </Button>
               </Dropdown>
             </Header>
-            <Content style={layoutStyle}>{children}</Content>
+            <Content style={layoutStyle}>
+              {pathname === "/" ? (
+                <div style={{ padding: "2rem" }}>
+                  <Title level={2}>
+                    Welcome back, {userDetails.givenName} {userDetails.familyName}!
+                  </Title>
+                </div>
+              ) : (
+                children
+              )}
+            </Content>
             <Footer style={{ textAlign: "center" }}>
               Reporting hub ©{new Date().getFullYear()} Created by Fiftytwodays
             </Footer>
