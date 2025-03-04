@@ -164,6 +164,7 @@ export default function CreateYearlyFormNew({
   useEffect(() => {
     setUserDetails();
     if (id && yearlyPlanDetail) {
+      setProjectFacilitator(yearlyPlanDetail.user);
       form.setFieldsValue({
         year: yearlyPlanDetail.year,
         project: yearlyPlanDetail.projectId,
