@@ -43,7 +43,7 @@ const Projects: React.FC<ProjectsProps> = ({ form, id, setLoading }) => {
     })) || [];
   };
 
-  return (projectsData &&
+  return (!isProjectTypesDataLoading && projectsData &&
     <Select
       showSearch
       dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
