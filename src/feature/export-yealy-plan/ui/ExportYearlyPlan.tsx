@@ -1,8 +1,10 @@
 import * as docx from "docx";
-import React, { useState } from "react";
-import { saveAs } from "file-saver"; // Optional, for browser download
+import React from "react";
+import { saveAs } from "file-saver";
 import { Project } from "@/entities/project/config/types";
-import useProjectsDetails from "../api/project-details";
+import { Button } from "antd";
+import { VerticalAlignBottomOutlined } from "@ant-design/icons";
+import useFunctionalAreasList from "@/entities/functional-area/api/functional-areas-list";
 
 const {
   Document,
@@ -13,6 +15,8 @@ const {
   TableCell,
   TextRun,
   HeadingLevel,
+  AlignmentType,
+  WidthType,
 } = docx;
 
 interface PlanDetails {
@@ -50,37 +54,36 @@ interface YearlyPlanDetails {
 
 interface YearlyPlanExporterProps {
   yearlyPlanDetails: YearlyPlanDetails | undefined;
+  projectDetails: Project | undefined;
 }
 
 const YearlyPlanExporter: React.FC<YearlyPlanExporterProps> = ({
   yearlyPlanDetails,
+  projectDetails,
 }) => {
   if (!yearlyPlanDetails) {
     return <div>No plan details available.</div>; // Handle the case where data is undefined
   }
 
-  const { projectsList, isProjectsListLoading } = useProjectsDetails({
-    condition: true,
-    projectId: yearlyPlanDetails.projectId ?? "",
-  });
+  const { functionalAreasList } = useFunctionalAreasList({ condition: true });
 
   const { user, year, quarterlyPlans, comments } = yearlyPlanDetails;
 
-  const projectName = projectsList?.name; // Set default if projectId is undefined
-  const projectLocation = projectsList?.location; // Placeholder
+  const projectName = projectDetails?.name; // Set default if projectId is undefined
+  const projectLocation = projectDetails?.location; // Placeholder
   const projectFacilitator = user || ""; // Placeholder
 
   // Helper function to map quarter to human-readable format
   const getQuarterTitle = (quarter: number): string => {
     switch (quarter) {
       case 1:
-        return `Jan-Mar ${new Date().getFullYear()}`;
-      case 2:
         return `Apr-Jun ${new Date().getFullYear()}`;
-      case 3:
+      case 2:
         return `Jul-Sep ${new Date().getFullYear()}`;
-      case 4:
+      case 3:
         return `Oct-Dec ${new Date().getFullYear()}`;
+      case 4:
+        return `Jan-Mar ${new Date().getFullYear()}`;
       default:
         return `Quarter ${quarter}`;
     }
@@ -89,50 +92,87 @@ const YearlyPlanExporter: React.FC<YearlyPlanExporterProps> = ({
   // Function to generate the Plan Table for each quarter
   const generatePlanTable = (plans: PlanDetails[]) => {
     const rows = plans.map((plan) => {
+      const functionalArea = functionalAreasList.find(
+        (area) => area.id === plan.functionalAreaId
+      );
       return new TableRow({
         children: [
           new TableCell({
-            children: [new Paragraph(plan.activity)],
+            children: [new Paragraph(plan.activity || "No activity")],
+            width: { size: 25, type: WidthType.PERCENTAGE },
           }),
           new TableCell({
-            children: [new Paragraph(plan.month.join(", "))],
+            children: [new Paragraph(plan.month.join(", ") || "No months")],
+            width: { size: 25, type: WidthType.PERCENTAGE },
           }),
           new TableCell({
-            children: [new Paragraph(plan.functionalAreaId)],
+            children: [
+              new Paragraph(functionalArea?.name || "No functional area"),
+            ],
+            width: { size: 25, type: WidthType.PERCENTAGE },
           }),
           new TableCell({
             children: [new Paragraph(plan.isMajorGoal ? "Yes" : "No")],
+            width: { size: 10, type: WidthType.PERCENTAGE },
           }),
           new TableCell({
             children: [new Paragraph(plan.comments || "No comments")],
+            width: { size: 15, type: WidthType.PERCENTAGE },
           }),
         ],
       });
     });
 
-    return new Table({
-      rows: [
-        new TableRow({
+    // The table header needs to be created separately with bold text
+    const headerRow = new TableRow({
+      children: [
+        new TableCell({
           children: [
-            new TableCell({
-              children: [new Paragraph("Activity")],
-            }),
-            new TableCell({
-              children: [new Paragraph("Months")],
-            }),
-            new TableCell({
-              children: [new Paragraph("Functional Area ID")],
-            }),
-            new TableCell({
-              children: [new Paragraph("Major Goal")],
-            }),
-            new TableCell({
-              children: [new Paragraph("Comments")],
+            new Paragraph({
+              children: [new TextRun({ text: "Activity", bold: true })],
             }),
           ],
+          width: { size: 25, type: WidthType.PERCENTAGE },
         }),
-        ...rows,
+        new TableCell({
+          children: [
+            new Paragraph({
+              children: [new TextRun({ text: "Months", bold: true })],
+            }),
+          ],
+          width: { size: 25, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              children: [new TextRun({ text: "Functional area", bold: true })],
+            }),
+          ],
+          width: { size: 25, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              children: [new TextRun({ text: "Major goal", bold: true })],
+            }),
+          ],
+          width: { size: 10, type: WidthType.PERCENTAGE },
+        }),
+        new TableCell({
+          children: [
+            new Paragraph({
+              children: [new TextRun({ text: "Comments", bold: true })],
+            }),
+          ],
+          width: { size: 15, type: WidthType.PERCENTAGE },
+        }),
       ],
+    });
+
+    // Return the full table with the header row and data rows
+    return new Table({
+      rows: [headerRow, ...rows],
+      width: { size: 100, type: WidthType.PERCENTAGE },
     });
   };
 
@@ -145,22 +185,53 @@ const YearlyPlanExporter: React.FC<YearlyPlanExporterProps> = ({
             new Paragraph({
               text: `${projectName} Yearly Plan`,
               heading: HeadingLevel.HEADING_1,
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 150, after: 150 },
             }),
             new Paragraph({
               text: "Project Details",
               heading: HeadingLevel.HEADING_2,
+              spacing: { before: 100, after: 100 },
             }),
             new Paragraph({
-              text: `Project Name: ${projectName}`,
+              children: [
+                new TextRun({
+                  text: "Project Name: ",
+                  bold: true,
+                }),
+                new TextRun(projectName || "No project name"),
+              ],
+              spacing: { after: 50 },
             }),
             new Paragraph({
-              text: `Project Location: ${projectLocation}`,
+              children: [
+                new TextRun({
+                  text: "Project Location: ",
+                  bold: true,
+                }),
+                new TextRun(projectLocation || "No location provided"),
+              ],
+              spacing: { after: 50 },
             }),
             new Paragraph({
-              text: `Project Facilitator: ${projectFacilitator}`,
+              children: [
+                new TextRun({
+                  text: "Project Facilitator: ",
+                  bold: true,
+                }),
+                new TextRun(projectFacilitator),
+              ],
+              spacing: { after: 50 },
             }),
             new Paragraph({
-              text: `Plan Year: ${year}`,
+              children: [
+                new TextRun({
+                  text: "Plan Year: ",
+                  bold: true,
+                }),
+                new TextRun(year || "No year provided"),
+              ],
+              spacing: { after: 50 },
             }),
 
             // Loop through each quarter and create the sections
@@ -173,6 +244,7 @@ const YearlyPlanExporter: React.FC<YearlyPlanExporterProps> = ({
                   new Paragraph({
                     text: quarterTitle,
                     heading: HeadingLevel.HEADING_2,
+                    alignment: "center",
                   }),
                   planTable,
                 ];
@@ -198,12 +270,13 @@ const YearlyPlanExporter: React.FC<YearlyPlanExporterProps> = ({
   };
 
   return (
-    <div>
-      <h1>Export Yearly Plan</h1>
-      <p>Project: {projectName}</p>
-      <p>Year: {year}</p>
-      <button onClick={generateYearlyPlanDoc}>Export Yearly Plan</button>
-    </div>
+    <Button
+      type="primary"
+      icon={<VerticalAlignBottomOutlined />}
+      onClick={() => generateYearlyPlanDoc()}
+    >
+      Export yearly plan
+    </Button>
   );
 };
 

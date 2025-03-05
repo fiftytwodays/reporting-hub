@@ -2,7 +2,7 @@ import useSWR, { mutate } from "swr";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
 
-import type { Project } from "../../../entities/project/config/types";
+import type { Project } from "../config/types";
 import { useState } from "react";
 
 interface FetchOptions {
@@ -14,7 +14,7 @@ interface ApiResponse {
   Projects: Project;
 }
 
-export default function useProjectsDetails({
+export default function useProjectDetail({
   condition = true,
   projectId,
 }: FetchOptions) {
@@ -44,7 +44,7 @@ export default function useProjectsDetails({
   };
 
   const { data, isLoading, error } = useSWR(
-    condition ? ["api/projects"] : null,
+    condition ? [`api/projects/${projectId}`] : null,
     fetcher,
     {
       keepPreviousData: true,
@@ -55,7 +55,7 @@ export default function useProjectsDetails({
     mutate(
       (keys) =>
         Array.isArray(keys) &&
-        keys.some((item) => item.startsWith("api/projects")),
+        keys.some((item) => item.startsWith(`api/projects/${projectId}`)),
       undefined,
       {
         revalidate: true,
@@ -65,9 +65,8 @@ export default function useProjectsDetails({
 
   const projectData = data?.Projects;
   return {
-    projectsList: projectData,
+    projectData: projectData,
     isProjectsListLoading: isLoading,
     isProjectsListError: error,
-    reloadProjectList,
   };
 }

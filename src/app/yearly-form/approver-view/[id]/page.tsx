@@ -13,60 +13,126 @@ import { PlusOutlined } from "@ant-design/icons";
 
 import outputs from "@root/amplify_outputs.json";
 import useYearlyPlanDetails from "@/entities/yearly-form/api/yearlyplan-details";
+import { ExportYearlyPlan } from "@/feature/export-yealy-plan";
+import useProjectDetail from "@/entities/project/api/project-details";
+import { useState } from "react";
 Amplify.configure(outputs);
 
-export default  function ApproverViewDetail({
+interface PlanDetails {
+  id: string;
+  quarterlyPlanId: string;
+  activity: string;
+  month: string[];
+  functionalAreaId: string;
+  department?: string;
+  comments?: string;
+  isMajorGoal: boolean;
+}
+
+interface QuarterlyPlanDetails {
+  id: string;
+  yearlyPlanId: string;
+  status?: string;
+  reviewedBy?: string;
+  approvedBy?: string;
+  plans: PlanDetails[];
+}
+
+interface YearlyPlanDetails {
+  id: string;
+  user: string;
+  userId: string;
+  projectId?: string;
+  comments?: string;
+  status?: string;
+  year?: string;
+  reviewedBy?: string;
+  approvedBy?: string;
+  quarterlyPlans: Record<number, QuarterlyPlanDetails>; // Change: Key is quarter number
+}
+
+export default function ApproverViewDetail({
   params,
 }: {
-  params: { id: string }
+  params: { id: string };
 }) {
+  const [yearlyPlanDetails, setyearlyPlanDetails] =
+    useState<YearlyPlanDetails>();
   // const router = useRouter();
-  const  id  =  params.id;
-  const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 3 });
-  const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanDetails({ condition: !!id }, id);
+  const id = params.id;
+  const [messageApi, contextHolder] = message.useMessage({
+    maxCount: 1,
+    duration: 3,
+  });
+  const {
+    yearlyPlanDetail,
+    isYearlyPlanDetailLoading,
+    isYearlyPlanDetailError,
+  } = useYearlyPlanDetails({ condition: !!id }, id);
+
+  const { projectData, isProjectsListLoading } = useProjectDetail({
+    condition: !!id && !!yearlyPlanDetails?.projectId, // Only call when id and projectId are available
+    projectId: yearlyPlanDetails?.projectId ?? "",
+  });
+
   return (
     <>
-     {contextHolder}
-    <Page
-    showPageHeader
-      header={{
-        title: `${yearlyPlanDetail?.projectName + " [" + yearlyPlanDetail?.year + "]"}`,
-        breadcrumbs: [
-          {
-            title: "Home",
-            href: "/",
-          },
-
-          {
-            title: "Yearly Plans",
-            href: "/yearly-form/approver-view",
-            menu: {
-              items: [
-                {
-                  key: '/yearly-form/my-forms',
-                  label: 'My Yearly Plans',
-                },
-              {
-                key: '/yearly-form/reviewer-view',
-                label: 'Reviewer view',
-              },
-              {
-                key: '/yearly-form/approver-view',
-                label: 'Approver view',
-              },
-            ]
+      {contextHolder}
+      <Page
+        showPageHeader
+        header={{
+          title: `${
+            yearlyPlanDetail?.projectName + " [" + yearlyPlanDetail?.year + "]"
+          }`,
+          breadcrumbs: [
+            {
+              title: "Home",
+              href: "/",
             },
-          },
-          {
-            title: "Approver view",
-            href: "/yearly-form/approver-view",
-          },
-        ],
-        // extra: <Button onClick={() => router.push("/yearly-form/create") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
-        // extra: <Button onClick={() => router.push("/yearly-form/new-my-form") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
-      }}
-      content={<CreateYearlyFormNew id={id} messageApi={messageApi} type="approver"/> }
-    />
+
+            {
+              title: "Yearly Plans",
+              href: "/yearly-form/approver-view",
+              menu: {
+                items: [
+                  {
+                    key: "/yearly-form/my-forms",
+                    label: "My Yearly Plans",
+                  },
+                  {
+                    key: "/yearly-form/reviewer-view",
+                    label: "Reviewer view",
+                  },
+                  {
+                    key: "/yearly-form/approver-view",
+                    label: "Approver view",
+                  },
+                ],
+              },
+            },
+            {
+              title: "Approver view",
+              href: "/yearly-form/approver-view",
+            },
+          ],
+          extra: (
+            <ExportYearlyPlan
+              yearlyPlanDetails={yearlyPlanDetails}
+              projectDetails={projectData}
+            />
+          ),
+          // extra: <Button onClick={() => router.push("/yearly-form/create") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
+          // extra: <Button onClick={() => router.push("/yearly-form/new-my-form") } type="primary" icon={<PlusOutlined />} > Create Yearly Form  </Button>,
+        }}
+        content={
+          <CreateYearlyFormNew
+            setyearlyPlanDetails={setyearlyPlanDetails}
+            id={id}
+            messageApi={messageApi}
+            type="approver"
+          />
+        }
+      />
     </>
   );
 }
