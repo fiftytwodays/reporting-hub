@@ -21,6 +21,7 @@ import CommentModal from "@/shared/ui/comment/CommentModal";
 import { AuthUser } from "aws-amplify/auth";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
+import { ExportYearlyPlan } from "@/feature/export-yealy-plan";
 
 
 const { Panel } = Collapse;
@@ -153,6 +154,8 @@ export default function CreateYearlyFormNew({
   ];
 
   const { yearlyPlanDetail, isYearlyPlanDetailLoading, isYearlyPlanDetailError } = useYearlyPlanFullDetails({ condition: !!id }, id);
+  console.log("yearly plan full detail ",yearlyPlanDetail);
+  
   const getFutureQuarter = () => {
     const month = new Date().getMonth() + 1;
 
@@ -515,6 +518,7 @@ export default function CreateYearlyFormNew({
 
   return (
     <div>
+      <ExportYearlyPlan yearlyPlanDetails = {yearlyPlanDetail}/>
       <CommentModal status={status} isOpen={modalVisible} onClose={() => setModalVisible(false)} onSave={handleSave} />
       {/* <h1>Yearly Planning</h1> */}
       <Form form={form} onChange={handleFormChange} layout="horizontal" disabled={(type !== "createNew" && type !== "myforms") || (type === "myforms" && (yearlyPlanDetail?.status != "draft" && yearlyPlanDetail?.status != "resent" && yearlyPlanDetail?.status != "approved")) || (yearlyPlanDetail?.userId ? yearlyPlanDetail.userId !== loggedUser : false)} initialValues={{ year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`, project: "" }}>
