@@ -7,7 +7,12 @@ import type { MenuProps } from "antd";
 import useUserGroupList from "@/entities/user/api/user-group-list";
 
 import { Avatar, Button, Dropdown, Layout, Menu, Spin, Typography } from "antd";
-import { fetchUserAttributes, getCurrentUser, signOut } from "aws-amplify/auth";
+import {
+  fetchUserAttributes,
+  FetchUserAttributesOutput,
+  getCurrentUser,
+  signOut,
+} from "aws-amplify/auth";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import useSWR, { mutate } from "swr";
@@ -155,36 +160,42 @@ const useMenuItems: MenuProps["items"] = [
 ];
 
 const AppLayout = ({ children }: LayoutProps) => {
-  const [userDetails, setUserDetails] = useState({
-    givenName: "",
-    familyName: "",
-  });
-  useEffect(() => {
-    const getUserDetails = async () => {
-      try {
-        const attributes = await fetchUserAttributes();
-        setUserDetails({
-          givenName: attributes.given_name || "",
-          familyName: attributes.family_name || "",
-        });
-        console.log("the attributes are ", attributes);
-      } catch (error) {
-        console.error("Error fetching user attributes:", error);
-      }
-    };
-
-    getUserDetails();
-  }, []);
-
   const router = useRouter();
   const pathname = usePathname();
   const menuName = pathname?.split("/")[1];
-  const { data: userData } = useSWR(["user-details"], getCurrentUser);
+
+  const { data: userData, error: userError } = useSWR(["user-details"], getCurrentUser);
+  
+  // State to store user attributes
+  const [attributes, setAttributes] = useState<FetchUserAttributesOutput | null>(null);
+  const [loadingAttributes, setLoadingAttributes] = useState<boolean>(false);
+  
   const { userGroupList, isUserGroupListLoading } = useUserGroupList({
     userName: userData?.signInDetails?.loginId,
   });
 
   const groupNames = userGroupList.map((group: UserGroup) => group.GroupName);
+
+  // Check if the user is logged in and fetch attributes if necessary
+  useEffect(() => {
+    if (userData) {
+      const fetchAttributes = async () => {
+        try {
+          setLoadingAttributes(true);
+          const userAttributes = await fetchUserAttributes();
+          setAttributes(userAttributes);
+        } catch (error) {
+          console.error("Error fetching user attributes", error);
+        } finally {
+          setLoadingAttributes(false);
+        }
+      };
+      fetchAttributes();
+    }
+  }, [userData]);  // Trigger when userData changes
+
+  const isLoading = isUserGroupListLoading || !userData || loadingAttributes || userError;
+
   const getMenuItems = () => {
     const updatedItems = [...defaultItems];
 
@@ -230,10 +241,10 @@ const AppLayout = ({ children }: LayoutProps) => {
   return (
     <>
       <Authenticator hideSignUp={true}>
-        {(!groupNames || groupNames.length == 0) && (
+        {isLoading && (
           <Spin tip="Loading, please wait" size="large" spinning fullscreen />
         )}
-        {!(groupNames.length == 0) && (
+        {!isLoading && (
           <Layout style={{ minHeight: "100vh" }}>
             <Header
               style={{
@@ -276,7 +287,8 @@ const AppLayout = ({ children }: LayoutProps) => {
               {pathname === "/" ? (
                 <div style={{ padding: "2rem" }}>
                   <Title level={2}>
-                    Welcome back, {userDetails.givenName} {userDetails.familyName}!
+                    Welcome back, {attributes?.given_name ?? ""}{" "}
+                    {attributes?.family_name ?? ""}!
                   </Title>
                 </div>
               ) : (
