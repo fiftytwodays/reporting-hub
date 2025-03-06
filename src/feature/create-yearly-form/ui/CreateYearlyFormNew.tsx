@@ -194,9 +194,11 @@ export default function CreateYearlyFormNew({
   useEffect(() => {
     if (!id) {
       setUserDetails();
+      setLoggedUserDetails();
     }
     if (id && yearlyPlanDetail) {
       setProjectFacilitator(yearlyPlanDetail.user);
+      setLoggedUserDetails();
       form.setFieldsValue({
         year: yearlyPlanDetail.year,
         project: yearlyPlanDetail.projectId,
@@ -310,6 +312,8 @@ export default function CreateYearlyFormNew({
     setProjectFacilitator(
       attributes["given_name"] + " " + attributes["family_name"]
     );
+  };
+  const setLoggedUserDetails = async () => {
     const { username, userId, signInDetails } = await getCurrentUser();
     setLoggedUser(userId);
   };
@@ -786,10 +790,21 @@ export default function CreateYearlyFormNew({
                       onClick={() => handleDeletePlan(quarter.key, index)}
                       style={{ marginLeft: 16 }}
                     > */}
-                        <DeleteTwoTone
-                          onClick={() => handleDeletePlan(quarter.key, index)}
-                          twoToneColor="#FF0000"
-                        />
+                        {(type !== "createNew" && type !== "myforms") ||
+                          (type === "myforms" &&
+                            yearlyPlanDetail?.status != "draft" &&
+                            yearlyPlanDetail?.status != "resent" &&
+                            yearlyPlanDetail?.status != "approved") ||
+                          ((yearlyPlanDetail?.userId
+                            ? yearlyPlanDetail.userId !== loggedUser
+                            : false) && (
+                            <DeleteTwoTone
+                              onClick={() =>
+                                handleDeletePlan(quarter.key, index)
+                              }
+                              twoToneColor="#FF0000"
+                            />
+                          ))}
                         {/* </Button> */}
                       </Col>
                     </Row>
