@@ -4,3 +4,12 @@ html,
 body {
   margin: 0;
 }
+
+/* Custom CSS for disabled form */
+.ant-input-disabled,
+.ant-select-selector,
+.ant-select-selection-item,
+.ant-checkbox-wrapper,
+.ant-radio-wrapper {
+  color: black !important; /* Set the color to black */
+}
