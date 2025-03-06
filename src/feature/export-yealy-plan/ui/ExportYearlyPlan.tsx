@@ -77,13 +77,13 @@ const YearlyPlanExporter: React.FC<YearlyPlanExporterProps> = ({
   const getQuarterTitle = (quarter: number): string => {
     switch (quarter) {
       case 1:
-        return `Apr-Jun ${new Date().getFullYear()}`;
+        return `Apr-Jun ${year?.split("-")[0]}`;
       case 2:
-        return `Jul-Sep ${new Date().getFullYear()}`;
+        return `Jul-Sep ${year?.split("-")[0]}`;
       case 3:
-        return `Oct-Dec ${new Date().getFullYear()}`;
+        return `Oct-Dec ${year?.split("-")[0]}`;
       case 4:
-        return `Jan-Mar ${new Date().getFullYear()}`;
+        return `Jan-Mar ${year?.split("-")[1]}`;
       default:
         return `Quarter ${quarter}`;
     }
