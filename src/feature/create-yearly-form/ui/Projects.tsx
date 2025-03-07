@@ -12,12 +12,16 @@ interface Project {
 interface ProjectsProps {
   form: FormInstance;
   id: string;
-  status: string | undefined;
-  type: string;
+  fetchAll: boolean;
   setLoading: (loading: boolean) => void;
 }
 
-const Projects: React.FC<ProjectsProps> = ({ form, id, status, type, setLoading }) => {
+const Projects: React.FC<ProjectsProps> = ({
+  form,
+  id,
+  fetchAll,
+  setLoading,
+}) => {
   const projectListData = useProjectList({
     condition: true,
     projectId: id,
@@ -28,10 +32,16 @@ const Projects: React.FC<ProjectsProps> = ({ form, id, status, type, setLoading 
   });
 
   // Decide which data to use
-  const projectsData = (type !== "createNew" && type !== "myforms") || (type === "myforms" && (status != "draft" && status != "resent" && status != "approved")) ? fullProjectListData.projectsList : projectListData.projectsData;
-  const isProjectTypesDataLoading = (type !== "createNew" && type !== "myforms") || (type === "myforms" && (status != "draft" && status != "resent" && status != "approved")) ? fullProjectListData.isProjectsListLoading : projectListData.isProjectTypesDataLoading;
+  const projectsData = fetchAll
+    ? fullProjectListData.projectsList
+    : projectListData.projectsData;
+  const isProjectTypesDataLoading = fetchAll
+    ? fullProjectListData.isProjectsListLoading
+    : projectListData.isProjectTypesDataLoading;
 
-  const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     if (projectsData) {
