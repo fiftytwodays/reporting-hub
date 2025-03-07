@@ -239,6 +239,7 @@ const schema = a.schema({
     comments: a.string(),
     isMajorGoal: a.boolean(),
   })
+  .secondaryIndexes((index)=>[index("quarterlyPlanId")])
   .authorization((allow) => [
     allow.authenticated().to(["read", "update"]),
     allow.owner(),

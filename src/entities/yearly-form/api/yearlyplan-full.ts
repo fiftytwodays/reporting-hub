@@ -86,8 +86,12 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
             };
 
             // Fetch Plans for each Quarterly Plan
-            const plans = await client.models.Plan.list({
-              filter: { quarterlyPlanId: { eq: quarterlyPlan.id } },
+            // quarterlyPlanId
+            // const plans = await client.models.Plan.list({
+            //   filter: { quarterlyPlanId: { eq: quarterlyPlan.id } },
+            // });
+            const plans = await client.models.Plan.listPlanByQuarterlyPlanId({
+              quarterlyPlanId: quarterlyPlan.id ,
             });
             const sortedPlans = plans?.data.sort((a: any, b: any) => (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()));
 
