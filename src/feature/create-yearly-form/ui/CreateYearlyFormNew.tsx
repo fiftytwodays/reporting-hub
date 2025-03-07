@@ -192,8 +192,12 @@ export default function CreateYearlyFormNew({
     return 4;
   };
   useEffect(() => {
-    setUserDetails();
+    if (!id) {
+      setUserDetails();
+      setLoggedUserDetails();
+    }
     if (id && yearlyPlanDetail) {
+      setLoggedUserDetails();
       setProjectFacilitator(yearlyPlanDetail.user);
       form.setFieldsValue({
         year: yearlyPlanDetail.year,
@@ -308,7 +312,9 @@ export default function CreateYearlyFormNew({
     setProjectFacilitator(
       attributes["given_name"] + " " + attributes["family_name"]
     );
+  };
 
+  const setLoggedUserDetails = async () => {
     const { username, userId, signInDetails } = await getCurrentUser();
     setLoggedUser(userId);
   };
@@ -610,8 +616,16 @@ export default function CreateYearlyFormNew({
             >
               <Projects
                 form={form}
-                status={yearlyPlanDetail?.status}
-                type={type}
+                fetchAll={
+                  (type !== "createNew" && type !== "myforms") ||
+                  (type === "myforms" &&
+                    yearlyPlanDetail?.status != "draft" &&
+                    yearlyPlanDetail?.status != "resent" &&
+                    yearlyPlanDetail?.status != "approved") ||
+                  (yearlyPlanDetail?.userId
+                    ? yearlyPlanDetail.userId !== loggedUser
+                    : false)
+                }
                 setLoading={setLoading}
                 id={form.getFieldValue("project") ?? undefined}
               />
