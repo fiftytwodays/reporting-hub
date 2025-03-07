@@ -223,6 +223,7 @@ const schema = a.schema({
     approvedBy: a.string(),
     plan: a.hasMany("Plan", "quarterlyPlanId")
   })
+  .secondaryIndexes((index)=>[index("yearlyPlanId")])
   .authorization((allow) => [
     allow.authenticated().to(["read", "update"]),
     allow.owner(),
