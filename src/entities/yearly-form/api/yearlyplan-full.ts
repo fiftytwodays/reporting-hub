@@ -69,8 +69,11 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
       };
 
       // Fetch Quarterly Plans
-      const quarterlyPlans = await client.models.QuarterlyPlan.list({
-        filter: { yearlyPlanId: { eq: id } },
+      // const quarterlyPlans = await client.models.QuarterlyPlan.list({
+      //   filter: { yearlyPlanId: { eq: id } },
+      // });
+      const quarterlyPlans = await client.models.QuarterlyPlan.listQuarterlyPlanByYearlyPlanId({
+         yearlyPlanId:  id ,
       });
 
       yearlyPlanDetails.quarterlyPlans = Object.fromEntries(
