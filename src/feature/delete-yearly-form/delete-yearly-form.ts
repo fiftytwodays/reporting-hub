@@ -15,6 +15,18 @@ export default function useDeleteYearlyForm() {
 
   const deleteYearlyForm = async (key: string, { arg }: { arg: DeleteYearlyFormInput }) => {
 
+    const quarterlyPlans = await client.models.QuarterlyPlan.listQuarterlyPlanByYearlyPlanId({yearlyPlanId: arg.id});
+    if(quarterlyPlans?.data?.length){
+      for (const quarterlyPlan of quarterlyPlans.data) {
+        const plans = await client.models.Plan.listPlanByQuarterlyPlanId({quarterlyPlanId: quarterlyPlan.id});
+        if(plans?.data?.length){
+          for (const plan of plans.data) {
+            await client.models.Plan.delete({id: plan.id});
+          }
+        }
+        await client.models.QuarterlyPlan.delete({id: quarterlyPlan.id});
+      }
+    }
     const response = await client.models.YearlyPlan.delete({id: arg.id});
 
     if (response?.data) {

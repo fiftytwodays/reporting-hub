@@ -133,7 +133,9 @@ export default function CreateYearlyFormNew({
   const [originalPush, setOriginalPush] = useState<
     ((href: string) => void) | null
   >(null);
-  const [draftSaved, setDraftSaved] = useState("");
+  // const [draftSaved, setDraftSaved] = useState("");
+  const [draftSaved, setDraftSaved] = useState<string | undefined>(undefined);
+
 
   const monthsArray = [
     "April",
@@ -173,11 +175,12 @@ export default function CreateYearlyFormNew({
     },
   ];
 
+  const resolvedId = id || draftSaved;
   const {
     yearlyPlanDetail,
     isYearlyPlanDetailLoading,
     isYearlyPlanDetailError,
-  } = useYearlyPlanFullDetails({ condition: !!id }, id);
+  } = useYearlyPlanFullDetails({ condition: !!resolvedId }, resolvedId);
 
   if (yearlyPlanDetail && setyearlyPlanDetails) {
     setyearlyPlanDetails(yearlyPlanDetail);
@@ -196,7 +199,7 @@ export default function CreateYearlyFormNew({
       setUserDetails();
       setLoggedUserDetails();
     }
-    if (id && yearlyPlanDetail) {
+    if ((id || draftSaved) && yearlyPlanDetail) {
       setLoggedUserDetails();
       setProjectFacilitator(yearlyPlanDetail.user);
       form.setFieldsValue({
@@ -371,7 +374,7 @@ export default function CreateYearlyFormNew({
         try {
           if (
             (yearlyPlanDetail?.id && "" != yearlyPlanDetail?.id) ||
-            draftSaved != ""
+            (draftSaved != "" && draftSaved != undefined)
           ) {
             yearlyPlanPayload.id =
               yearlyPlanDetail?.id && yearlyPlanDetail?.id !== ""
@@ -568,7 +571,7 @@ export default function CreateYearlyFormNew({
         and: [{ projectId: { eq: projectId } }, { userId: { eq: userId } }],
       },
     });
-    if (existingPlan?.data.length > 0 && !yearlyPlanDetail && !id) {
+    if (existingPlan?.data.length > 0 && !yearlyPlanDetail && !id && !draftSaved) {
       messageApi.error("The yearly plan for this project already exist");
       // throw { statusCode: 409, message: "The yearly plan for this project already exist" } as CustomError;
     }
