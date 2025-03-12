@@ -200,7 +200,7 @@ export default function CreateYearlyFormNew({
       setLoggedUserDetails();
     }
     if ((id || draftSaved) && yearlyPlanDetail) {
-      // console.log("yearlyPlanDetail inside useEffect", yearlyPlanDetail);
+      console.log("yearlyPlanDetail inside useEffect", yearlyPlanDetail);
       setLoggedUserDetails();
       setProjectFacilitator(yearlyPlanDetail.user);
       form.setFieldsValue({
@@ -394,26 +394,27 @@ export default function CreateYearlyFormNew({
           for (const quarter of [1, 2, 3, 4]) {
             const quarterlyPlanData = quarterPlans[quarter];
 
-            if (quarterlyPlanData) {
-              const quarterlyPlanPayload = {
-                id: quarterlyPlanData.id || undefined,
-                yearlyPlanId: yearlyPlanResp.id,
-                quarter: quarter,
-                status: status,
-                ...(quarterlyPlanData?.id &&
-                  quarterlyPlanData?.id !== "" && { id: quarterlyPlanData.id }),
-              };
+            const quarterlyPlanPayload = {
+              // id: quarterlyPlanData.id || undefined,
+              yearlyPlanId: yearlyPlanResp.id,
+              quarter: quarter,
+              status: status,
+              ...(quarterlyPlanData?.id &&
+                quarterlyPlanData?.id !== "" && { id: quarterlyPlanData.id }),
+            };
 
-              let quarterPlanResp;
-              if (quarterlyPlanData.id) {
-                quarterPlanResp = await updateQuarterlyPlan(
-                  quarterlyPlanPayload
-                );
-              } else {
-                quarterPlanResp = await createQuarterlyPlan(
-                  quarterlyPlanPayload
-                );
-              }
+            let quarterPlanResp;
+            if (quarterlyPlanData?.id) {
+              quarterPlanResp = await updateQuarterlyPlan(
+                quarterlyPlanPayload
+              );
+            } else {
+              quarterPlanResp = await createQuarterlyPlan(
+                quarterlyPlanPayload
+              );
+            }
+            if (quarterlyPlanData) {
+              
 
               if (quarterPlanResp) {
                 for (const plan of quarterlyPlanData.plans) {
