@@ -234,6 +234,7 @@ export default function CreateYearlyFormNew({
 
       // Update state
       setQuarterPlans(mappedQuarterPlans);
+      setDraftSaved(undefined);
     }
   }, [yearlyPlanDetail]);
   useEffect(() => {
