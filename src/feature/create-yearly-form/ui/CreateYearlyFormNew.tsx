@@ -200,6 +200,7 @@ export default function CreateYearlyFormNew({
       setLoggedUserDetails();
     }
     if ((id || draftSaved) && yearlyPlanDetail) {
+      // console.log("yearlyPlanDetail inside useEffect", yearlyPlanDetail);
       setLoggedUserDetails();
       setProjectFacilitator(yearlyPlanDetail.user);
       form.setFieldsValue({
@@ -384,11 +385,7 @@ export default function CreateYearlyFormNew({
           } else {
             yearlyPlanResp = await createYearlyPlan(yearlyPlanPayload);
           }
-          if (yearlyPlanResp) {
-            if (type === "createNew" && status === "draft") {
-              setDraftSaved(yearlyPlanResp?.id);
-            }
-          }
+
         } catch (error: any) {
           throw error;
         }
@@ -439,6 +436,9 @@ export default function CreateYearlyFormNew({
                 }
               }
             }
+          }
+          if (type === "createNew" && status === "draft") {
+            setDraftSaved(yearlyPlanResp?.id);
           }
         }
         // }
