@@ -459,12 +459,17 @@ export default function CreateYearlyFormNew({
         } else if (status === "resent") {
           await messageApi.success("Yearly Plan has been resent.");
         }
+        // if (
+        //   (type === "myforms" || type === "createNew") &&
+        //   status !== "draft"
+        // ) {
+        //   router.push("/yearly-form/my-forms");
+        // }
         if (
-          (type === "myforms" || type === "createNew") &&
-          status !== "draft"
-        ) {
+          type === "myforms" || type === "createNew") {
           router.push("/yearly-form/my-forms");
-        } else if (type === "approver") {
+        }
+        else if (type === "approver") {
           router.push("/yearly-form/approver-view");
         } else if (type === "reviewer") {
           router.push("/yearly-form/reviewer-view");
