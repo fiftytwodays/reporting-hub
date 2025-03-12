@@ -175,7 +175,7 @@ export default function CreateYearlyFormNew({
     },
   ];
 
-  const resolvedId = id || draftSaved;
+  const resolvedId = draftSaved || id;
   const {
     yearlyPlanDetail,
     isYearlyPlanDetailLoading,
