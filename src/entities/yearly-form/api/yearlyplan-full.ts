@@ -116,7 +116,7 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
     } return null;
   };
 
-  const { data, isLoading, error } = useSWR(
+  const { data, isLoading, error, mutate } = useSWR(
     condition ? ["api/yearlyPlanDetail", id] : null,
     fetcher,
     {
@@ -128,5 +128,6 @@ export default function useYearlyPlanFullDetails({ condition = true }: FetchOpti
     yearlyPlanDetail: data?.YearlyPlanDetails,
     isYearlyPlanDetailLoading: isLoading,
     isYearlyPlanDetailError: error,
+    mutateYearlyPlanDetail: mutate,
   };
 }
