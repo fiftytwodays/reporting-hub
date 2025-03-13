@@ -180,6 +180,7 @@ export default function CreateYearlyFormNew({
     yearlyPlanDetail,
     isYearlyPlanDetailLoading,
     isYearlyPlanDetailError,
+    mutateYearlyPlanDetail,
   } = useYearlyPlanFullDetails({ condition: !!resolvedId }, resolvedId);
 
   if (yearlyPlanDetail && setyearlyPlanDetails) {
@@ -236,7 +237,7 @@ export default function CreateYearlyFormNew({
       setQuarterPlans(mappedQuarterPlans);
       setDraftSaved(undefined);
     }
-  }, [yearlyPlanDetail]);
+  }, [JSON.stringify(yearlyPlanDetail)]);
   useEffect(() => {
     // Warn user before closing or reloading the page
     const handleWindowClose = (event: BeforeUnloadEvent) => {
@@ -438,8 +439,9 @@ export default function CreateYearlyFormNew({
               }
             }
           }
-          if (type === "createNew" && status === "draft") {
+          if ((type === "createNew" || type==="myforms") && status === "draft") {
             setDraftSaved(yearlyPlanResp?.id);
+            mutateYearlyPlanDetail();
           }
         }
         // }
@@ -459,16 +461,16 @@ export default function CreateYearlyFormNew({
         } else if (status === "resent") {
           await messageApi.success("Yearly Plan has been resent.");
         }
-        // if (
-        //   (type === "myforms" || type === "createNew") &&
-        //   status !== "draft"
-        // ) {
-        //   router.push("/yearly-form/my-forms");
-        // }
         if (
-          type === "myforms" || type === "createNew") {
+          (type === "myforms" || type === "createNew") &&
+          status !== "draft"
+        ) {
           router.push("/yearly-form/my-forms");
         }
+        // if (
+        //   type === "myforms" || type === "createNew") {
+        //   router.push("/yearly-form/my-forms");
+        // }
         else if (type === "approver") {
           router.push("/yearly-form/approver-view");
         } else if (type === "reviewer") {
