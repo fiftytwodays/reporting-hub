@@ -121,6 +121,7 @@ export default function CreateYearlyFormNew({
   const { Option } = Select;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [projectLoading, setProjectLoading] = useState(false);
   const [comment, setComment] = useState<string>("");
   const [modalVisible, setModalVisible] = useState(false);
   const [status, setStatus] = useState("");
@@ -439,7 +440,7 @@ export default function CreateYearlyFormNew({
               }
             }
           }
-          if ((type === "createNew" || type==="myforms") && status === "draft") {
+          if ((type === "createNew" || type === "myforms") && status === "draft") {
             setDraftSaved(yearlyPlanResp?.id);
             mutateYearlyPlanDetail();
           }
@@ -637,7 +638,7 @@ export default function CreateYearlyFormNew({
                     ? yearlyPlanDetail.userId !== loggedUser
                     : false)
                 }
-                setLoading={setLoading}
+                setProjectLoading={setProjectLoading}
                 id={form.getFieldValue("project") ?? undefined}
               />
             </Form.Item>
@@ -680,7 +681,7 @@ export default function CreateYearlyFormNew({
           </Col>
         </Row>
         <>
-          {isYearlyPlanDetailLoading || loading ? (
+          {isYearlyPlanDetailLoading || projectLoading || loading ? (
             <div
               style={{
                 position: "fixed",

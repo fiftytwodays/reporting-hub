@@ -13,14 +13,14 @@ interface ProjectsProps {
   form: FormInstance;
   id: string;
   fetchAll: boolean;
-  setLoading: (loading: boolean) => void;
+  setProjectLoading: (loading: boolean) => void;
 }
 
 const Projects: React.FC<ProjectsProps> = ({
   form,
   id,
   fetchAll,
-  setLoading,
+  setProjectLoading,
 }) => {
   const projectListData = useProjectList({
     condition: true,
@@ -48,8 +48,8 @@ const Projects: React.FC<ProjectsProps> = ({
       const project = projectsData.find((project) => project.id === id);
       setSelectedValue(project?.name);
     }
-    setLoading(isProjectTypesDataLoading);
-  }, [isProjectTypesDataLoading, projectsData, id, setLoading]);
+    setProjectLoading(isProjectTypesDataLoading);
+  }, [isProjectTypesDataLoading, projectsData, id, setProjectLoading]);
 
   if (!selectedValue && id && id !== "project") {
     return null; // Optionally, show a loading indicator instead
