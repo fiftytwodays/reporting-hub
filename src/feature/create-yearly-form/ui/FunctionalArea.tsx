@@ -13,9 +13,10 @@ interface FunctionalAreaProps {
   quarterKey: number;
   index: number;
   functionalAreaId: string,
+  disabled: boolean;
 }
 
-const FunctionalArea: React.FC<FunctionalAreaProps> = ({ handlePlanChange, quarterKey, index, functionalAreaId }) => {
+const FunctionalArea: React.FC<FunctionalAreaProps> = ({ handlePlanChange, quarterKey, index, functionalAreaId, disabled }) => {
   const { functionalAreasData } = useFunctionalAreaList({ condition: true });
 const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
   useEffect(() => {
@@ -45,6 +46,7 @@ const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined
 
   return (
     <Select
+    disabled={disabled}
       showSearch
       dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
       allowClear
