@@ -14,6 +14,7 @@ import {
   Select,
   Space,
   Spin,
+  Tooltip,
 } from "antd";
 import Projects from "./Projects";
 import FunctionalArea from "./FunctionalArea";
@@ -122,6 +123,7 @@ export default function CreateYearlyFormNew({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [projectLoading, setProjectLoading] = useState(false);
+  const [readOnly, setReadOnly] = useState(false);
   const [comment, setComment] = useState<string>("");
   const [modalVisible, setModalVisible] = useState(false);
   const [status, setStatus] = useState("");
@@ -203,6 +205,15 @@ export default function CreateYearlyFormNew({
     }
     if ((id || draftSaved) && yearlyPlanDetail) {
       // console.log("yearlyPlanDetail inside useEffect", yearlyPlanDetail);
+      setReadOnly(
+        (type !== "createNew" && type !== "myforms") ||
+        (type === "myforms" &&
+          yearlyPlanDetail?.status != "draft" &&
+          yearlyPlanDetail?.status != "resent" &&
+          yearlyPlanDetail?.status != "approved") ||
+        (yearlyPlanDetail?.userId
+          ? yearlyPlanDetail.userId !== loggedUser
+          : false))
       setLoggedUserDetails();
       setProjectFacilitator(yearlyPlanDetail.user);
       form.setFieldsValue({
@@ -572,6 +583,7 @@ export default function CreateYearlyFormNew({
       }));
     }
   };
+  
   // };
 
   const checkProjectExist = async (projectId: string, userId: string) => {
@@ -604,16 +616,7 @@ export default function CreateYearlyFormNew({
         form={form}
         onChange={handleFormChange}
         layout="horizontal"
-        disabled={
-          (type !== "createNew" && type !== "myforms") ||
-          (type === "myforms" &&
-            yearlyPlanDetail?.status != "draft" &&
-            yearlyPlanDetail?.status != "resent" &&
-            yearlyPlanDetail?.status != "approved") ||
-          (yearlyPlanDetail?.userId
-            ? yearlyPlanDetail.userId !== loggedUser
-            : false)
-        }
+        
         initialValues={{
           year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
           project: "",
@@ -727,7 +730,8 @@ export default function CreateYearlyFormNew({
                       </Col>
                       <Col span={5}>
                         <Form.Item>
-                          <Input
+                          <Tooltip title={plan.activity || ""}>
+                          <Input readOnly={readOnly}
                             value={plan.activity || ""}
                             onChange={(e) =>
                               handlePlanChange(
@@ -738,11 +742,13 @@ export default function CreateYearlyFormNew({
                               )
                             }
                           />
+                          </Tooltip>
                         </Form.Item>
                       </Col>
                       <Col span={4}>
                         <Form.Item>
                           <FunctionalArea
+                           disabled={readOnly}
                             handlePlanChange={handlePlanChange}
                             quarterKey={quarter.key}
                             index={index}
@@ -753,6 +759,7 @@ export default function CreateYearlyFormNew({
                       <Col span={3}>
                         <Form.Item>
                           <Select
+                            disabled={readOnly}
                             mode="multiple"
                             value={plan.month || []}
                             onChange={(value) =>
@@ -777,6 +784,7 @@ export default function CreateYearlyFormNew({
                       <Col span={3}>
                         <Form.Item>
                           <Checkbox
+                           disabled={readOnly}
                             checked={plan.isMajorGoal || false}
                             onChange={(e) =>
                               handlePlanChange(
@@ -792,6 +800,7 @@ export default function CreateYearlyFormNew({
                       <Col span={6}>
                         <Form.Item>
                           <Input
+                           disabled={readOnly}
                             value={plan.comments || ""}
                             onChange={(e) =>
                               handlePlanChange(
