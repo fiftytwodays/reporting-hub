@@ -14,6 +14,7 @@ interface ProjectsProps {
   id: string;
   fetchAll: boolean;
   setProjectLoading: (loading: boolean) => void;
+  disabled: boolean;
 }
 
 const Projects: React.FC<ProjectsProps> = ({
@@ -21,6 +22,7 @@ const Projects: React.FC<ProjectsProps> = ({
   id,
   fetchAll,
   setProjectLoading,
+  disabled,
 }) => {
   const projectListData = useProjectList({
     condition: true,
@@ -69,6 +71,7 @@ const Projects: React.FC<ProjectsProps> = ({
     !isProjectTypesDataLoading &&
     projectsData && (
       <Select
+      disabled={disabled}
         showSearch
         dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
         allowClear
