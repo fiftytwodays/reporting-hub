@@ -4,18 +4,33 @@ import {
   months,
   projects,
   functionalAreas,
-  nextMonthGoals, // Add this import for the goals for next month
+  nextMonthGoals,
+  years, // Add this import for the goals for next month
 } from "@/widgets/monthly-forms-list/config/projects";
 import {
   MinusOutlined,
   MinusCircleOutlined,
   PlusOutlined,
+  DeleteTwoTone,
 } from "@ant-design/icons";
 
-import { Form, Input, Row, Col, Select, Button, Space, message } from "antd";
+import {
+  Form,
+  Input,
+  Row,
+  Col,
+  Select,
+  Button,
+  Space,
+  message,
+  Collapse,
+  Divider,
+} from "antd";
 import { MessageInstance } from "antd/es/message/interface";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+
+const { Panel } = Collapse;
 
 interface CreateMonthlyFormProps {
   messageApi: MessageInstance;
@@ -54,6 +69,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
   messageApi,
 }) => {
   const [defaultMonth, setDefaultMonth] = useState<number>();
+  const [currentYear, setCurrentYear] = useState<string>();
 
   const [form] = Form.useForm();
 
@@ -73,6 +89,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
 
   useEffect(() => {
     const currentDate = dayjs();
+    const currentYear = currentDate.year();
     const currentDay = currentDate.date();
     const currentMonth = currentDate.month() + 1; // dayjs months are 0-indexed
     const calculatedMonth = currentDay > 25 ? currentMonth : currentMonth - 1;
@@ -82,6 +99,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
 
     setDefaultMonth(finalMonth);
     form.setFieldValue("month", finalMonth);
+    form.setFieldValue("year", currentYear);
   }, [form]);
 
   const handleSubmit = (values: FormValues) => {
@@ -98,6 +116,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       return;
     }
     messageApi.success("Monthly form created successfully");
+    console.log(values);
   };
 
   const handleAchievedChange = (value: FormValues, index: number) => {
@@ -134,32 +153,52 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
             <Select options={months} value={defaultMonth} disabled />
           </Form.Item>
         </Col>
+        <Col xs={24} sm={6}>
+          <Form.Item label="Year" name="year">
+            <Select options={years} value={currentYear} disabled />
+          </Form.Item>
+        </Col>
       </Row>
 
       {isGoalsListEnabled && (
-        <>
+        <Collapse defaultActiveKey={["1", "2", "3", "4", "5", "6", "7", "8"]}>
           {/* Boxed Section for Goals */}
-          <div
+          {/* <div
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
               padding: "10px",
               marginTop: "16px",
             }}
-          >
-            <h3 style={{ marginBottom: "16px" }}>
+          > */}
+          {/* <h3 style={{ marginBottom: "16px" }}>
               Outcomes from the Month Just Ended
-            </h3>
-
+            </h3> */}
+          <Panel header="Outcomes from the Month Just Ended" key="1">
             {/* Goals Section */}
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>Goal</Col>
+              <Col span={4}>
+                Achieved <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>Reason for not achieving</Col>
+              <Col span={4}>Major Goal</Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             <Form.List name="goalsList">
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name }) => (
                     <Row align="middle" gutter={24} key={key}>
+                      <Col span={1}>
+                        <div>{name + 1}</div>
+                      </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={name === 0 ? "Goal" : ""}
+                          // label={name === 0 ? "Goal" : ""}
                           name={[name, "goal"]}
                           initialValue={goals[name]?.goal}
                         >
@@ -168,19 +207,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={name === 0 ? "Major goal" : ""}
-                          name={[name, "majorGoal"]}
-                        >
-                          <Select
-                            options={achieved}
-                            placeholder="Major goal or not"
-                            disabled
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} sm={4}>
-                        <Form.Item
-                          label={name === 0 ? "Achieved" : ""}
+                          // label={name === 0 ? "Achieved" : ""}
                           name={[name, "achieved"]}
                           rules={[
                             {
@@ -200,7 +227,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={name === 0 ? "Reason for not achieving" : ""}
+                          // label={name === 0 ? "Reason for not achieving" : ""}
                           name={[name, "whyNotAchieved"]}
                           dependencies={[name, "achieved"]}
                           required={false}
@@ -230,7 +257,19 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={name === 0 ? "Comments" : ""}
+                          // label={name === 0 ? "Major goal" : ""}
+                          name={[name, "majorGoal"]}
+                        >
+                          <Select
+                            options={achieved}
+                            placeholder="Major goal or not"
+                            disabled
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={4}>
+                        <Form.Item
+                          // label={name === 0 ? "Comments" : ""}
                           name={[name, "comments"]}
                         >
                           <Input placeholder="Add comments" />
@@ -241,10 +280,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 </>
               )}
             </Form.List>
-          </div>
+          </Panel>
+          {/* </div> */}
 
           {/* Additional Activities Section */}
-          <div
+          {/* <div
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
@@ -254,17 +294,39 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
           >
             <h3 style={{ marginBottom: "16px" }}>
               Additional activities other than that is planned
-            </h3>
+            </h3> */}
 
+          <Panel
+            header="Additional activities other than that is planned"
+            key="2"
+          >
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>
+                Activity <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>
+                Functional area <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>
+                Major Goal <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             {/* Additional Activities Section */}
             <Form.List name="additionalActivities">
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name }) => (
-                    <Row align="middle" gutter={24} key={key}>
+                    <Row gutter={24} key={key}>
+                      <Col span={1}>
+                        <div>{name + 1}</div>
+                      </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label="Activity"
+                          // label="Activity"
                           name={[name, "activity"]}
                           rules={[
                             { required: true, message: "Activity is required" },
@@ -275,7 +337,24 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={"Major goal"}
+                          // label="Functional Area"
+                          name={[name, "functionalArea"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Functional Area is required",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Select functional area"
+                            options={functionalAreas}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={4}>
+                        <Form.Item
+                          // label={"Major goal"}
                           name={[name, "majorGoal"]}
                           rules={[
                             {
@@ -292,67 +371,78 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label="Functional Area"
-                          name={[name, "functionalArea"]}
-                          rules={[
-                            {
-                              required: true,
-                              message: "Functional Area is required",
-                            },
-                          ]}
+                          // label="Comments"
+                          name={[name, "comments"]}
                         >
-                          <Select
-                            placeholder="Select functional area"
-                            options={functionalAreas}
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} sm={4}>
-                        <Form.Item label="Comments" name={[name, "comments"]}>
                           <Input placeholder="Add comments" />
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={4}>
-                        <Button
+                        {/* <Button
+                          type="text"
                           onClick={() => remove(name)}
                           icon={<MinusOutlined />}
+                        /> */}
+                        <DeleteTwoTone
+                          onClick={() => remove(name)}
+                          twoToneColor="#FF0000"
                         />
                       </Col>
                     </Row>
                   ))}
 
-                  <Button
+                  {/* <Button
                     type="dashed"
                     onClick={() => add()}
                     icon={<PlusOutlined />}
                   >
                     Add additional activity
+                  </Button> */}
+                  <Button type="dashed" onClick={() => add()} block>
+                    Add additional activity
                   </Button>
                 </>
               )}
             </Form.List>
-          </div>
+          </Panel>
+          {/* </div> */}
 
           {/* Goals for Next Month Section */}
-          <div
+          {/* <div
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
               padding: "10px",
               marginTop: "16px",
             }}
-          >
-            <h3 style={{ marginBottom: "16px" }}>Goals for next month</h3>
+          > */}
 
+          {/* <h3 style={{ marginBottom: "16px" }}>Goals for next month</h3> */}
+
+          <Panel header="Goals for next month Section" key="3">
             {/* Goals for next month Section */}
+
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>Activity</Col>
+              <Col span={4}>Functional area</Col>
+              <Col span={4}>Major Goal</Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
+
             <Form.List name="nextMonthGoals">
               {(fields) => (
                 <>
                   {nextMonthGoals.map((goal, index) => (
-                    <Row align="middle" gutter={24} key={index}>
-                      <Col xs={24} sm={6}>
+                    <Row gutter={24} key={index}>
+                      <Col span={1}>
+                        <div>{index + 1}</div>
+                      </Col>
+                      <Col xs={24} sm={4}>
                         <Form.Item
-                          label={index === 0 ? "Activity" : ""}
+                          // label={index === 0 ? "Activity" : ""}
                           name={[index, "activity"]}
                           initialValue={goal.activity}
                         >
@@ -361,7 +451,16 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={index === 0 ? "Major goal" : ""}
+                          // label={index === 0 ? "Functional Area" : ""}
+                          name={[index, "functionalArea"]}
+                          initialValue={goal.functionalArea}
+                        >
+                          <Input placeholder="Functional Area" disabled />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={4}>
+                        <Form.Item
+                          // label={index === 0 ? "Major goal" : ""}
                           name={[index, "majorGoal"]}
                           initialValue={goal.majorGoal}
                         >
@@ -372,18 +471,9 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                           />
                         </Form.Item>
                       </Col>
-                      <Col xs={24} sm={6}>
+                      <Col xs={24} sm={4}>
                         <Form.Item
-                          label={index === 0 ? "Functional Area" : ""}
-                          name={[index, "functionalArea"]}
-                          initialValue={goal.functionalArea}
-                        >
-                          <Input placeholder="Functional Area" disabled />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} sm={6}>
-                        <Form.Item
-                          label={index === 0 ? "Comments" : ""}
+                          // label={index === 0 ? "Comments" : ""}
                           name={[index, "comments"]}
                           initialValue={goal.comments}
                         >
@@ -395,10 +485,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 </>
               )}
             </Form.List>
-          </div>
+          </Panel>
+          {/* </div> */}
 
           {/* Additional Activities for Next Month Section */}
-          <div
+          {/* <div
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
@@ -409,17 +500,36 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
           >
             <h3 style={{ marginBottom: "16px" }}>
               Additional activities for next month
-            </h3>
+            </h3> */}
 
+          <Panel header="Additional activities for next month" key="4">
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>
+                Activity <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>
+                Functional area <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>
+                Major Goal <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             {/* Additional Activities for Next Month Section */}
             <Form.List name="additionalActivitiesNextMonth">
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name }) => (
-                    <Row align="middle" gutter={24} key={key}>
-                      <Col xs={24} sm={6}>
+                    <Row gutter={24} key={key}>
+                      <Col span={1}>
+                        <div>{name + 1}</div>
+                      </Col>
+                      <Col xs={24} sm={4}>
                         <Form.Item
-                          label="Activity"
+                          // label="Activity"
                           name={[name, "activity"]}
                           rules={[
                             { required: true, message: "Activity is required" },
@@ -430,24 +540,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={"Major goal"}
-                          name={[name, "majorGoal"]}
-                          rules={[
-                            {
-                              required: true,
-                              message: "Please whether its major goal or not",
-                            },
-                          ]}
-                        >
-                          <Select
-                            options={achieved}
-                            placeholder="Major goal or not"
-                          />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24} sm={6}>
-                        <Form.Item
-                          label="Functional Area"
+                          // label="Functional Area"
                           name={[name, "functionalArea"]}
                           rules={[
                             {
@@ -462,34 +555,62 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                           />
                         </Form.Item>
                       </Col>
-                      <Col xs={24} sm={6}>
-                        <Form.Item label="Comments" name={[name, "comments"]}>
+                      <Col xs={24} sm={4}>
+                        <Form.Item
+                          // label={"Major goal"}
+                          name={[name, "majorGoal"]}
+                          rules={[
+                            {
+                              required: true,
+                              message: "Please whether its major goal or not",
+                            },
+                          ]}
+                        >
+                          <Select
+                            options={achieved}
+                            placeholder="Major goal or not"
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={4}>
+                        <Form.Item
+                          // label="Comments"
+                          name={[name, "comments"]}
+                        >
                           <Input placeholder="Add comments" />
                         </Form.Item>
                       </Col>
-                      <Col xs={24} sm={6}>
-                        <Button
+                      <Col xs={24} sm={4}>
+                        {/* <Button
                           type="text"
                           onClick={() => remove(name)}
                           icon={<MinusOutlined />}
+                        /> */}
+                        <DeleteTwoTone
+                          onClick={() => remove(name)}
+                          twoToneColor="#FF0000"
                         />
                       </Col>
                     </Row>
                   ))}
 
-                  <Button
+                  {/* <Button
                     type="dashed"
                     onClick={() => add()}
                     icon={<PlusOutlined />}
                   >
                     Add additional activity
+                  </Button> */}
+                  <Button type="dashed" onClick={() => add()} block>
+                    Add additional activity
                   </Button>
                 </>
               )}
             </Form.List>
-          </div>
+          </Panel>
+          {/* </div> */}
 
-          <div
+          {/* <div
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
@@ -498,7 +619,9 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
               marginBottom: "24px",
             }}
           >
-            <h3 style={{ marginBottom: "16px" }}>Praise points</h3>
+            <h3 style={{ marginBottom: "16px" }}>Praise points</h3> */}
+
+          <Panel header="Praise points" key="5">
             {/* Praise/Prayer Request Section */}
             <Row gutter={24}>
               <Col xs={24}>
@@ -511,7 +634,10 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       <>
                         {fields.map(({ key, name }) => (
                           <Row key={key} gutter={24}>
-                            <Col xs={20}>
+                            <Col span={1}>
+                              <div>{name + 1}</div>
+                            </Col>
+                            <Col xs={16}>
                               <Form.Item
                                 name={[name, "point"]}
                                 rules={[
@@ -524,20 +650,30 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 <Input placeholder="Enter Praise Point" />
                               </Form.Item>
                             </Col>
-                            <Col xs={4}>
+                            {/* <Col xs={4}>
                               <MinusCircleOutlined
                                 onClick={() => remove(name)}
+                              />
+                            </Col> */}
+                            <Col xs={4}>
+                              <DeleteTwoTone
+                                onClick={() => remove(name)}
+                                twoToneColor="#FF0000"
                               />
                             </Col>
                           </Row>
                         ))}
                         <Form.Item>
-                          <Button
+                          {/* <Button
                             type="dashed"
                             icon={<PlusOutlined />}
                             onClick={() => add()} // Add another input field
                           >
                             Add Praise Point
+                          </Button> */}
+
+                          <Button type="dashed" onClick={() => add()} block>
+                            Add praise point
                           </Button>
                         </Form.Item>
                       </>
@@ -546,10 +682,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 </Form.Item>
               </Col>
             </Row>
-          </div>
+          </Panel>
+          {/* </div> */}
 
           {/* Prayer Requests Section */}
-          <div
+          {/* <div
             style={{
               border: "1px solid #d9d9d9",
               borderRadius: "8px",
@@ -558,7 +695,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
               marginBottom: "24px",
             }}
           >
-            <h3 style={{ marginBottom: "16px" }}>Prayer requests</h3>
+            <h3 style={{ marginBottom: "16px" }}>Prayer requests</h3> */}
+          <Panel header="Prayer requests" key="6">
             <Row gutter={24}>
               <Col xs={24}>
                 <Form.Item required>
@@ -570,7 +708,10 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       <>
                         {fields.map(({ key, name }) => (
                           <Row key={key} gutter={24}>
-                            <Col xs={20}>
+                            <Col span={1}>
+                              <div>{name + 1}</div>
+                            </Col>
+                            <Col xs={16}>
                               <Form.Item
                                 name={[name, "request"]}
                                 rules={[
@@ -583,20 +724,29 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 <Input placeholder="Enter Prayer Request" />
                               </Form.Item>
                             </Col>
-                            <Col xs={4}>
+                            {/* <Col xs={4}>
                               <MinusCircleOutlined
                                 onClick={() => remove(name)}
+                              />
+                            </Col> */}
+                            <Col xs={4}>
+                              <DeleteTwoTone
+                                onClick={() => remove(name)}
+                                twoToneColor="#FF0000"
                               />
                             </Col>
                           </Row>
                         ))}
                         <Form.Item>
-                          <Button
+                          {/* <Button
                             type="dashed"
                             icon={<PlusOutlined />}
                             onClick={() => add()} // Add another input field
                           >
                             Add Prayer Request
+                          </Button> */}
+                          <Button type="dashed" onClick={() => add()} block>
+                            Add prayer request
                           </Button>
                         </Form.Item>
                       </>
@@ -605,62 +755,71 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 </Form.Item>
               </Col>
             </Row>
-          </div>
+          </Panel>
+          {/* </div> */}
 
           {/* Story/Testimony Section */}
-          <Row gutter={24}>
-            <Col xs={24}>
-              <Form.Item
-                rules={[
-                  {
-                    required: true,
-                    message: "Please provide an input",
-                  },
-                ]}
-                label="Story/Testimony"
-                name="storyTestimony"
-              >
-                <Input.TextArea
-                  placeholder="Please enter your story or testimony. If you don't have one, simply write `none`"
-                  rows={4}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Panel header="Story/Testimony" key="7">
+            <Row gutter={24}>
+              <Col xs={24}>
+                <Form.Item
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please provide an input",
+                    },
+                  ]}
+                  label="Story/Testimony"
+                  name="storyTestimony"
+                >
+                  <Input.TextArea
+                    placeholder="Please enter your story or testimony. If you don't have one, simply write `none`"
+                    rows={4}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Panel>
 
           {/* Concerns/Struggles Section */}
-          <Row gutter={24}>
-            <Col xs={24}>
-              <Form.Item
-                rules={[
-                  {
-                    required: true,
-                    message: "Please provide an input",
-                  },
-                ]}
-                label="Concerns/Struggles"
-                name="concernsStruggles"
-              >
-                <Input.TextArea
-                  placeholder="Please enter your concerns or struggles. If you don't have one, simply write `none`"
-                  rows={4}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        </>
+          <Panel header="Concerns/Struggles" key="8">
+            <Row gutter={24}>
+              <Col xs={24}>
+                <Form.Item
+                  rules={[
+                    {
+                      required: true,
+                      message: "Please provide an input",
+                    },
+                  ]}
+                  label="Concerns/Struggles"
+                  name="concernsStruggles"
+                >
+                  <Input.TextArea
+                    placeholder="Please enter your concerns or struggles. If you don't have one, simply write `none`"
+                    rows={4}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Panel>
+        </Collapse>
       )}
 
       {/* Footer Actions */}
       <Space style={{ marginTop: "24px" }}>
-        <Button type="default" onClick={() => form.resetFields()}>
-          Reset
-        </Button>
         <Button type="default" href="/monthly-form/my-forms">
           Cancel
         </Button>
+        <Button
+          type="primary"
+          onClick={() => console.log(form.getFieldsValue)}
+          htmlType="submit"
+        >
+          Save as draft
+        </Button>
         <Button type="primary" htmlType="submit">
-          Save
+          Submit for approval
         </Button>
       </Space>
     </Form>
