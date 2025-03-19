@@ -39,6 +39,7 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
 import { ExportYearlyPlan } from "@/feature/export-yealy-plan";
 import useProjectsDetails from "@/entities/project/api/project-details";
+import TextArea from "antd/es/input/TextArea";
 
 const { Panel } = Collapse;
 
@@ -317,11 +318,58 @@ export default function CreateYearlyFormNew({
     originalPush(href);
   };
   const showCommentPrompt = (status: string) => {
-    setStatus(status);
-    if (status != "draft") {
-      setModalVisible(true);
-    } else {
-      handleSave("draft", "");
+    try {
+      if (!form.getFieldValue("project"))
+        messageApi.error("Please select the project");
+      else {
+
+        for (const quarter of [1, 2, 3, 4]) {
+          const quarterlyPlanData = quarterPlans[quarter];
+          console.log("quarterlyPlanData", quarterlyPlanData);
+          if (quarterlyPlanData) {
+            for (const plan of quarterlyPlanData.plans) {
+              if (!plan.activity)
+                throw {
+                  statusCode: 400,
+                  message: "Activity is required",
+                } as CustomError;
+              else if (!plan.functionalAreaId)
+                throw {
+                  statusCode: 400,
+                  message: "Function area is required",
+                } as CustomError;
+              else if (!(plan.month.length > 0))
+                throw {
+                  statusCode: 400,
+                  message: "Month is required",
+                } as CustomError;
+            }
+          } else {
+            if (status === "waiting for review")
+              throw {
+                statusCode: 400,
+                message: "Please add plans for all quarter",
+              } as CustomError;
+          }
+        }
+
+        setStatus(status);
+        if (status != "draft") {
+          setModalVisible(true);
+        } else {
+          handleSave("draft", "");
+        }
+      }
+    } catch (error: any) {
+      if (error?.statusCode === 409) {
+        messageApi.error(error.message);
+      } else if (error?.statusCode === 400) {
+        messageApi.error(error.message);
+      } else {
+        messageApi.error(
+          "Unable to create/update the project. Please try again."
+        );
+      }
     }
   };
 
@@ -583,7 +631,7 @@ export default function CreateYearlyFormNew({
       }));
     }
   };
-  
+
   // };
 
   const checkProjectExist = async (projectId: string, userId: string) => {
@@ -616,7 +664,7 @@ export default function CreateYearlyFormNew({
         form={form}
         onChange={handleFormChange}
         layout="horizontal"
-        
+
         initialValues={{
           year: `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
           project: "",
@@ -630,6 +678,7 @@ export default function CreateYearlyFormNew({
               rules={[{ required: true, message: "Project is required" }]}
             >
               <Projects
+                disabled={readOnly}
                 form={form}
                 fetchAll={
                   (type !== "createNew" && type !== "myforms") ||
@@ -658,29 +707,12 @@ export default function CreateYearlyFormNew({
           </Col>
         </Row>
         <Row gutter={24} style={{ padding: "10px" }}>
-          <Col xs={8}>
-            {yearlyPlanDetail?.comments && (
-              <div
-                style={{
-                  padding: "7px 7px 7px 0px",
-                  borderRadius: "5px",
-                }}
-              >
-                Comments:{" "}
-                <span
-                  style={{
-                    background:
-                      yearlyPlanDetail.status === "resent"
-                        ? "#ffccc7"
-                        : "#f0f2f5",
-                    padding: "3px 5px",
-                    borderRadius: "3px",
-                  }}
-                >
-                  {yearlyPlanDetail.comments}
-                </span>
-              </div>
-            )}
+          <Col xs={10}>
+          {yearlyPlanDetail?.comments && (<Form.Item label="Comments">
+            <Tooltip title={yearlyPlanDetail?.comments}>
+              <TextArea  autoSize={{minRows:1, maxRows:3}} readOnly  value={yearlyPlanDetail?.comments}/>
+              </Tooltip>
+            </Form.Item>)}
           </Col>
         </Row>
         <>
@@ -731,24 +763,24 @@ export default function CreateYearlyFormNew({
                       <Col span={5}>
                         <Form.Item>
                           <Tooltip title={plan.activity || ""}>
-                          <Input readOnly={readOnly}
-                            value={plan.activity || ""}
-                            onChange={(e) =>
-                              handlePlanChange(
-                                quarter.key,
-                                index,
-                                "activity",
-                                e.target.value
-                              )
-                            }
-                          />
+                            <Input readOnly={readOnly}
+                              value={plan.activity || ""}
+                              onChange={(e) =>
+                                handlePlanChange(
+                                  quarter.key,
+                                  index,
+                                  "activity",
+                                  e.target.value
+                                )
+                              }
+                            />
                           </Tooltip>
                         </Form.Item>
                       </Col>
                       <Col span={4}>
                         <Form.Item>
                           <FunctionalArea
-                           disabled={readOnly}
+                            disabled={readOnly}
                             handlePlanChange={handlePlanChange}
                             quarterKey={quarter.key}
                             index={index}
@@ -784,7 +816,7 @@ export default function CreateYearlyFormNew({
                       <Col span={3}>
                         <Form.Item>
                           <Checkbox
-                           disabled={readOnly}
+                            disabled={readOnly}
                             checked={plan.isMajorGoal || false}
                             onChange={(e) =>
                               handlePlanChange(
@@ -799,18 +831,20 @@ export default function CreateYearlyFormNew({
                       </Col>
                       <Col span={6}>
                         <Form.Item>
-                          <Input
-                           disabled={readOnly}
-                            value={plan.comments || ""}
-                            onChange={(e) =>
-                              handlePlanChange(
-                                quarter.key,
-                                index,
-                                "comments",
-                                e.target.value
-                              )
-                            }
-                          />
+                          <Tooltip title={plan.comments || ""}>
+                            <Input
+                              readOnly={readOnly}
+                              value={plan.comments || ""}
+                              onChange={(e) =>
+                                handlePlanChange(
+                                  quarter.key,
+                                  index,
+                                  "comments",
+                                  e.target.value
+                                )
+                              }
+                            />
+                          </Tooltip>
                         </Form.Item>
                       </Col>
                       <Col span={2}>
@@ -840,13 +874,16 @@ export default function CreateYearlyFormNew({
                     </Row>
                     // </div>
                   ))}
-                  <Button
-                    type="dashed"
-                    onClick={() => handleAddPlan(quarter.key)}
-                    block
-                  >
-                    Add Planned Activities
-                  </Button>
+                  <Tooltip title="Add Planned Activities">
+                    <Button
+                      disabled={readOnly}
+                      type="dashed"
+                      onClick={() => handleAddPlan(quarter.key)}
+                      block
+                    >
+                      Add Planned Activities
+                    </Button>
+                  </Tooltip>
                 </Panel>
               ))}
             </Collapse>
@@ -857,97 +894,111 @@ export default function CreateYearlyFormNew({
           <Space>
             {(type === "myforms" || type === "createNew") && (
               <>
-                <Button
-                  type="primary"
-                  disabled={
-                    (type !== "createNew" &&
-                      yearlyPlanDetail?.status !== "draft" &&
-                      yearlyPlanDetail?.status !== "resent" &&
-                      yearlyPlanDetail?.status !== "approved") ||
-                    false ||
-                    (yearlyPlanDetail?.userId
-                      ? yearlyPlanDetail.userId !== loggedUser
-                      : false)
-                  }
-                  onClick={() => showCommentPrompt("draft")}
-                >
-                  Save as Draft
-                </Button>
-                <Button
-                  type="primary"
-                  disabled={
-                    (type !== "createNew" &&
-                      yearlyPlanDetail?.status !== "draft" &&
-                      yearlyPlanDetail?.status !== "resent" &&
-                      yearlyPlanDetail?.status !== "approved") ||
-                    false ||
-                    (yearlyPlanDetail?.userId
-                      ? yearlyPlanDetail.userId !== loggedUser
-                      : false)
-                  }
-                  onClick={() => showCommentPrompt("waiting for review")}
-                >
-                  Send for Review
-                </Button>
+                <Tooltip title="Save as Draft">
+                  <Button
+                    type="primary"
+                    disabled={
+                      (type !== "createNew" &&
+                        yearlyPlanDetail?.status !== "draft" &&
+                        yearlyPlanDetail?.status !== "resent" &&
+                        yearlyPlanDetail?.status !== "approved") ||
+                      false ||
+                      (yearlyPlanDetail?.userId
+                        ? yearlyPlanDetail.userId !== loggedUser
+                        : false)
+                    }
+                    onClick={() => showCommentPrompt("draft")}
+                  >
+                    Save as Draft
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Send for Review">
+                  <Button
+                    type="primary"
+                    disabled={
+                      (type !== "createNew" &&
+                        yearlyPlanDetail?.status !== "draft" &&
+                        yearlyPlanDetail?.status !== "resent" &&
+                        yearlyPlanDetail?.status !== "approved") ||
+                      false ||
+                      (yearlyPlanDetail?.userId
+                        ? yearlyPlanDetail.userId !== loggedUser
+                        : false)
+                    }
+                    onClick={() => showCommentPrompt("waiting for review")}
+                  >
+                    Send for Review
+                  </Button>
+                </Tooltip>
               </>
             )}
 
             {type === "reviewer" && (
               <>
-                <Button
-                  type="primary"
-                  disabled={false}
-                  onClick={() => showCommentPrompt("waiting for approval")}
-                >
-                  Send for Approval
-                </Button>
-                <Button
-                  type="default"
-                  disabled={false}
-                  danger
-                  onClick={() => showCommentPrompt("resent")}
-                >
-                  Resend
-                </Button>
+                <Tooltip title="Send for Approval">
+                  <Button
+                    type="primary"
+                    disabled={false}
+                    onClick={() => showCommentPrompt("waiting for approval")}
+                  >
+                    Send for Approval
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Resend">
+                  <Button
+                    type="default"
+                    disabled={false}
+                    danger
+                    onClick={() => showCommentPrompt("resent")}
+                  >
+                    Resend
+                  </Button>
+                </Tooltip>
               </>
             )}
 
             {type === "approver" && (
               <>
-                <Button
-                  type="primary"
-                  disabled={false}
-                  onClick={() => showCommentPrompt("approved")}
-                >
-                  Approve
-                </Button>
-                <Button
-                  type="default"
-                  disabled={false}
-                  danger
-                  onClick={() => showCommentPrompt("resent")}
-                >
-                  Resend
-                </Button>
+                <Tooltip title="Approve">
+                  <Button
+                    type="primary"
+                    disabled={false}
+                    onClick={() => showCommentPrompt("approved")}
+                  >
+                    Approve
+                  </Button>
+                </Tooltip>
+                <Tooltip title="Resend">
+                  <Button
+                    type="default"
+                    disabled={false}
+                    danger
+                    onClick={() => showCommentPrompt("resent")}
+                  >
+                    Resend
+                  </Button>
+                </Tooltip>
               </>
             )}
-            <Button
-              type="primary"
-              disabled={false}
-              onClick={() => {
-                if (type === "myforms") {
-                  router.push("/yearly-form/my-forms");
-                } else if (type === "approver") {
-                  router.push("/yearly-form/approver-view");
-                } else if (type === "reviewer") {
-                  router.push("/yearly-form/reviewer-view");
-                } else {
-                  router.push("/yearly-form/my-forms"); // Default fallback
-                }
-              }}
-            >
-              Cancel
-            </Button>
+            <Tooltip title="Cancel">
+              <Button
+                type="primary"
+                disabled={false}
+                onClick={() => {
+                  if (type === "myforms") {
+                    router.push("/yearly-form/my-forms");
+                  } else if (type === "approver") {
+                    router.push("/yearly-form/approver-view");
+                  } else if (type === "reviewer") {
+                    router.push("/yearly-form/reviewer-view");
+                  } else {
+                    router.push("/yearly-form/my-forms"); // Default fallback
+                  }
+                }}
+              >
+                Cancel
+              </Button>
+            </Tooltip>
           </Space>
         </Form.Item>
       </Form>
