@@ -1,6 +1,7 @@
 export const values = {
   projectName: "Project Alpha",
   month: "January",
+  year: "2025",
   goalsList: [
     {
       goal: "Complete Module 1",
