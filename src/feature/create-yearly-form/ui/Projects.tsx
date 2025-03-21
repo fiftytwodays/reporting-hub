@@ -59,6 +59,10 @@ const Projects: React.FC<ProjectsProps> = ({
 
   const handleChange = (value: string | number) => {
     form.setFieldsValue({ project: value });
+    if (projectsData) {
+      const project = projectsData.find((project) => project.id === value);
+      setSelectedValue(project?.name);
+    }
   };
 
   const transformProjectsData = (data?: Project[]) =>
