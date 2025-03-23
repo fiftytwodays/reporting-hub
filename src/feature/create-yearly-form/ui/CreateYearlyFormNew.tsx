@@ -205,7 +205,7 @@ export default function CreateYearlyFormNew({
       setLoggedUserDetails();
     }
     if ((id || draftSaved) && yearlyPlanDetail) {
-      // console.log("yearlyPlanDetail inside useEffect", yearlyPlanDetail);
+      setLoggedUserDetails(); 
       setReadOnly(
         (type !== "createNew" && type !== "myforms") ||
         (type === "myforms" &&
@@ -215,7 +215,7 @@ export default function CreateYearlyFormNew({
         (yearlyPlanDetail?.userId
           ? yearlyPlanDetail.userId !== loggedUser
           : false))
-      setLoggedUserDetails();
+
       setProjectFacilitator(yearlyPlanDetail.user);
       form.setFieldsValue({
         year: yearlyPlanDetail.year,
@@ -250,7 +250,7 @@ export default function CreateYearlyFormNew({
       setQuarterPlans(mappedQuarterPlans);
       setDraftSaved(undefined);
     }
-  }, [JSON.stringify(yearlyPlanDetail)]);
+  }, [JSON.stringify(yearlyPlanDetail), loggedUser]);
   useEffect(() => {
     // Warn user before closing or reloading the page
     const handleWindowClose = (event: BeforeUnloadEvent) => {
@@ -708,9 +708,9 @@ export default function CreateYearlyFormNew({
         </Row>
         <Row gutter={24} style={{ padding: "10px" }}>
           <Col xs={10}>
-          {yearlyPlanDetail?.comments && (<Form.Item label="Comments">
-            <Tooltip title={yearlyPlanDetail?.comments}>
-              <TextArea  autoSize={{minRows:1, maxRows:3}} readOnly  value={yearlyPlanDetail?.comments}/>
+            {yearlyPlanDetail?.comments && (<Form.Item label="Comments">
+              <Tooltip title={yearlyPlanDetail?.comments}>
+                <TextArea autoSize={{ minRows: 1, maxRows: 3 }} readOnly value={yearlyPlanDetail?.comments} />
               </Tooltip>
             </Form.Item>)}
           </Col>
