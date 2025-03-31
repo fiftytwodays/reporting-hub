@@ -13,16 +13,16 @@ interface ProjectsProps {
   form: FormInstance;
   id: string;
   fetchAll: boolean;
-  setProjectLoading: (loading: boolean) => void;
-  disabled: boolean;
+  setLoading: (loading: boolean) => void;
+  setSelectedProject?: (projectId: string) => void; // Optional onChange prop
 }
 
 const Projects: React.FC<ProjectsProps> = ({
   form,
   id,
   fetchAll,
-  setProjectLoading,
-  disabled,
+  setLoading,
+  setSelectedProject,
 }) => {
   const projectListData = useProjectList({
     condition: true,
@@ -50,8 +50,11 @@ const Projects: React.FC<ProjectsProps> = ({
       const project = projectsData.find((project) => project.id === id);
       setSelectedValue(project?.name);
     }
-    setProjectLoading(isProjectTypesDataLoading);
-  }, [isProjectTypesDataLoading, projectsData, id, setProjectLoading]);
+    setLoading(isProjectTypesDataLoading);
+
+    console.log("ProjectsData", projectsData);
+    console.log("isProjectTypesDataLoading", isProjectTypesDataLoading);
+  }, [isProjectTypesDataLoading, projectsData, id, setLoading]);
 
   if (!selectedValue && id && id !== "project") {
     console.log("Selected value is not set", selectedValue);
@@ -61,9 +64,8 @@ const Projects: React.FC<ProjectsProps> = ({
 
   const handleChange = (value: string | number) => {
     form.setFieldsValue({ project: value });
-    if (projectsData) {
-      const project = projectsData.find((project) => project.id === value);
-      setSelectedValue(project?.name);
+    if (setSelectedProject) {
+      setSelectedProject(value as string); // Call the optional onChange prop
     }
   };
 
@@ -77,7 +79,6 @@ const Projects: React.FC<ProjectsProps> = ({
     !isProjectTypesDataLoading &&
     projectsData && (
       <Select
-      disabled={disabled}
         showSearch
         dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
         allowClear
