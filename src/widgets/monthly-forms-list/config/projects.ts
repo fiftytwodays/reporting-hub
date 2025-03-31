@@ -87,54 +87,6 @@ export const years = [
   { label: "2040", value: "2040" },
 ];
 
-export const goals = [
-  {
-    goal: "Increase Sales by 20%",
-  },
-  {
-    goal: "Improve Customer Satisfaction",
-  },
-  {
-    goal: "Reduce Operational Costs",
-  },
-  {
-    goal: "Launch New Marketing Campaign",
-  },
-  {
-    goal: "Expand into New Markets",
-  },
-  {
-    goal: "Achieve 95% Employee Retention",
-  },
-  {
-    goal: "Enhance Product Quality",
-  },
-  {
-    goal: "Develop New Product Line",
-  },
-  {
-    goal: "Increase Website Traffic by 30%",
-  },
-  {
-    goal: "Strengthen Brand Awareness",
-  },
-  {
-    goal: "Improve Operational Efficiency",
-  },
-  {
-    goal: "Reduce Customer Churn",
-  },
-  {
-    goal: "Launch Mobile Application",
-  },
-  {
-    goal: "Increase Social Media Engagement",
-  },
-  {
-    goal: "Implement New CRM System",
-  },
-];
-
 export const achieved = [
   {
     label: "Yes",
