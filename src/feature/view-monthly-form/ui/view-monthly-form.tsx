@@ -1,5 +1,15 @@
 import React from "react";
-import { Form, Input, Row, Col, Select, Button, Space, Collapse } from "antd";
+import {
+  Form,
+  Input,
+  Row,
+  Col,
+  Select,
+  Button,
+  Space,
+  Collapse,
+  Divider,
+} from "antd";
 import { values as data } from "../api/dummy-data";
 
 const { Panel } = Collapse;
@@ -83,21 +93,28 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
           <h3>Outcomes from the Month Just Ended</h3> */}
 
           <Panel header="Outcomes from the Month Just Ended" key="1">
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>Goal</Col>
+              <Col span={4}>Achieved</Col>
+              <Col span={4}>Reason for not achieving</Col>
+              <Col span={4}>Major Goal</Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             {data.goalsList.map((goal, index) => (
               <Row gutter={24} key={index}>
+                <Col span={1}>
+                  <div>{index + 1}</div>
+                </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Goal" : ""}
-                    name={["goalsList", index, "goal"]}
-                  >
+                  <Form.Item name={["goalsList", index, "goal"]}>
                     <Input />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Achieved" : ""}
-                    name={["goalsList", index, "achieved"]}
-                  >
+                  <Form.Item name={["goalsList", index, "achieved"]}>
                     <Select>
                       <Select.Option value={true}>Yes</Select.Option>
                       <Select.Option value={false}>No</Select.Option>
@@ -105,18 +122,12 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Reason for not achieving" : ""}
-                    name={["goalsList", index, "whyNotAchieved"]}
-                  >
+                  <Form.Item name={["goalsList", index, "whyNotAchieved"]}>
                     <Input />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Major goal" : ""}
-                    name={["goalsList", index, "majorGoal"]}
-                  >
+                  <Form.Item name={["goalsList", index, "majorGoal"]}>
                     <Select>
                       <Select.Option value={true}>Yes</Select.Option>
                       <Select.Option value={false}>No</Select.Option>
@@ -124,10 +135,7 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Comments" : ""}
-                    name={["goalsList", index, "comments"]}
-                  >
+                  <Form.Item name={["goalsList", index, "comments"]}>
                     <Input />
                   </Form.Item>
                 </Col>
@@ -150,19 +158,27 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
             header="Additional activities other than that is planned"
             key="2"
           >
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>Activity</Col>
+              <Col span={4}>Functional area</Col>
+              <Col span={4}>Major Goal</Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             {data.additionalActivities.map((activity, index) => (
               <Row gutter={24} key={index}>
+                <Col span={1}>
+                  <div>{index + 1}</div>
+                </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Activity" : ""}
-                    name={["additionalActivities", index, "activity"]}
-                  >
+                  <Form.Item name={["additionalActivities", index, "activity"]}>
                     <Input />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={4}>
                   <Form.Item
-                    label={index === 0 ? "Functional area" : ""}
                     name={["additionalActivities", index, "functionalArea"]}
                   >
                     <Input />
@@ -170,7 +186,6 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
                 </Col>
                 <Col xs={24} sm={4}>
                   <Form.Item
-                    label={index === 0 ? "Major goal" : ""}
                     name={["additionalActivities", index, "majorGoal"]}
                   >
                     <Select>
@@ -180,10 +195,7 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Comments" : ""}
-                    name={["additionalActivities", index, "comments"]}
-                  >
+                  <Form.Item name={["additionalActivities", index, "comments"]}>
                     <Input />
                   </Form.Item>
                 </Col>
@@ -204,29 +216,32 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
           <h3>Goals for Next Month</h3> */}
 
           <Panel header="Goals for Next Month" key="3">
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>Activity</Col>
+              <Col span={4}>Functional area</Col>
+              <Col span={4}>Major Goal</Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             {data.nextMonthGoals.map((goal, index) => (
               <Row gutter={24} key={index}>
+                <Col span={1}>
+                  <div>{index + 1}</div>
+                </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Activity" : ""}
-                    name={["nextMonthGoals", index, "activity"]}
-                  >
+                  <Form.Item name={["nextMonthGoals", index, "activity"]}>
                     <Input />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Functional area" : ""}
-                    name={["nextMonthGoals", index, "functionalArea"]}
-                  >
+                  <Form.Item name={["nextMonthGoals", index, "functionalArea"]}>
                     <Input />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Major goal" : ""}
-                    name={["nextMonthGoals", index, "majorGoal"]}
-                  >
+                  <Form.Item name={["nextMonthGoals", index, "majorGoal"]}>
                     <Select>
                       <Select.Option value={true}>Yes</Select.Option>
                       <Select.Option value={false}>No</Select.Option>
@@ -234,10 +249,7 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={4}>
-                  <Form.Item
-                    label={index === 0 ? "Comments" : ""}
-                    name={["nextMonthGoals", index, "comments"]}
-                  >
+                  <Form.Item name={["nextMonthGoals", index, "comments"]}>
                     <Input />
                   </Form.Item>
                 </Col>
@@ -258,11 +270,22 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
           <h3>Additional activities for next month</h3> */}
 
           <Panel header="Additional activities for next month" key="4">
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>Activity</Col>
+              <Col span={4}>Functional area</Col>
+              <Col span={4}>Major Goal</Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             {data.additionalActivitiesNextMonth.map((goal, index) => (
               <Row gutter={24} key={index}>
+                <Col span={1}>
+                  <div>{index + 1}</div>
+                </Col>
                 <Col xs={24} sm={4}>
                   <Form.Item
-                    label={index === 0 ? "Activity" : ""}
                     name={["additionalActivitiesNextMonth", index, "activity"]}
                   >
                     <Input />
@@ -270,7 +293,6 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
                 </Col>
                 <Col xs={24} sm={4}>
                   <Form.Item
-                    label={index === 0 ? "Functional area" : ""}
                     name={[
                       "additionalActivitiesNextMonth",
                       index,
@@ -282,7 +304,6 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
                 </Col>
                 <Col xs={24} sm={4}>
                   <Form.Item
-                    label={index === 0 ? "Major goal" : ""}
                     name={["additionalActivitiesNextMonth", index, "majorGoal"]}
                   >
                     <Select>
@@ -293,7 +314,6 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
                 </Col>
                 <Col xs={24} sm={4}>
                   <Form.Item
-                    label={index === 0 ? "Comments" : ""}
                     name={["additionalActivitiesNextMonth", index, "comments"]}
                   >
                     <Input />
@@ -364,7 +384,7 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
         </Collapse>
       </Form>
 
-      <Space>
+      <Space style={{ marginTop: "16px" }}>
         <Button type="default" href="/monthly-form/my-forms">
           Back
         </Button>

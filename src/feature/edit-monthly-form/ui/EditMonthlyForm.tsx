@@ -22,6 +22,7 @@ import {
   Space,
   message,
   Collapse,
+  Divider,
 } from "antd";
 import { useEffect, useState } from "react";
 
@@ -181,22 +182,33 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
 
           <Panel header="Outcomes from the Month Just Ended" key="1">
             {/* Goals Section */}
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>Goal</Col>
+              <Col span={4}>
+                Achieved <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>Reason for not achieving</Col>
+              <Col span={4}>Major Goal</Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             <Form.List name="goalsList">
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name }) => (
-                    <Row align="middle" gutter={24} key={key}>
+                    <Row gutter={24} key={key}>
+                      <Col span={1}>
+                        <div>{name + 1}</div>
+                      </Col>
                       <Col xs={24} sm={4}>
-                        <Form.Item
-                          label={name === 0 ? "Goal" : ""}
-                          name={[name, "goal"]}
-                        >
+                        <Form.Item name={[name, "goal"]}>
                           <Input placeholder="Enter goal" disabled />
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={name === 0 ? "Achieved" : ""}
                           name={[name, "achieved"]}
                           rules={[
                             {
@@ -216,7 +228,6 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={name === 0 ? "Reason for not achieving" : ""}
                           name={[name, "whyNotAchieved"]}
                           dependencies={[name, "achieved"]}
                           required={false}
@@ -245,10 +256,7 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={4}>
-                        <Form.Item
-                          label={name === 0 ? "Major goal" : ""}
-                          name={[name, "majorGoal"]}
-                        >
+                        <Form.Item name={[name, "majorGoal"]}>
                           <Select
                             options={achieved}
                             placeholder="Major goal or not"
@@ -257,10 +265,7 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={4}>
-                        <Form.Item
-                          label={name === 0 ? "Comments" : ""}
-                          name={[name, "comments"]}
-                        >
+                        <Form.Item name={[name, "comments"]}>
                           <Input placeholder="Add comments" />
                         </Form.Item>
                       </Col>
@@ -291,14 +296,31 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
             key="2"
           >
             {/* Additional Activities Section */}
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>
+                Activity <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>
+                Functional area <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>
+                Major Goal <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             <Form.List name="additionalActivities">
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name }) => (
-                    <Row align="middle" gutter={24} key={key}>
+                    <Row gutter={24} key={key}>
+                      <Col span={1}>
+                        <div>{name + 1}</div>
+                      </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label="Activity"
                           name={[name, "activity"]}
                           rules={[
                             { required: true, message: "Activity is required" },
@@ -309,7 +331,6 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label="Functional Area"
                           name={[name, "functionalArea"]}
                           rules={[
                             {
@@ -326,7 +347,6 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={"Major goal"}
                           name={[name, "majorGoal"]}
                           rules={[
                             {
@@ -342,7 +362,7 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={4}>
-                        <Form.Item label="Comments" name={[name, "comments"]}>
+                        <Form.Item name={[name, "comments"]}>
                           <Input placeholder="Add comments" />
                         </Form.Item>
                       </Col>
@@ -359,11 +379,7 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                     </Row>
                   ))}
 
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    icon={<PlusOutlined />}
-                  >
+                  <Button type="dashed" onClick={() => add()} block>
                     Add additional activity
                   </Button>
                 </>
@@ -384,32 +400,35 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
             <h3>Goals for Next Month</h3> */}
           <Panel header="Goals for Next Month" key="3">
             {/* Goals for Next Month Section */}
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>Activity</Col>
+              <Col span={4}>Functional area</Col>
+              <Col span={4}>Major Goal</Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             <Form.List name="nextMonthGoals">
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name }) => (
-                    <Row align="middle" gutter={24} key={key}>
+                    <Row gutter={24} key={key}>
+                      <Col span={1}>
+                        <div>{name + 1}</div>
+                      </Col>
                       <Col xs={24} sm={4}>
-                        <Form.Item
-                          label={name === 0 ? "Goal" : ""}
-                          name={[name, "goal"]}
-                        >
+                        <Form.Item name={[name, "goal"]}>
                           <Input disabled />
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={4}>
-                        <Form.Item
-                          label={name === 0 ? "Functional area" : ""}
-                          name={[name, "functionalArea"]}
-                        >
+                        <Form.Item name={[name, "functionalArea"]}>
                           <Select options={functionalAreas} disabled />
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={4}>
-                        <Form.Item
-                          label={name === 0 ? "Major goal" : ""}
-                          name={[name, "majorGoal"]}
-                        >
+                        <Form.Item name={[name, "majorGoal"]}>
                           <Select
                             options={achieved}
                             placeholder="Major goal or not"
@@ -418,10 +437,7 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={4}>
-                        <Form.Item
-                          label={name === 0 ? "Comments" : ""}
-                          name={[name, "comments"]}
-                        >
+                        <Form.Item name={[name, "comments"]}>
                           <Input disabled />
                         </Form.Item>
                       </Col>
@@ -449,14 +465,31 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
 
           <Panel header="Additional activities for next month" key="4">
             {/* Additional Activities for Next Month Section */}
+            <Row gutter={24}>
+              <Col span={1}>Sl. No</Col>
+              <Col span={4}>
+                Activity <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>
+                Functional area <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>
+                Major Goal <span style={{ color: "red" }}>*</span>
+              </Col>
+              <Col span={4}>Comments</Col>
+              <Col span={2}></Col>
+            </Row>
+            <Divider></Divider>
             <Form.List name="additionalActivitiesNextMonth">
               {(fields, { add, remove }) => (
                 <>
                   {fields.map(({ key, name }) => (
-                    <Row align="middle" gutter={24} key={key}>
+                    <Row gutter={24} key={key}>
+                      <Col span={1}>
+                        <div>{name + 1}</div>
+                      </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label="Activity"
                           name={[name, "activity"]}
                           rules={[
                             { required: true, message: "Activity is required" },
@@ -467,7 +500,6 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label="Functional Area"
                           name={[name, "functionalArea"]}
                           rules={[
                             {
@@ -484,7 +516,6 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                       </Col>
                       <Col xs={24} sm={4}>
                         <Form.Item
-                          label={"Major goal"}
                           name={[name, "majorGoal"]}
                           rules={[
                             {
@@ -500,7 +531,7 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={4}>
-                        <Form.Item label="Comments" name={[name, "comments"]}>
+                        <Form.Item name={[name, "comments"]}>
                           <Input placeholder="Add comments" />
                         </Form.Item>
                       </Col>
@@ -517,11 +548,7 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                     </Row>
                   ))}
 
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    icon={<PlusOutlined />}
-                  >
+                  <Button type="dashed" onClick={() => add()} block>
                     Add additional activity
                   </Button>
                 </>
@@ -552,7 +579,10 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                       <>
                         {fields.map(({ key, name }) => (
                           <Row key={key} gutter={24}>
-                            <Col xs={20}>
+                            <Col span={1}>
+                              <div>{name + 1}</div>
+                            </Col>
+                            <Col xs={16}>
                               <Form.Item
                                 name={[name, "praise"]}
                                 rules={[
@@ -566,21 +596,23 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                               </Form.Item>
                             </Col>
                             <Col xs={4}>
-                              {key !== 0 && (
-                                <MinusCircleOutlined
-                                  onClick={() => remove(name)}
-                                />
-                              )}
+                              <DeleteTwoTone
+                                onClick={() => remove(name)}
+                                twoToneColor="#FF0000"
+                              />
                             </Col>
                           </Row>
                         ))}
                         <Form.Item>
-                          <Button
+                          {/* <Button
                             type="dashed"
                             icon={<PlusOutlined />}
                             onClick={() => add()} // Add another input field
                           >
                             Add Praise Point
+                          </Button> */}
+                          <Button type="dashed" onClick={() => add()} block>
+                            Add praise point
                           </Button>
                         </Form.Item>
                       </>
@@ -613,7 +645,10 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                       <>
                         {fields.map(({ key, name }) => (
                           <Row key={key} gutter={24}>
-                            <Col xs={20}>
+                            <Col span={1}>
+                              <div>{name + 1}</div>
+                            </Col>
+                            <Col xs={16}>
                               <Form.Item
                                 name={[name, "prayerRequest"]}
                                 rules={[
@@ -627,21 +662,16 @@ const EditMonthlyForm: React.FC<EditMonthlyFormProps> = ({
                               </Form.Item>
                             </Col>
                             <Col xs={4}>
-                              {key !== 0 && (
-                                <MinusCircleOutlined
-                                  onClick={() => remove(name)}
-                                />
-                              )}
+                              <DeleteTwoTone
+                                onClick={() => remove(name)}
+                                twoToneColor="#FF0000"
+                              />
                             </Col>
                           </Row>
                         ))}
                         <Form.Item>
-                          <Button
-                            type="dashed"
-                            icon={<PlusOutlined />}
-                            onClick={() => add()} // Add another input field
-                          >
-                            Add Prayer Request
+                          <Button type="dashed" onClick={() => add()} block>
+                            Add praise point
                           </Button>
                         </Form.Item>
                       </>

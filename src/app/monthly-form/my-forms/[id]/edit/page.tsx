@@ -5,13 +5,8 @@ import EditMonthlyFormPage from "@/feature/edit-monthly-form/ui/EditMonthlyFormP
 
 Amplify.configure(outputs);
 
-
 const EditMonthlyForm = () => {
-
-  return (
-      <EditMonthlyFormPage id={"1"} />
-  );
+  return <EditMonthlyFormPage id={"1"} />;
 };
 
 export default EditMonthlyForm;
-

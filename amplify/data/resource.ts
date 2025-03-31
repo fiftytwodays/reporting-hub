@@ -174,78 +174,85 @@ const schema = a.schema({
     .model({
       name: a.string().required(),
       description: a.string(),
-      plan: a.hasMany("Plan", "functionalAreaId")
+      plan: a.hasMany("Plan", "functionalAreaId"),
     })
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
   Project: a
-  .model({
-    name: a.string().required(),
-    location: a.string().required(),
-    projectTypeId: a.id(),
-    projectType: a.belongsTo("ProjectType", "projectTypeId"), // Belongs to ProjectType
-    clusterId: a.id(), //
-    cluster: a.belongsTo("Cluster", "clusterId"), // Belongs to Cluster
-    description: a.string(),
-    yearlyPlan: a.hasMany("YearlyPlan", "projectId")
-  })
-  .authorization((allow) => [
-    allow.authenticated().to(["read"]),
-    allow.groups(["admin"]),
-  ]),
+    .model({
+      name: a.string().required(),
+      location: a.string().required(),
+      projectTypeId: a.id(),
+      projectType: a.belongsTo("ProjectType", "projectTypeId"), // Belongs to ProjectType
+      clusterId: a.id(), //
+      cluster: a.belongsTo("Cluster", "clusterId"), // Belongs to Cluster
+      description: a.string(),
+      yearlyPlan: a.hasMany("YearlyPlan", "projectId"),
+      monthlyForms: a.hasMany("MonthlyForm", "projectId"), 
+    })
+    .authorization((allow) => [
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
+    ]),
   YearlyPlan: a
-  .model({
-    user: a.string(),
-    userId: a.string().required(),
-    projectId: a.string(),
-    project: a.belongsTo("Project", "projectId"),
-    comments: a.string(),
-    status: a.string(), 
-    year: a.string(),
-    reviewedBy: a.string(), 
-    approvedBy: a.string(),
-    quarterlyPlan: a.hasMany("QuarterlyPlan", "yearlyPlanId")
-  })
-  .authorization((allow) => [
-    allow.authenticated().to(["read", "update"]),
-    allow.owner(),
-    allow.groups(["admin"]),
-  ]),
+    .model({
+      user: a.string(),
+      userId: a.string().required(),
+      projectId: a.string(),
+      project: a.belongsTo("Project", "projectId"),
+      comments: a.string(),
+      status: a.string(),
+      year: a.string(),
+      reviewedBy: a.string(),
+      approvedBy: a.string(),
+      quarterlyPlan: a.hasMany("QuarterlyPlan", "yearlyPlanId"),
+    })
+    .secondaryIndexes((index) => [
+      index("year"),
+      index("userId"),
+      index("projectId"),
+    ])
+    .authorization((allow) => [
+      allow.authenticated().to(["read", "update"]),
+      allow.owner(),
+      allow.groups(["admin"]),
+    ]),
   QuarterlyPlan: a
-  .model({
-    yearlyPlanId: a.id(),
-    yearlyPlan: a.belongsTo("YearlyPlan", "yearlyPlanId"),
-    quarter: a.integer(),
-    status: a.string(), 
-    reviewedBy: a.string(), 
-    approvedBy: a.string(),
-    plan: a.hasMany("Plan", "quarterlyPlanId")
-  })
-  .secondaryIndexes((index)=>[index("yearlyPlanId")])
-  .authorization((allow) => [
-    allow.authenticated().to(["read", "update"]),
-    allow.owner(),
-    allow.groups(["admin"]),
-  ]),
+    .model({
+      yearlyPlanId: a.id(),
+      yearlyPlan: a.belongsTo("YearlyPlan", "yearlyPlanId"),
+      quarter: a.integer(),
+      status: a.string(),
+      reviewedBy: a.string(),
+      approvedBy: a.string(),
+      plan: a.hasMany("Plan", "quarterlyPlanId"),
+    })
+    .secondaryIndexes((index) => [index("yearlyPlanId"), index("quarter")])
+    .authorization((allow) => [
+      allow.authenticated().to(["read", "update"]),
+      allow.owner(),
+      allow.groups(["admin"]),
+    ]),
   Plan: a
-  .model({
-    quarterlyPlanId: a.id(),
-    quarterlyPlan: a.belongsTo("QuarterlyPlan", "quarterlyPlanId"),
-    activity: a.string().required(),
-    month: a.string().array(),
-    functionalAreaId: a.id(),
-    functionalArea: a.belongsTo("FunctionalArea", "functionalAreaId"),
-    comments: a.string(),
-    isMajorGoal: a.boolean(),
-  })
-  .secondaryIndexes((index)=>[index("quarterlyPlanId")])
-  .authorization((allow) => [
-    allow.authenticated().to(["read", "update"]),
-    allow.owner(),
-    allow.groups(["admin"]),
-  ]),
+    .model({
+      quarterlyPlanId: a.id(),
+      quarterlyPlan: a.belongsTo("QuarterlyPlan", "quarterlyPlanId"),
+      activity: a.string().required(),
+      month: a.string().array(),
+      functionalAreaId: a.id(),
+      functionalArea: a.belongsTo("FunctionalArea", "functionalAreaId"),
+      comments: a.string(),
+      isMajorGoal: a.boolean(),
+      outcomes: a.hasMany("Outcome", "activityId"),
+    })
+    .secondaryIndexes((index) => [index("quarterlyPlanId")])
+    .authorization((allow) => [
+      allow.authenticated().to(["read", "update"]),
+      allow.owner(),
+      allow.groups(["admin"]),
+    ]),
   Organization: a
     .model({
       name: a.string().required(),
@@ -264,6 +271,51 @@ const schema = a.schema({
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
+  MonthlyForm: a
+    .model({
+      id: a.string().required(),
+      projectId: a.string().required(),
+      project: a.belongsTo("Project", "projectId"),
+      month: a.string().required(),
+      year: a.string().required(),
+      status: a.string(),
+      facilitator: a.string(),
+      praisePoints: a.string().array(),
+      prayerRequests: a.string().array(),
+      story: a.string(),
+      concerns: a.string(),
+      comments: a.string(),
+      outcomes: a.hasMany("Outcome", "monthlyFormId"), 
+      // additionalActivities: a.hasMany("AdditionalActivity", "monthlyFormId"),
+    })
+    .authorization((allow) => [
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
+    ]),
+  Outcome: a.model({
+    monthlyFormId: a.string().required(),
+    monthlyForm: a.belongsTo("MonthlyForm", "monthlyFormId"),
+    activityId: a.string().required(),
+    activity: a.belongsTo("Plan", "activityId"),
+    reason: a.string(),
+    achieved: a.boolean(),
+    comments: a.string(),
+  })
+  .authorization((allow) => [
+    allow.authenticated().to(["read"]),
+    allow.groups(["admin"]),
+  ]),
+  // AdditionalActivity: a
+  //   .model({
+  //     monthlyFormId: a.string().required(),
+  //     monthlyForm: a.belongsTo("MonthlyForm", "monthlyFormId"),
+  //     activityId: a.string().required(),
+  //     activity: a.belongsTo("Plan", "activityId"),
+  //   })
+  //   .authorization((allow) => [
+  //     allow.authenticated().to(["read"]),
+  //     allow.groups(["admin"]),
+  //   ]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
