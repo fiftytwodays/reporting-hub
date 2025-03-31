@@ -139,6 +139,7 @@ export default function CreateYearlyFormNew({
   >(null);
   // const [draftSaved, setDraftSaved] = useState("");
   const [draftSaved, setDraftSaved] = useState<string | undefined>(undefined);
+  const [projectDisabled, setProjectDisabled] = useState(false);
 
 
   const monthsArray = [
@@ -501,6 +502,7 @@ export default function CreateYearlyFormNew({
           }
           if ((type === "createNew" || type === "myforms") && status === "draft") {
             setDraftSaved(yearlyPlanResp?.id);
+            setProjectDisabled(true);
             mutateYearlyPlanDetail();
           }
         }
@@ -678,7 +680,8 @@ export default function CreateYearlyFormNew({
               rules={[{ required: true, message: "Project is required" }]}
             >
               <Projects
-                disabled={readOnly}
+              key={`${projectDisabled}-${form.getFieldValue("project")}`}
+                disabled={readOnly || type !== "createNew" || projectDisabled} 
                 form={form}
                 fetchAll={
                   (type !== "createNew" && type !== "myforms") ||
