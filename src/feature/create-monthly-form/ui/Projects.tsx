@@ -63,6 +63,14 @@ const Projects: React.FC<ProjectsProps> = ({
   }
 
   const handleChange = (value: string | number) => {
+    form.resetFields([
+      "additionalActivities",
+      "additionalActivitiesNextMonth",
+      "praisePoints",
+      "prayerRequests",
+      "storyTestimony",
+      "concernsStruggles",
+    ]);
     form.setFieldsValue({ project: value });
     if (setSelectedProject) {
       setSelectedProject(value as string); // Call the optional onChange prop
