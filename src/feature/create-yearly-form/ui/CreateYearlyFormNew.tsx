@@ -125,6 +125,7 @@ export default function CreateYearlyFormNew({
   const [loading, setLoading] = useState(false);
   const [projectLoading, setProjectLoading] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
+  const [actionsDisabled, setActionsDisabled] = useState(false);
   const [comment, setComment] = useState<string>("");
   const [modalVisible, setModalVisible] = useState(false);
   const [status, setStatus] = useState("");
@@ -206,7 +207,7 @@ export default function CreateYearlyFormNew({
       setLoggedUserDetails();
     }
     if ((id || draftSaved) && yearlyPlanDetail) {
-      setLoggedUserDetails(); 
+      setLoggedUserDetails();
       setReadOnly(
         (type !== "createNew" && type !== "myforms") ||
         (type === "myforms" &&
@@ -429,7 +430,8 @@ export default function CreateYearlyFormNew({
           user: yearlyPlanDetail?.user ?? projectFacilitator,
           userId: yearlyPlanDetail?.userId ?? userId,
           projectId: formValues.project,
-          ...(comment && "" != comment && { comments: comment }),
+          // ...(comment && "" != comment && { comments: comment }),
+          comments: comment ?? "",
           status: status,
           year: formValues.year,
           ...(yearlyPlanDetail?.id &&
@@ -511,6 +513,9 @@ export default function CreateYearlyFormNew({
           deletePlan({ ids: plansToDelete });
         }
         isDirty.current = false;
+        if (status != "draft") {
+          setActionsDisabled(true);
+        }
         setLoading(false);
         if (status === "waiting for review") {
           await messageApi.success("Yearly Plan submitted for review.");
@@ -538,6 +543,7 @@ export default function CreateYearlyFormNew({
         } else if (type === "reviewer") {
           router.push("/yearly-form/reviewer-view");
         }
+
       }
     } catch (error: any) {
       console.error("Error saving data:", error);
@@ -680,8 +686,8 @@ export default function CreateYearlyFormNew({
               rules={[{ required: true, message: "Project is required" }]}
             >
               <Projects
-              key={`${projectDisabled}-${form.getFieldValue("project")}`}
-                disabled={readOnly || type !== "createNew" || projectDisabled} 
+                key={`${projectDisabled}-${form.getFieldValue("project")}`}
+                disabled={readOnly || type !== "createNew" || projectDisabled}
                 form={form}
                 fetchAll={
                   (type !== "createNew" && type !== "myforms") ||
@@ -901,14 +907,14 @@ export default function CreateYearlyFormNew({
                   <Button
                     type="primary"
                     disabled={
-                      (type !== "createNew" &&
+                      (actionsDisabled || (type !== "createNew" &&
                         yearlyPlanDetail?.status !== "draft" &&
                         yearlyPlanDetail?.status !== "resent" &&
                         yearlyPlanDetail?.status !== "approved") ||
                       false ||
                       (yearlyPlanDetail?.userId
                         ? yearlyPlanDetail.userId !== loggedUser
-                        : false)
+                        : false))
                     }
                     onClick={() => showCommentPrompt("draft")}
                   >
@@ -919,14 +925,14 @@ export default function CreateYearlyFormNew({
                   <Button
                     type="primary"
                     disabled={
-                      (type !== "createNew" &&
+                      (actionsDisabled || (type !== "createNew" &&
                         yearlyPlanDetail?.status !== "draft" &&
                         yearlyPlanDetail?.status !== "resent" &&
                         yearlyPlanDetail?.status !== "approved") ||
                       false ||
                       (yearlyPlanDetail?.userId
                         ? yearlyPlanDetail.userId !== loggedUser
-                        : false)
+                        : false))
                     }
                     onClick={() => showCommentPrompt("waiting for review")}
                   >
@@ -941,7 +947,7 @@ export default function CreateYearlyFormNew({
                 <Tooltip title="Send for Approval">
                   <Button
                     type="primary"
-                    disabled={false}
+                    disabled={actionsDisabled}
                     onClick={() => showCommentPrompt("waiting for approval")}
                   >
                     Send for Approval
@@ -950,7 +956,7 @@ export default function CreateYearlyFormNew({
                 <Tooltip title="Resend">
                   <Button
                     type="default"
-                    disabled={false}
+                    disabled={actionsDisabled}
                     danger
                     onClick={() => showCommentPrompt("resent")}
                   >
@@ -965,7 +971,7 @@ export default function CreateYearlyFormNew({
                 <Tooltip title="Approve">
                   <Button
                     type="primary"
-                    disabled={false}
+                    disabled={actionsDisabled}
                     onClick={() => showCommentPrompt("approved")}
                   >
                     Approve
@@ -974,7 +980,7 @@ export default function CreateYearlyFormNew({
                 <Tooltip title="Resend">
                   <Button
                     type="default"
-                    disabled={false}
+                    disabled={actionsDisabled}
                     danger
                     onClick={() => showCommentPrompt("resent")}
                   >
