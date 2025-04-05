@@ -190,7 +190,7 @@ const schema = a.schema({
       cluster: a.belongsTo("Cluster", "clusterId"), // Belongs to Cluster
       description: a.string(),
       yearlyPlan: a.hasMany("YearlyPlan", "projectId"),
-      monthlyForms: a.hasMany("MonthlyForm", "projectId"), 
+      monthlyForms: a.hasMany("MonthlyForm", "projectId"),
     })
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
@@ -273,7 +273,6 @@ const schema = a.schema({
     ]),
   MonthlyForm: a
     .model({
-      id: a.string().required(),
       projectId: a.string().required(),
       project: a.belongsTo("Project", "projectId"),
       month: a.string().required(),
@@ -285,26 +284,27 @@ const schema = a.schema({
       story: a.string(),
       concerns: a.string(),
       comments: a.string(),
-      outcomes: a.hasMany("Outcome", "monthlyFormId"), 
+      outcomes: a.hasMany("Outcome", "monthlyFormId"),
       // additionalActivities: a.hasMany("AdditionalActivity", "monthlyFormId"),
     })
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
     ]),
-  Outcome: a.model({
-    monthlyFormId: a.string().required(),
-    monthlyForm: a.belongsTo("MonthlyForm", "monthlyFormId"),
-    activityId: a.string().required(),
-    activity: a.belongsTo("Plan", "activityId"),
-    reason: a.string(),
-    achieved: a.boolean(),
-    comments: a.string(),
-  })
-  .authorization((allow) => [
-    allow.authenticated().to(["read"]),
-    allow.groups(["admin"]),
-  ]),
+  Outcome: a
+    .model({
+      monthlyFormId: a.string(),
+      monthlyForm: a.belongsTo("MonthlyForm", "monthlyFormId"),
+      activityId: a.string(),
+      activity: a.belongsTo("Plan", "activityId"),
+      reason: a.string(),
+      achieved: a.boolean(),
+      comments: a.string(),
+    })
+    .authorization((allow) => [
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
+    ]),
   // AdditionalActivity: a
   //   .model({
   //     monthlyFormId: a.string().required(),
