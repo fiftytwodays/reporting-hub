@@ -33,6 +33,12 @@ import usePlansFetcher from "../api/get-all-goals";
 import { getCurrentUser } from "@aws-amplify/auth";
 import Projects from "./Projects";
 import useFunctionalAreaList from "../api/functional-area-options";
+import { useSaveMonthlyForm } from "../api/handle-monthly-form";
+import { useSaveOutcomes } from "../api/create-outcome";
+import { useDeleteMonthlyForm } from "../api/delete-monthly-form";
+import { useMonthlyFormsList } from "../api/get-monthlyForms";
+import { getAllOutcomes } from "../api/get-outcomes";
+import { useUpdateMonthlyForm } from "../api/update-monthly-form";
 
 const { Panel } = Collapse;
 
@@ -49,6 +55,7 @@ interface Goal {
 }
 
 interface FormValues {
+  id: string;
   project: string;
   month: string;
   goalsList: Goal[];
@@ -104,13 +111,28 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
   //   }
   // };
 
-  console.log("Plans");
   setLoggedUserDetails();
+
+  const {
+    saveMonthlyForm,
+    savedMonthlyForm,
+    isMonthlyFormSaving,
+    saveMonthlyFormError,
+  } = useSaveMonthlyForm();
+
+  const { saveOutcome, savedOutcomes, isOutcomesSaving, saveOutcomesError } =
+    useSaveOutcomes();
+
+  // const { monthlyFormsList } = useMonthlyFormsList({
+  //   condition: true,
+  // });
+
+  // console.log("Monthly Forms List", monthlyFormsList);
+
+  const { deleteMonthlyForm } = useDeleteMonthlyForm();
 
   const { functionalAreasData, isFunctionalAreaTypesDataLoading } =
     useFunctionalAreaList({ condition: true });
-
-  console.log("Functional Areas Data", functionalAreasData);
 
   const {
     plans,
@@ -141,9 +163,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
   }, [form]);
 
   const handleSubmit = (values: FormValues) => {
-    console.log("Form values:", values);
-    console.log("Form values:", values);
-
     const incompleteFields = values.goalsList.some(
       (goal) =>
         goal.achieved === undefined ||
@@ -156,6 +175,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       );
       return;
     }
+
     messageApi.success("Monthly form created successfully");
     console.log(values);
   };
@@ -168,6 +188,98 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     form.setFieldsValue({
       goalsList: currentGoals,
     });
+  };
+
+  async function handleSaveAsDraft(): Promise<void> {
+    const formValues = form.getFieldsValue();
+    console.log("Form values:", formValues);
+    const monthlyFormPayload = {
+      id: formValues.id || undefined, // Optional, if editing an existing form
+      projectId: formValues.project, // Maps to `projectId`
+      month: formValues.month, // Maps to `month`
+      year: formValues.year, // Maps to `year`
+      status: "draft", // Assuming "draft" is the status for saving as draft
+      facilitator: loggedUser, // Maps to `facilitator`
+      praisePoints:
+        formValues.praisePoints?.map((point: { point: any }) => point.point) ||
+        [], // Maps to `praisePoints`
+      prayerRequests:
+        formValues.prayerRequests?.map(
+          (request: { request: any }) => request.request
+        ) || [], // Maps to `prayerRequests`
+      story: formValues.storyTestimony || "", // Maps to `story`
+      concerns: formValues.concernsStruggles || "", // Maps to `concerns`
+      comments: "", // Assuming comments are not part of the form values
+    };
+
+    // monthlyFormPayload.id
+    // ?
+    createMonthlyForm(monthlyFormPayload, formValues);
+    // : updateExistingMonthlyForm(monthlyFormPayload, formValues);
+  }
+
+  const createMonthlyForm = async (
+    monthlyFormPayload: any,
+    formValues: any
+  ) => {
+    await saveMonthlyForm(monthlyFormPayload)
+      .then(async (response) => {
+        form.setFieldValue("id", response.id);
+
+        if (response && response.id) {
+          const outcomes =
+            formValues.goalsList?.map(
+              (
+                goal: {
+                  id: any;
+                  whyNotAchieved: any;
+                  achieved: any;
+                  comments: any;
+                },
+                index: string | number
+              ) => {
+                const correspondingGoal = !Array.isArray(plans)
+                  ? plans.CurrentMonthGoals[index as number]
+                  : undefined; // Match by index
+                return {
+                  id: goal.id || undefined, // Maps to `id`
+                  monthlyFormId: response.id, // Maps to `monthlyFormId`
+                  activityId: correspondingGoal?.id || "", // Take `id` from CurrentMonthGoals
+                  reason: goal.whyNotAchieved || "", // Maps to `reason`
+                  achieved: goal.achieved, // Maps to `achieved`
+                  comments: goal.comments || "", // Maps to `comments`
+                };
+              }
+            ) || [];
+          for (const outcomePayload of outcomes) {
+            try {
+              const outcomeResponse = await saveOutcome(outcomePayload);
+              if (outcomeResponse && outcomeResponse.id) {
+                const currentGoals = form.getFieldValue("goalsList");
+                const goalIndex = outcomes.indexOf(outcomePayload);
+                if (goalIndex !== -1) {
+                  currentGoals[goalIndex].id = outcomeResponse.id;
+                  form.setFieldsValue({
+                    goalsList: currentGoals,
+                  });
+                }
+              }
+            } catch (error) {
+              console.error("Error saving individual outcome:", error);
+              messageApi.error(
+                "An error occurred while saving the monthly form."
+              );
+              throw new Error("Failed to save one or more outcomes.");
+            }
+          }
+        } else {
+          messageApi.error("Failed to save the monthly form.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error saving monthly form:", error);
+        messageApi.error("An error occurred while saving the monthly form.");
+      });
   };
 
   return (
@@ -184,6 +296,10 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       }}
       // onValuesChange={handleValuesChange}
     >
+      {/* Hidden Form Item for ID */}
+      <Form.Item name="id" hidden>
+        <Input type="hidden" />
+      </Form.Item>
       {/* Project and Month Section */}
       <Row gutter={24}>
         <Col xs={24} sm={6}>
@@ -262,6 +378,9 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               <Col span={1}>
                                 <div>{index + 1}</div>
                               </Col>
+                              <Form.Item name={[index, "id"]} hidden>
+                                <Input type="hidden" />
+                              </Form.Item>
                               <Col xs={24} sm={4}>
                                 <Form.Item
                                   // label={name === 0 ? "Goal" : ""}
@@ -327,13 +446,12 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 <Form.Item
                                   // label={name === 0 ? "Major goal" : ""}
                                   name={[index, "majorGoal"]}
+                                  initialValue={
+                                    plans.CurrentMonthGoals[index]?.isMajorGoal
+                                  }
                                 >
                                   <Select
                                     options={achieved}
-                                    defaultValue={
-                                      plans.CurrentMonthGoals[index]
-                                        ?.isMajorGoal
-                                    }
                                     placeholder="Major goal or not"
                                     disabled
                                   />
@@ -343,14 +461,12 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 <Form.Item
                                   // label={name === 0 ? "Comments" : ""}
                                   name={[index, "comments"]}
+                                  initialValue={
+                                    plans.CurrentMonthGoals[index]?.comments ??
+                                    ""
+                                  }
                                 >
-                                  <Input
-                                    placeholder="Add comments"
-                                    defaultValue={
-                                      plans.CurrentMonthGoals[index]
-                                        ?.comments ?? ""
-                                    }
-                                  />
+                                  <Input placeholder="Add comments" />
                                 </Form.Item>
                               </Col>
                             </Row>
@@ -917,7 +1033,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
               <Button type="default" href="/monthly-form/my-forms">
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit"
+                onClick={handleSaveAsDraft}
+              >
                 Save as draft
               </Button>
               <Button type="primary" htmlType="submit">
