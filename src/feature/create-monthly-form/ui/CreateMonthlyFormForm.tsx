@@ -39,6 +39,7 @@ import { useDeleteMonthlyForm } from "../api/delete-monthly-form";
 import { useMonthlyFormsList } from "../api/get-monthlyForms";
 import { getAllOutcomes } from "../api/get-outcomes";
 import { useUpdateMonthlyForm } from "../api/update-monthly-form";
+import { useSaveAdditionalActivity } from "../api/create-additional-activity";
 
 const { Panel } = Collapse;
 
@@ -60,6 +61,7 @@ interface FormValues {
   month: string;
   goalsList: Goal[];
   additionalActivities: Array<{
+    id: string;
     activity: string;
     majorGoal: boolean;
     functionalArea: string;
@@ -123,6 +125,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
   const { saveOutcome, savedOutcomes, isOutcomesSaving, saveOutcomesError } =
     useSaveOutcomes();
 
+  const { saveAdditionalActivity } = useSaveAdditionalActivity();
+
   // const { monthlyFormsList } = useMonthlyFormsList({
   //   condition: true,
   // });
@@ -162,9 +166,9 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     form.setFieldValue("year", currentYear);
   }, [form]);
 
-  const handleSubmit = (values: FormValues) => {
+  const handleSubmit = (values: any) => {
     const incompleteFields = values.goalsList.some(
-      (goal) =>
+      (goal: Goal) =>
         goal.achieved === undefined ||
         (goal.achieved === false && !goal.whyNotAchieved)
     );
@@ -180,7 +184,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     console.log(values);
   };
 
-  const handleAchievedChange = (value: FormValues, index: number) => {
+  const handleAchievedChange = (value: any, index: number) => {
     const currentGoals = form.getFieldValue("goalsList");
     currentGoals[index].achieved = value;
 
@@ -251,6 +255,25 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 };
               }
             ) || [];
+          const additionalActivities =
+            formValues.additionalActivities?.map(
+              (activity: {
+                id: any;
+                activity: any;
+                majorGoal: any;
+                functionalArea: any;
+                comments: any;
+              }) => {
+                return {
+                  id: activity.id || undefined, // Maps to `id`
+                  monthlyFormId: response.id, // Maps to `monthlyFormId`
+                  activity: activity.activity || "", // Maps to `activity`
+                  majorGoal: activity.majorGoal, // Maps to `majorGoal`
+                  functionalAreaId: activity.functionalArea || "", // Maps to `functionalAreaId`
+                  comments: activity.comments || "", // Maps to `comments`
+                };
+              }
+            ) || [];
           for (const outcomePayload of outcomes) {
             try {
               const outcomeResponse = await saveOutcome(outcomePayload);
@@ -272,6 +295,36 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
               throw new Error("Failed to save one or more outcomes.");
             }
           }
+
+          for (const additionalActivity of additionalActivities) {
+            try {
+              const additionalActivityResponse = await saveAdditionalActivity(
+                additionalActivity
+              );
+              if (additionalActivityResponse && additionalActivityResponse.id) {
+                const additionalActivities = form.getFieldValue(
+                  "additionalActivities"
+                );
+                const activityIndex =
+                  additionalActivities.indexOf(additionalActivity);
+                if (activityIndex !== -1) {
+                  additionalActivities[activityIndex].id =
+                    additionalActivityResponse.id;
+                  form.setFieldsValue({
+                    additionalActivities: additionalActivities,
+                  });
+                }
+              }
+            } catch (error) {
+              console.error("Error saving additional activity:", error);
+              messageApi.error(
+                "An error occurred while saving the monthly form."
+              );
+              throw new Error(
+                "Failed to save one or more additional activity."
+              );
+            }
+          }
         } else {
           messageApi.error("Failed to save the monthly form.");
         }
@@ -289,10 +342,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       layout="vertical"
       initialValues={{
         goalsList: Array.isArray(plans) ? [] : plans.CurrentMonthGoals,
-        nextMonthGoals:
-          !Array.isArray(plans) && plans?.NextMonthGoals
-            ? plans.NextMonthGoals
-            : [],
+        nextMonthGoals: Array.isArray(plans) ? [] : plans.NextMonthGoals,
       }}
       // onValuesChange={handleValuesChange}
     >
@@ -383,7 +433,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               </Form.Item>
                               <Col xs={24} sm={4}>
                                 <Form.Item
-                                  // label={name === 0 ? "Goal" : ""}
                                   name={[index, "goal"]}
                                   initialValue={
                                     plans.CurrentMonthGoals[index]?.activity
@@ -394,7 +443,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               </Col>
                               <Col xs={24} sm={4}>
                                 <Form.Item
-                                  // label={name === 0 ? "Achieved" : ""}
                                   name={[index, "achieved"]}
                                   rules={[
                                     {
@@ -414,7 +462,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               </Col>
                               <Col xs={24} sm={4}>
                                 <Form.Item
-                                  // label={name === 0 ? "Reason for not achieving" : ""}
                                   name={[index, "whyNotAchieved"]}
                                   dependencies={[index, "achieved"]}
                                   required={false}
@@ -444,7 +491,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               </Col>
                               <Col xs={24} sm={4}>
                                 <Form.Item
-                                  // label={name === 0 ? "Major goal" : ""}
                                   name={[index, "majorGoal"]}
                                   initialValue={
                                     plans.CurrentMonthGoals[index]?.isMajorGoal
@@ -459,7 +505,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               </Col>
                               <Col xs={24} sm={4}>
                                 <Form.Item
-                                  // label={name === 0 ? "Comments" : ""}
                                   name={[index, "comments"]}
                                   initialValue={
                                     plans.CurrentMonthGoals[index]?.comments ??
@@ -475,20 +520,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   )}
                 </Form.List>
               </Panel>
-              {/* </div> */}
-
-              {/* Additional Activities Section */}
-              {/* <div
-            style={{
-              border: "1px solid #d9d9d9",
-              borderRadius: "8px",
-              padding: "10px",
-              marginTop: "16px",
-            }}
-          >
-            <h3 style={{ marginBottom: "16px" }}>
-              Additional activities other than that is planned
-            </h3> */}
 
               <Panel
                 header="Additional activities other than that is planned"
@@ -513,15 +544,17 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 <Form.List name="additionalActivities">
                   {(fields, { add, remove }) => (
                     <>
-                      {fields.map(({ key, name }) => (
-                        <Row gutter={24} key={key}>
+                      {fields.map((field, index) => (
+                        <Row gutter={24} key={index}>
                           <Col span={1}>
-                            <div>{name + 1}</div>
+                            <div>{index + 1}</div>
                           </Col>
+                          <Form.Item name={[index, "id"]} hidden>
+                            <Input type="hidden" />
+                          </Form.Item>
                           <Col xs={24} sm={4}>
                             <Form.Item
-                              // label="Activity"
-                              name={[name, "activity"]}
+                              name={[index, "activity"]}
                               rules={[
                                 {
                                   required: true,
@@ -534,8 +567,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                           </Col>
                           <Col xs={24} sm={4}>
                             <Form.Item
-                              // label="Functional Area"
-                              name={[name, "functionalArea"]}
+                              name={[index, "functionalArea"]}
                               rules={[
                                 {
                                   required: true,
@@ -551,13 +583,12 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                           </Col>
                           <Col xs={24} sm={4}>
                             <Form.Item
-                              // label={"Major goal"}
-                              name={[name, "majorGoal"]}
+                              name={[index, "majorGoal"]}
                               rules={[
                                 {
                                   required: true,
                                   message:
-                                    "Please select whether its major goal or not",
+                                    "Please select whether it's a major goal or not",
                                 },
                               ]}
                             >
@@ -568,21 +599,13 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                             </Form.Item>
                           </Col>
                           <Col xs={24} sm={4}>
-                            <Form.Item
-                              // label="Comments"
-                              name={[name, "comments"]}
-                            >
+                            <Form.Item name={[index, "comments"]}>
                               <Input placeholder="Add comments" />
                             </Form.Item>
                           </Col>
                           <Col xs={24} sm={4}>
-                            {/* <Button
-                          type="text"
-                          onClick={() => remove(name)}
-                          icon={<MinusOutlined />}
-                        /> */}
                             <DeleteTwoTone
-                              onClick={() => remove(name)}
+                              onClick={() => remove(index)}
                               twoToneColor="#FF0000"
                             />
                           </Col>
@@ -603,19 +626,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   )}
                 </Form.List>
               </Panel>
-              {/* </div> */}
-
-              {/* Goals for Next Month Section */}
-              {/* <div
-            style={{
-              border: "1px solid #d9d9d9",
-              borderRadius: "8px",
-              padding: "10px",
-              marginTop: "16px",
-            }}
-          > */}
-
-              {/* <h3 style={{ marginBottom: "16px" }}>Goals for next month</h3> */}
 
               <Panel header="Goals for next month Section" key="3">
                 {/* Goals for next month Section */}
@@ -631,71 +641,76 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 <Divider></Divider>
 
                 <Form.List name="nextMonthGoals">
-                  {(fields) => (
+                  {(fields, { add, remove }) => (
                     <>
-                      {!Array.isArray(plans) &&
-                        plans.NextMonthGoals.map((goal, index) => (
-                          <Row gutter={24} key={index}>
-                            <Col span={1}>
-                              <div>{index + 1}</div>
-                            </Col>
-                            <Col xs={24} sm={4}>
-                              <Form.Item
-                                // label={index === 0 ? "Activity" : ""}
-                                name={[index, "activity"]}
-                                initialValue={
-                                  plans.NextMonthGoals[index].activity
-                                }
-                              >
-                                <Input placeholder="Activity" disabled />
+                      {Array.isArray(plans)
+                        ? null
+                        : plans.NextMonthGoals.map((goal, index) => (
+                            <Row gutter={24} key={index}>
+                              <Col span={1}>
+                                <div>{index + 1}</div>
+                              </Col>
+                              <Form.Item name={[index, "id"]} hidden>
+                                <Input type="hidden" />
                               </Form.Item>
-                            </Col>
-                            <Col xs={24} sm={4}>
-                              <Form.Item
-                                // label={index === 0 ? "Functional Area" : ""}
-                                name={[index, "functionalArea"]}
-                                initialValue={
-                                  plans.NextMonthGoals[index].functionalAreaId
-                                }
-                              >
-                                <Select
-                                  defaultValue={
+                              <Col xs={24} sm={4}>
+                                <Form.Item
+                                  // label={index === 0 ? "Activity" : ""}
+                                  name={[index, "activity"]}
+                                  initialValue={
+                                    plans.NextMonthGoals[index].activity
+                                  }
+                                >
+                                  <Input placeholder="Activity" disabled />
+                                </Form.Item>
+                              </Col>
+                              <Col xs={24} sm={4}>
+                                <Form.Item
+                                  // label={index === 0 ? "Functional Area" : ""}
+                                  name={[index, "functionalArea"]}
+                                  initialValue={
                                     plans.NextMonthGoals[index].functionalAreaId
                                   }
-                                  options={functionalAreasData}
-                                  placeholder="Functional Area"
-                                  disabled
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col xs={24} sm={4}>
-                              <Form.Item
-                                // label={index === 0 ? "Major goal" : ""}
-                                name={[index, "majorGoal"]}
-                                initialValue={
-                                  plans.NextMonthGoals[index].isMajorGoal
-                                }
-                              >
-                                <Select
-                                  options={achieved}
-                                  placeholder="Major goal or not"
-                                  disabled
-                                />
-                              </Form.Item>
-                            </Col>
-                            <Col xs={24} sm={4}>
-                              <Form.Item
-                                // label={index === 0 ? "Comments" : ""}
-                                name={[index, "comments"]}
-                                initialValue={
-                                  plans.NextMonthGoals[index].comments ?? ""
-                                }
-                              >
-                                <Input placeholder="Comments" disabled />
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                        ))}
+                                >
+                                  <Select
+                                    defaultValue={
+                                      plans.NextMonthGoals[index]
+                                        .functionalAreaId
+                                    }
+                                    options={functionalAreasData}
+                                    placeholder="Functional Area"
+                                    disabled
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col xs={24} sm={4}>
+                                <Form.Item
+                                  // label={index === 0 ? "Major goal" : ""}
+                                  name={[index, "majorGoal"]}
+                                  initialValue={
+                                    plans.NextMonthGoals[index].isMajorGoal
+                                  }
+                                >
+                                  <Select
+                                    options={achieved}
+                                    placeholder="Major goal or not"
+                                    disabled
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col xs={24} sm={4}>
+                                <Form.Item
+                                  // label={index === 0 ? "Comments" : ""}
+                                  name={[index, "comments"]}
+                                  initialValue={
+                                    plans.NextMonthGoals[index].comments ?? ""
+                                  }
+                                >
+                                  <Input placeholder="Comments" disabled />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                          ))}
                     </>
                   )}
                 </Form.List>
@@ -736,15 +751,17 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 <Form.List name="additionalActivitiesNextMonth">
                   {(fields, { add, remove }) => (
                     <>
-                      {fields.map(({ key, name }) => (
-                        <Row gutter={24} key={key}>
+                      {fields.map((field, index) => (
+                        <Row gutter={24} key={index}>
                           <Col span={1}>
-                            <div>{name + 1}</div>
+                            <div>{index + 1}</div>
                           </Col>
+                          <Form.Item name={[index, "id"]} hidden>
+                            <Input type="hidden" />
+                          </Form.Item>
                           <Col xs={24} sm={4}>
                             <Form.Item
-                              // label="Activity"
-                              name={[name, "activity"]}
+                              name={[index, "activity"]}
                               rules={[
                                 {
                                   required: true,
@@ -757,8 +774,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                           </Col>
                           <Col xs={24} sm={4}>
                             <Form.Item
-                              // label="Functional Area"
-                              name={[name, "functionalArea"]}
+                              name={[index, "functionalArea"]}
                               rules={[
                                 {
                                   required: true,
@@ -774,13 +790,12 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                           </Col>
                           <Col xs={24} sm={4}>
                             <Form.Item
-                              // label={"Major goal"}
-                              name={[name, "majorGoal"]}
+                              name={[index, "majorGoal"]}
                               rules={[
                                 {
                                   required: true,
                                   message:
-                                    "Please select whether its major goal or not",
+                                    "Please select whether it's a major goal or not",
                                 },
                               ]}
                             >
@@ -791,21 +806,13 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                             </Form.Item>
                           </Col>
                           <Col xs={24} sm={4}>
-                            <Form.Item
-                              // label="Comments"
-                              name={[name, "comments"]}
-                            >
+                            <Form.Item name={[index, "comments"]}>
                               <Input placeholder="Add comments" />
                             </Form.Item>
                           </Col>
                           <Col xs={24} sm={4}>
-                            {/* <Button
-                          type="text"
-                          onClick={() => remove(name)}
-                          icon={<MinusOutlined />}
-                        /> */}
                             <DeleteTwoTone
-                              onClick={() => remove(name)}
+                              onClick={() => remove(index)}
                               twoToneColor="#FF0000"
                             />
                           </Col>
