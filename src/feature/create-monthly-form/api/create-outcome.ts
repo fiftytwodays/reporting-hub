@@ -9,13 +9,11 @@ export function useSaveOutcomes() {
 
   const saveOutcome = async (key: string, { arg }: { arg: any }) => {
     let outcome;
-    console.log("Saving outcome:", arg);
 
     outcome = await client.models.Outcome.get({
       id: arg.id,
     });
 
-    console.log("Outcome fetched:", outcome);
     if (outcome?.data) {
       outcome = await client.models.Outcome.update({
         id: arg.id,
@@ -25,10 +23,8 @@ export function useSaveOutcomes() {
         reason: arg.reason,
         achieved: arg.achieved,
       });
-      console.log("Outcome fetched inside update:", outcome);
     }
     if (!outcome?.data) {
-      console.log("Outcome not found, creating a new one", arg);
       const payload = {
         comments: arg.comments,
         activityId: arg.activityId,
@@ -36,12 +32,9 @@ export function useSaveOutcomes() {
         reason: arg.reason,
         achieved: arg.achieved,
       };
-      console.log("Payload for creating outcome:", payload); 
       outcome = await client.models.Outcome.create(payload);
-      console.log("Outcome fetched inside create:", outcome);
     }
 
-    console.log("Outcome saved:", outcome);
     if (outcome?.data) {
       return outcome.data;
     }
