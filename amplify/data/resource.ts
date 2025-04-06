@@ -175,6 +175,7 @@ const schema = a.schema({
       name: a.string().required(),
       description: a.string(),
       plan: a.hasMany("Plan", "functionalAreaId"),
+      additionalActivities: a.hasMany("AdditionalActivity", "functionalAreaId"),
     })
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
@@ -285,7 +286,21 @@ const schema = a.schema({
       concerns: a.string(),
       comments: a.string(),
       outcomes: a.hasMany("Outcome", "monthlyFormId"),
-      // additionalActivities: a.hasMany("AdditionalActivity", "monthlyFormId"),
+      additionalActivities: a.hasMany("AdditionalActivity", "monthlyFormId"),
+    })
+    .authorization((allow) => [
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
+    ]),
+  AdditionalActivity: a
+    .model({
+      monthlyFormId: a.string().required(),
+      monthlyForm: a.belongsTo("MonthlyForm", "monthlyFormId"),
+      activity: a.string().required(),
+      functionalAreaId: a.id().required(),
+      functionalArea: a.belongsTo("FunctionalArea", "functionalAreaId"),
+      comments: a.string(),
+      isMajorGoal: a.boolean(),
     })
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
@@ -306,17 +321,6 @@ const schema = a.schema({
       allow.groups(["admin"]),
     ]),
 });
-// AdditionalActivity: a
-//   .model({
-//     monthlyFormId: a.string().required(),
-//     monthlyForm: a.belongsTo("MonthlyForm", "monthlyFormId"),
-//     activityId: a.string().required(),
-//     activity: a.belongsTo("Plan", "activityId"),
-//   })
-//   .authorization((allow) => [
-//     allow.authenticated().to(["read"]),
-//     allow.groups(["admin"]),
-//   ]),
 
 export type Schema = ClientSchema<typeof schema>;
 
