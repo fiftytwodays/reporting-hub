@@ -311,6 +311,7 @@ const schema = a.schema({
       comments: a.string(),
       isMajorGoal: a.boolean(),
     })
+    .secondaryIndexes((index) => [index("monthlyFormId")])
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
@@ -337,6 +338,7 @@ const schema = a.schema({
       activityId: a.string(),
       activity: a.belongsTo("Plan", "activityId"),
     })
+    .secondaryIndexes((index) => [index("monthlyFormId"), index("activityId")])
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
