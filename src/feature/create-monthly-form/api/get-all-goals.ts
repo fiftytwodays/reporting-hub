@@ -3,6 +3,7 @@ import type { Schema } from "@root/amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import useSWR from "swr";
 import { Goal } from "../config/monthly-form";
+import next from "next";
 
 interface FetchOptions {
   condition: boolean;
@@ -13,7 +14,12 @@ interface FetchOptions {
 }
 
 interface ApiResponse {
-  Plans: { CurrentMonthGoals: Goal[]; NextMonthGoals: Goal[] };
+  Plans: {
+    quarterlyPlanId: string;
+    nextMonthGoalsQuarterlyPlanId: string;
+    CurrentMonthGoals: Goal[];
+    NextMonthGoals: Goal[];
+  };
 }
 
 const monthNames = [
@@ -71,27 +77,62 @@ export default function usePlansFetcher({
       const yearlyPlansResponse =
         await client.models.YearlyPlan.listYearlyPlanByUserId({ userId });
       if (!yearlyPlansResponse?.data)
-        return { Plans: { CurrentMonthGoals: [], NextMonthGoals: [] } };
+        return {
+          Plans: {
+            quarterlyPlanId: "",
+            nextMonthGoalsQuarterlyPlanId: "",
+            CurrentMonthGoals: [],
+            NextMonthGoals: [],
+          },
+        };
 
       const yearlyPlan = yearlyPlansResponse.data.find(
         (yp) => yp.year === years && yp.projectId === projectId
       );
       if (!yearlyPlan)
-        return { Plans: { CurrentMonthGoals: [], NextMonthGoals: [] } };
+        return {
+          Plans: {
+            quarterlyPlanId: "",
+            nextMonthGoalsQuarterlyPlanId: "",
+            CurrentMonthGoals: [],
+            NextMonthGoals: [],
+          },
+        };
 
       const quarterlyPlansResponse = await yearlyPlan.quarterlyPlan();
       if (!quarterlyPlansResponse?.data)
-        return { Plans: { CurrentMonthGoals: [], NextMonthGoals: [] } };
+        return {
+          Plans: {
+            quarterlyPlanId: "",
+            nextMonthGoalsQuarterlyPlanId: "",
+            CurrentMonthGoals: [],
+            NextMonthGoals: [],
+          },
+        };
 
       const quarterlyPlan = quarterlyPlansResponse.data.find(
         (qp) => qp.quarter === quarter
       );
       if (!quarterlyPlan)
-        return { Plans: { CurrentMonthGoals: [], NextMonthGoals: [] } };
+        return {
+          Plans: {
+            quarterlyPlanId: "",
+            nextMonthGoalsQuarterlyPlanId: "",
+            CurrentMonthGoals: [],
+            NextMonthGoals: [],
+          },
+        };
 
       const plansResponse = await quarterlyPlan.plan();
       if (!plansResponse?.data)
-        return { Plans: { CurrentMonthGoals: [], NextMonthGoals: [] } };
+        return {
+          Plans: {
+            quarterlyPlanId: "",
+            nextMonthGoalsQuarterlyPlanId: "",
+            CurrentMonthGoals: [],
+            NextMonthGoals: [],
+          },
+        };
 
       const plans = sortPlans(
         plansResponse.data.filter((plan) =>
@@ -108,8 +149,10 @@ export default function usePlansFetcher({
       }));
 
       let nextMonthGoals: Goal[] = [];
+      let nextMonthGoalsQuarterlyPlanId = "";
 
       if (nextQuarter === quarter && nextYears === years) {
+        nextMonthGoalsQuarterlyPlanId = quarterlyPlan.id;
         nextMonthGoals = sortPlans(
           plansResponse.data
             .filter((plan) => plan.month?.includes(getMonthName(nextMonth)))
@@ -127,6 +170,7 @@ export default function usePlansFetcher({
           (qp) => qp.quarter === nextQuarter
         );
         if (nextQuarterlyPlan) {
+          nextMonthGoalsQuarterlyPlanId = nextQuarterlyPlan.id;
           const nextPlansResponse = await nextQuarterlyPlan.plan();
           if (nextPlansResponse?.data) {
             nextMonthGoals = sortPlans(
@@ -150,13 +194,22 @@ export default function usePlansFetcher({
 
       return {
         Plans: {
+          quarterlyPlanId: quarterlyPlan.id,
+          nextMonthGoalsQuarterlyPlanId: nextMonthGoalsQuarterlyPlanId,
           CurrentMonthGoals: currentMonthGoals,
           NextMonthGoals: nextMonthGoals,
         },
       };
     } catch (error) {
       console.error("Error fetching plans:", error);
-      return { Plans: { CurrentMonthGoals: [], NextMonthGoals: [] } };
+      return {
+        Plans: {
+          quarterlyPlanId: "",
+          nextMonthGoalsQuarterlyPlanId: "",
+          CurrentMonthGoals: [],
+          NextMonthGoals: [],
+        },
+      };
     }
   };
 

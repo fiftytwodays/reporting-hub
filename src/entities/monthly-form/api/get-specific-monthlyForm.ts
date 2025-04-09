@@ -4,37 +4,62 @@ import type { Schema } from "@root/amplify/data/resource";
 
 interface FetchOptions {
   condition: boolean;
+  projectId: string;
 }
 
-export function useMonthlyFormsList({ condition = true }: FetchOptions) {
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const getMonthName = (month: number) =>
+  monthNames[month - 1] || "Invalid month";
+
+export function useMonthlyFormsList({
+  condition = true,
+  projectId,
+}: FetchOptions) {
   const client = generateClient<Schema>();
 
   const fetcher = async () => {
-    const response = await client.models.MonthlyForm.list();
+    const anc = await client.models.MonthlyForm.list({});
+
+    const response = await client.models.MonthlyForm.listMonthlyFormByProjectId(
+      {
+        projectId: projectId,
+      }
+    );
     if (response?.data) {
       const monthlyForms = await Promise.all(
         response.data.map(async (form) => {
           const project = await client.models.Project.get({
             id: form.projectId ?? "",
           });
-          const outcomes = await client.models.Outcome.list({
-            filter: { monthlyFormId: { eq: form.id } },
-          });
 
           return {
             id: form.id ?? "",
-            projectId: form.projectId ?? "",
+            // projectId: form.projectId ?? "",
             projectName: project.data?.name ?? "",
-            month: form.month ?? "",
+            location: project.data?.location ?? "",
+            month: getMonthName(Number(form.month)) ?? "",
             year: form.year ?? "",
             status: form.status ?? "",
             facilitator: form.facilitator ?? "",
-            praisePoints: form.praisePoints ?? [],
-            prayerRequests: form.prayerRequests ?? [],
-            story: form.story ?? "",
-            concerns: form.concerns ?? "",
-            comments: form.comments ?? "",
-            outcomes: outcomes.data ?? [],
+            // praisePoints: form.praisePoints ?? [],
+            // prayerRequests: form.prayerRequests ?? [],
+            // story: form.story ?? "",
+            // concerns: form.concerns ?? "",
+            // comments: form.comments ?? "",
           };
         })
       );
@@ -71,18 +96,12 @@ export function useMonthlyFormsList({ condition = true }: FetchOptions) {
   const monthlyFormsData = data?.MonthlyForms?.map((form, index) => ({
     key: index,
     id: form.id,
-    projectId: form.projectId,
-    projectName: form.projectName,
+    name: form.projectName,
     month: form.month,
     year: form.year,
     status: form.status,
     facilitator: form.facilitator,
-    praisePoints: form.praisePoints,
-    prayerRequests: form.prayerRequests,
-    story: form.story,
-    concerns: form.concerns,
-    comments: form.comments,
-    outcomes: form.outcomes,
+    location: form.location,
   }));
 
   return {
