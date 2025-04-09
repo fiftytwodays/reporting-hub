@@ -1,6 +1,5 @@
 import {
   achieved,
-  goals,
   months,
   projects,
   functionalAreas,

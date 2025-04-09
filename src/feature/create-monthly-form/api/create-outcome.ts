@@ -10,6 +10,7 @@ export function useSaveOutcomes() {
   const saveOutcome = async (key: string, { arg }: { arg: any }) => {
     let outcome;
 
+    console.log("Saving outcome:", arg);
     outcome = await client.models.Outcome.get({
       id: arg.id,
     });

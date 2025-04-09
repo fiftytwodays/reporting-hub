@@ -1,7 +1,8 @@
 export interface MonthlyForm {
-  id: string | number;
+  id: string;
   name: string;
   location: string;
+  facilitator: string;
   month: string;
   year: string;
   status: String;
