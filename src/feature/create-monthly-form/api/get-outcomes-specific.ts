@@ -39,8 +39,6 @@ export function getOutcomeByMonthlyFormId({
         monthlyFormId: monthlyFormId,
       });
 
-    console.log("Fetched :", monthlyFormId);
-    console.log("Fetched outcomes response:", outcomesResponse);
     if (outcomesResponse?.data?.length) {
       const outcomes = await Promise.all(
         outcomesResponse.data.map(async (outcome) => {
