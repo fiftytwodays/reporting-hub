@@ -14,7 +14,9 @@ interface Column<T = any> {
   render?: (value: any, record: any, index: number) => React.ReactNode;
 }
 
-export default function generateColumns<T>(columns: Column<any>[]): Column<T>[] {
+export default function generateColumns<T>(
+  columns: Column<any>[]
+): Column<T>[] {
   const { Text } = Typography;
 
   return columns.map((column) => ({
@@ -24,12 +26,19 @@ export default function generateColumns<T>(columns: Column<any>[]): Column<T>[] 
         return (
           <div>
             <Space>
-              {record.status !== "Approved" && (
-                <_Button type="link" href={`/monthly-form/my-forms/abc/edit`}>
+              {(record.status !== "Approved" ||
+                record.status !== "waiting for approval") && (
+                <_Button
+                  type="link"
+                  href={`/monthly-form/my-forms/${record.id}/edit`}
+                >
                   Edit
                 </_Button>
               )}
-              <_Button type="link" href={`/monthly-form/my-forms/abc/view`}>
+              <_Button
+                type="link"
+                href={`/monthly-form/my-forms/${record.id}/view`}
+              >
                 View
               </_Button>
             </Space>

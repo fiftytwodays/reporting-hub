@@ -247,6 +247,10 @@ const schema = a.schema({
       comments: a.string(),
       isMajorGoal: a.boolean(),
       outcomes: a.hasMany("Outcome", "activityId"),
+      additionalActivitiesNextMonth: a.hasMany(
+        "AdditionalActivityNextMonth",
+        "activityId"
+      ),
     })
     .secondaryIndexes((index) => [index("quarterlyPlanId")])
     .authorization((allow) => [
@@ -287,7 +291,12 @@ const schema = a.schema({
       comments: a.string(),
       outcomes: a.hasMany("Outcome", "monthlyFormId"),
       additionalActivities: a.hasMany("AdditionalActivity", "monthlyFormId"),
+      additionalActivitiesNextMonth: a.hasMany(
+        "AdditionalActivityNextMonth",
+        "monthlyFormId"
+      ),
     })
+    .secondaryIndexes((index) => [index("projectId")])
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),
@@ -315,6 +324,18 @@ const schema = a.schema({
       reason: a.string(),
       achieved: a.boolean(),
       comments: a.string(),
+    })
+    .secondaryIndexes((index) => [index("monthlyFormId")])
+    .authorization((allow) => [
+      allow.authenticated().to(["read"]),
+      allow.groups(["admin"]),
+    ]),
+  AdditionalActivityNextMonth: a
+    .model({
+      monthlyFormId: a.string(),
+      monthlyForm: a.belongsTo("MonthlyForm", "monthlyFormId"),
+      activityId: a.string(),
+      activity: a.belongsTo("Plan", "activityId"),
     })
     .authorization((allow) => [
       allow.authenticated().to(["read"]),

@@ -7,13 +7,10 @@ export function useSaveAdditionalActivity() {
 
   const saveAdditionalActivity = async (key: string, { arg }: { arg: any }) => {
     let additionalActivity;
-    console.log("Saving additional activity:", arg);
 
     additionalActivity = await client.models.AdditionalActivity.get({
       id: arg.id,
     });
-
-    console.log("Additional activity fetched:", additionalActivity);
 
     if (additionalActivity?.data) {
       additionalActivity = await client.models.AdditionalActivity.update({
@@ -21,28 +18,23 @@ export function useSaveAdditionalActivity() {
         monthlyFormId: arg.monthlyFormId,
         activity: arg.activity,
         isMajorGoal: arg.isMajorGoal,
-        functionalAreaId: arg.functionalAreaId,
+        functionalAreaId: arg.functionalArea,
         comments: arg.comments,
       });
-      console.log("Additional activity updated:", additionalActivity);
     }
     if (!additionalActivity?.data) {
-      console.log("Additional activity not found, creating a new one", arg);
       const payload = {
         monthlyFormId: arg.monthlyFormId,
         activity: arg.activity,
         isMajorGoal: arg.majorGoal,
-        functionalAreaId: arg.functionalAreaId,
+        functionalAreaId: arg.functionalArea,
         comments: arg.comments,
       };
-      console.log("Payload for creating additional activity:", payload);
       additionalActivity = await client.models.AdditionalActivity.create(
         payload
       );
-      console.log("Additional activity created:", additionalActivity);
     }
 
-    console.log("Additional activity saved:", additionalActivity);
     if (additionalActivity?.data) {
       return additionalActivity.data;
     }
