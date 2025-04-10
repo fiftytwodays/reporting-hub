@@ -4,13 +4,11 @@ import { data } from "@/entities/monthly-form/api/monthly-forms-list";
 import { MonthlyForm } from "@/entities/monthly-form/config/types";
 import { MonthlyFormsApproverList as _MonthlyFormsList } from "@/entities/monthly-form -approver";
 import { projects } from "../config/projects";
-
-interface Data {
-  projectAlpha: MonthlyForm[];
-  projectBeta: MonthlyForm[];
-  projectGamma: MonthlyForm[];
-  projectDelta: MonthlyForm[];
-}
+import { useMonthlyFormsList } from "@/entities/monthly-form -approver/api/get-specific-monthlyForm";
+import useProjectList, {
+  Project,
+} from "@/feature/create-monthly-form/api/project-list";
+import { useMonthlyFormsListUser } from "@/entities/monthly-form -approver/api/get-monthlyForm-user";
 
 export default function MonthlyFormsListApprover() {
   const [messageApi, contextHolder] = message.useMessage({
@@ -18,38 +16,68 @@ export default function MonthlyFormsListApprover() {
     duration: 2,
   });
 
-  // Use keyof Data to restrict the selectedProject to the keys of Data
-  const [selectedProject, setSelectedProject] = useState<keyof Data | null>(null);
+  const [projectId, setSelectedProject] = useState("");
 
+  // Fetch all projects
+  const { projectsData, isProjectTypesDataLoading } = useProjectList({
+    condition: true,
+    projectId: "project",
+    type: "approver",
+  });
 
+  // Fetch monthly forms list only when projectId is selected
+  const { monthlyFormsList, isMonthlyFormsListLoading } = useMonthlyFormsList({
+    projectId,
+    condition: !!projectId,
+  });
+
+  const {
+    monthlyFormsList: allMonthlyFormList,
+    isMonthlyFormsListLoading: isAllMonthlyFormListLoading,
+  } = useMonthlyFormsListUser({
+    condition: projectId === "",
+  });
+
+  const transformProjectsData = (data?: Project[]) =>
+    data?.map((item) => ({
+      label: item.name,
+      value: item.id,
+    })) || [];
 
   return (
     <>
       {contextHolder}
-      <Select
-        options={projects}
-        onChange={(value: keyof Data) => setSelectedProject(value)} // Type assertion to keyof Data
-        placeholder="Select Project"
-        style={{ width: 200 }}
-      />
-
-      {/* Only render the MonthlyFormsList when a project is selected */}
-      {selectedProject && (
-        <_MonthlyFormsList
-          data={data[selectedProject] || []} // Safe access of data[selectedProject]
-          isLoading={false}
+      {!isProjectTypesDataLoading && (
+        <Select
+          options={transformProjectsData(projectsData)}
+          onChange={(value: string) => setSelectedProject(value)}
+          placeholder="Select Project"
+          style={{ width: 200, marginBottom: 16 }}
         />
       )}
 
-      {/* Modal logic if needed */}
-      {/* {isEditModalVisible && selectedMonthlyForm && (
-        <EditMonthlyFormModal
-          monthlyFormDetails={selectedMonthlyForm}
-          isModalVisible={isEditModalVisible}
-          setIsModalVisible={setIsEditModalVisible}
-          messageApi={messageApi}
+      {/* Render Monthly Forms list when data is available */}
+      {projectId !== "" ? (
+        <_MonthlyFormsList
+          data={monthlyFormsList}
+          isLoading={isMonthlyFormsListLoading}
         />
-      )} */}
+      ) : (
+        <_MonthlyFormsList
+          data={allMonthlyFormList}
+          isLoading={isAllMonthlyFormListLoading}
+        />
+      )}
+
+      {/* Modal logic placeholder (optional) */}
+      {/* {isEditModalVisible && selectedMonthlyForm && (
+          <EditMonthlyFormModal
+            monthlyFormDetails={selectedMonthlyForm}
+            isModalVisible={isEditModalVisible}
+            setIsModalVisible={setIsEditModalVisible}
+            messageApi={messageApi}
+          />
+        )} */}
     </>
   );
 }

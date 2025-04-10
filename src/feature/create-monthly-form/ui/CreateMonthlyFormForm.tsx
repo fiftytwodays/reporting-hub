@@ -30,7 +30,7 @@ import { MessageInstance } from "antd/es/message/interface";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import usePlansFetcher from "../api/get-all-goals";
-import { getCurrentUser } from "@aws-amplify/auth";
+import { fetchUserAttributes, getCurrentUser } from "@aws-amplify/auth";
 import Projects from "./Projects";
 import useFunctionalAreaList from "../api/functional-area-options";
 import { useSaveMonthlyForm } from "../api/handle-monthly-form";
@@ -52,7 +52,7 @@ const { Panel } = Collapse;
 interface CreateMonthlyFormProps {
   messageApi: MessageInstance;
   monthlyForm: MonthlyForm | null;
-  action: string; // Ensure action is included in the props interface
+  action: "create" | "view" | "edit" | "approver-view"; // Define specific string literal types for action
 }
 
 interface Outcome {
@@ -68,6 +68,7 @@ interface MonthlyForm {
   id: string;
   projectId: string;
   month: string;
+  clusterId: string;
   year: string;
   status: string;
   facilitator: string;
@@ -132,6 +133,37 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     const { userId } = await getCurrentUser();
     setLoggedUser(userId);
   };
+
+  const [clusters, setClusters] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchAttributes = async () => {
+      try {
+        const attributes = await fetchUserAttributes();
+        const clustersValue = attributes["custom:clusters"];
+        setClusters(stringToArray(clustersValue));
+      } catch (error) {
+        console.error("Error fetching user attributes:", error);
+      }
+    };
+
+    fetchAttributes();
+  }, []);
+
+  function stringToArray(str: string | undefined) {
+    if (str) {
+      const cleanedStr = str.replace(/[\[\]]/g, "").trim();
+      if (!cleanedStr) {
+        return [];
+      }
+      const arr = cleanedStr.includes(",")
+        ? cleanedStr.split(",").map((item) => item.trim())
+        : [cleanedStr];
+      return arr;
+    } else {
+      return [];
+    }
+  }
 
   setLoggedUserDetails();
 
@@ -616,7 +648,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       });
   };
 
-  if (!isFormReady && !loading) {
+  if (!isFormReady && !loading && action !== "create") {
     return (
       <div style={{ textAlign: "center", marginTop: "20px" }}>
         <Spin size="large" />
@@ -632,6 +664,20 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       <div style={{ textAlign: "center", marginTop: "20px" }}>
         <h3 style={{ color: "red" }}>
           You are not allowed to edit this monthly form.
+        </h3>
+      </div>
+    );
+  } else if (
+    monthlyForm !== null &&
+    action === "approver-view" &&
+    !clusters.includes(monthlyForm.clusterId)
+  ) {
+    console.log("Clusters for the user", clusters);
+    console.log("Cluster id in monthly fomr", monthlyForm.clusterId);
+    return (
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <h3 style={{ color: "red" }}>
+          You are not allowed to view this monthly form.
         </h3>
       </div>
     );
@@ -666,6 +712,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 setLoading={setLoading}
                 id={form.getFieldValue("project") ?? undefined}
                 setSelectedProject={setProjectId}
+                disabled={action !== "create"}
               />
             </Form.Item>
           </Col>
@@ -1392,7 +1439,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
               </Collapse>
 
               {/* Footer Actions */}
-              {action === "view" ? null : (
+              {action === "view" || action === "approver-view" ? null : (
                 <Space style={{ marginTop: "24px" }}>
                   <Button type="default" href="/monthly-form/my-forms">
                     Cancel
@@ -1413,15 +1460,19 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   </Button>
                 </Space>
               )}
-              {action === "approver-view" ? null : (
+              {action !== "approver-view" ? null : (
                 <Space style={{ marginTop: "24px" }}>
-                  <Button type="default" href="/monthly-form/approver-view">
+                  <Button
+                    type="default"
+                    disabled={false}
+                    href="/monthly-form/approver-view"
+                  >
                     Cancel
                   </Button>
-                  <Button type="primary" onClick={approve}>
+                  <Button type="primary" disabled={false} onClick={approve}>
                     Approve
                   </Button>
-                  <Button type="primary" onClick={reject}>
+                  <Button type="primary" disabled={false} onClick={reject}>
                     Resend
                   </Button>
                 </Space>

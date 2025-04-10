@@ -41,27 +41,29 @@ export function useMonthlyFormsList({
     );
     if (response?.data) {
       const monthlyForms = await Promise.all(
-        response.data.map(async (form) => {
-          const project = await client.models.Project.get({
-            id: form.projectId ?? "",
-          });
+        response.data
+          .filter((form) => form.status === "waiting for approval")
+          .map(async (form) => {
+            const project = await client.models.Project.get({
+              id: form.projectId ?? "",
+            });
 
-          return {
-            id: form.id ?? "",
-            // projectId: form.projectId ?? "",
-            projectName: project.data?.name ?? "",
-            location: project.data?.location ?? "",
-            month: getMonthName(Number(form.month)) ?? "",
-            year: form.year ?? "",
-            status: form.status ?? "",
-            facilitator: form.facilitator ?? "",
-            // praisePoints: form.praisePoints ?? [],
-            // prayerRequests: form.prayerRequests ?? [],
-            // story: form.story ?? "",
-            // concerns: form.concerns ?? "",
-            // comments: form.comments ?? "",
-          };
-        })
+            return {
+              id: form.id ?? "",
+              // projectId: form.projectId ?? "",
+              projectName: project.data?.name ?? "",
+              location: project.data?.location ?? "",
+              month: getMonthName(Number(form.month)) ?? "",
+              year: form.year ?? "",
+              status: form.status ?? "",
+              facilitator: form.facilitator ?? "",
+              // praisePoints: form.praisePoints ?? [],
+              // prayerRequests: form.prayerRequests ?? [],
+              // story: form.story ?? "",
+              // concerns: form.concerns ?? "",
+              // comments: form.comments ?? "",
+            };
+          })
       );
 
       monthlyForms.sort(
