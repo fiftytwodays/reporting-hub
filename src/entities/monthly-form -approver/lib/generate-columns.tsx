@@ -15,7 +15,7 @@ interface Column<T = any> {
 }
 
 export default function generateColumns<T>(
-  columns: Column<any>[],
+  columns: Column<any>[]
 ): Column<T>[] {
   const { Text } = Typography;
 
@@ -28,7 +28,7 @@ export default function generateColumns<T>(
             <Space>
               <_Button
                 type="link"
-                href={`/monthly-form/approver-view/abc/view`}
+                href={`/monthly-form/approver-view/${record.id}/view`}
               >
                 View
               </_Button>

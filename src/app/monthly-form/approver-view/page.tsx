@@ -12,28 +12,31 @@ import { MonthlyFormsListApprover } from "@/widgets/monthly-forms-list-approver"
 Amplify.configure(outputs);
 
 export default function MonthlyFormList() {
-  const [messageApi, contextHolder] = message.useMessage({ maxCount: 1, duration: 2 });
+  const [messageApi, contextHolder] = message.useMessage({
+    maxCount: 1,
+    duration: 2,
+  });
   return (
     <>
-     {contextHolder}
-    <Page
-    showPageHeader
-      header={{
-        title: "Monthly forms",
-        breadcrumbs: [
-          {
-            title: "Home",
-            href: "/",
-          },
+      {contextHolder}
+      <Page
+        showPageHeader
+        header={{
+          title: "Monthly forms",
+          breadcrumbs: [
+            {
+              title: "Home",
+              href: "/",
+            },
 
-          {
-            title: "Monthly forms",
-            href: "/monthly-form",
-          },
-        ],
-      }}
-      content={<MonthlyFormsListApprover />}
-    />
+            {
+              title: "Monthly forms",
+              href: "/monthly-form",
+            },
+          ],
+        }}
+        content={<MonthlyFormsListApprover />}
+      />
     </>
   );
 }

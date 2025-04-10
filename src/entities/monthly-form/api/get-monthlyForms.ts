@@ -1,6 +1,7 @@
 import useSWR, { mutate } from "swr";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@root/amplify/data/resource";
+import cluster from "cluster";
 
 interface FetchOptions {
   condition: boolean;
@@ -39,10 +40,14 @@ export function useMonthlyForm({
 
     if (response?.data) {
       const form = response.data;
-
+      const projectResponse = await client.models.Project.get({
+        id: form.projectId,
+      });
+      const clusterId = projectResponse?.data?.clusterId;
       return {
         id: form.id ?? "",
         projectId: form.projectId ?? "",
+        clusterId: clusterId ?? "",
         month: form.month ?? "",
         year: form.year ?? "",
         status: form.status ?? "",
