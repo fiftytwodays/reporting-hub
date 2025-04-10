@@ -32,8 +32,6 @@ export function useMonthlyFormsList({
   const client = generateClient<Schema>();
 
   const fetcher = async () => {
-    const anc = await client.models.MonthlyForm.list({});
-
     const response = await client.models.MonthlyForm.listMonthlyFormByProjectId(
       {
         projectId: projectId,

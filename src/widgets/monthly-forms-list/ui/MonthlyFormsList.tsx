@@ -6,6 +6,7 @@ import useProjectList, {
   Project,
 } from "@/feature/create-monthly-form/api/project-list";
 import { useMonthlyFormsList } from "@/entities/monthly-form/api/get-specific-monthlyForm";
+import { useMonthlyFormsListUser } from "@/entities/monthly-form/api/get-monthlyForm-user";
 
 export default function MonthlyFormsList() {
   const [messageApi, contextHolder] = message.useMessage({
@@ -19,12 +20,20 @@ export default function MonthlyFormsList() {
   const { projectsData, isProjectTypesDataLoading } = useProjectList({
     condition: true,
     projectId: "project",
+    type: "myforms",
   });
 
   // Fetch monthly forms list only when projectId is selected
   const { monthlyFormsList, isMonthlyFormsListLoading } = useMonthlyFormsList({
     projectId,
     condition: !!projectId,
+  });
+
+  const {
+    monthlyFormsList: allMonthlyFormList,
+    isMonthlyFormsListLoading: isAllMonthlyFormListLoading,
+  } = useMonthlyFormsListUser({
+    condition: projectId === "",
   });
 
   const transformProjectsData = (data?: Project[]) =>
@@ -46,10 +55,15 @@ export default function MonthlyFormsList() {
       )}
 
       {/* Render Monthly Forms list when data is available */}
-      {projectId && (
+      {projectId !== "" ? (
         <_MonthlyFormsList
           data={monthlyFormsList}
           isLoading={isMonthlyFormsListLoading}
+        />
+      ) : (
+        <_MonthlyFormsList
+          data={allMonthlyFormList}
+          isLoading={isAllMonthlyFormListLoading}
         />
       )}
 

@@ -13,6 +13,7 @@ interface ProjectsProps {
   form: FormInstance;
   id: string;
   fetchAll: boolean;
+  disabled?: boolean;
   setLoading: (loading: boolean) => void;
   setSelectedProject?: (projectId: string) => void; // Optional onChange prop
 }
@@ -21,12 +22,14 @@ const Projects: React.FC<ProjectsProps> = ({
   form,
   id,
   fetchAll,
+  disabled,
   setLoading,
   setSelectedProject,
 }) => {
   const projectListData = useProjectList({
     condition: true,
     projectId: id,
+    type: "user",
   });
 
   const fullProjectListData = useProjectsList({
@@ -87,6 +90,7 @@ const Projects: React.FC<ProjectsProps> = ({
     !isProjectTypesDataLoading &&
     projectsData && (
       <Select
+        disabled={disabled}
         showSearch
         dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
         allowClear

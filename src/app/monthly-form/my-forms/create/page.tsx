@@ -35,7 +35,7 @@ export default function CreateMonthlyFormPage() {
         }}
         content={
           <CreateMonthlyFormForm
-            action="edit"
+            action="create"
             messageApi={messageApi}
             monthlyForm={null}
           />
