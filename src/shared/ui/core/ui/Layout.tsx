@@ -147,6 +147,10 @@ const menuConfigurations = {
         key: "organization",
         label: <Link href="/settings/organization">Organization</Link>,
       },
+      {
+        key: "parameters",
+        label: <Link href="/settings/parameters">Parameters</Link>,
+      },
     ],
   },
 };
@@ -164,12 +168,16 @@ const AppLayout = ({ children }: LayoutProps) => {
   const pathname = usePathname();
   const menuName = pathname?.split("/")[1];
 
-  const { data: userData, error: userError } = useSWR(["user-details"], getCurrentUser);
-  
+  const { data: userData, error: userError } = useSWR(
+    ["user-details"],
+    getCurrentUser
+  );
+
   // State to store user attributes
-  const [attributes, setAttributes] = useState<FetchUserAttributesOutput | null>(null);
+  const [attributes, setAttributes] =
+    useState<FetchUserAttributesOutput | null>(null);
   const [loadingAttributes, setLoadingAttributes] = useState<boolean>(false);
-  
+
   const { userGroupList, isUserGroupListLoading } = useUserGroupList({
     userName: userData?.signInDetails?.loginId,
   });
@@ -192,9 +200,10 @@ const AppLayout = ({ children }: LayoutProps) => {
       };
       fetchAttributes();
     }
-  }, [userData]);  // Trigger when userData changes
+  }, [userData]); // Trigger when userData changes
 
-  const isLoading = isUserGroupListLoading || !userData || loadingAttributes || userError;
+  const isLoading =
+    isUserGroupListLoading || !userData || loadingAttributes || userError;
 
   const getMenuItems = () => {
     const updatedItems = [...defaultItems];
