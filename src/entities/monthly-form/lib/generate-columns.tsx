@@ -22,19 +22,20 @@ export default function generateColumns<T>(
   return columns.map((column) => ({
     ...column,
     render: (item: any, record: any, index: number) => {
+      console.log(record);
       if (column.key === "actions") {
         return (
           <div>
             <Space>
-              {(record.status !== "Approved" ||
-                record.status !== "waiting for approval") && (
-                <_Button
-                  type="link"
-                  href={`/monthly-form/my-forms/${record.id}/edit`}
-                >
-                  Edit
-                </_Button>
-              )}
+              {record.status !== "approved" &&
+                record.status !== "waiting for approval" && (
+                  <_Button
+                    type="link"
+                    href={`/monthly-form/my-forms/${record.id}/edit`}
+                  >
+                    Edit
+                  </_Button>
+                )}
               <_Button
                 type="link"
                 href={`/monthly-form/my-forms/${record.id}/view`}

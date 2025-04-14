@@ -1,17 +1,9 @@
 import {
   achieved,
   months,
-  projects,
-  functionalAreas,
-  nextMonthGoals,
   years, // Add this import for the goals for next month
 } from "@/widgets/monthly-forms-list/config/projects";
-import {
-  MinusOutlined,
-  MinusCircleOutlined,
-  PlusOutlined,
-  DeleteTwoTone,
-} from "@ant-design/icons";
+import { DeleteTwoTone } from "@ant-design/icons";
 
 import {
   Form,
@@ -36,8 +28,6 @@ import useFunctionalAreaList from "../api/functional-area-options";
 import { useSaveMonthlyForm } from "../api/handle-monthly-form";
 import { useSaveOutcomes } from "../api/create-outcome";
 import { useDeleteMonthlyForm } from "../api/delete-monthly-form";
-import { getAllOutcomes } from "../api/get-outcomes";
-import { useUpdateMonthlyForm } from "../api/update-monthly-form";
 import { useSaveAdditionalActivity } from "../api/create-additional-activity";
 import { useSaveAdditionalActivityNextMonth } from "../api/create-additional-activity-next-month";
 import { getOutcomeByMonthlyFormId } from "../api/get-outcomes-specific";
@@ -46,6 +36,7 @@ import { useDeleteAdditionalActivityNextMonth } from "../api/delete-additional-a
 import { getAdditionalActivitiesByMonthlyFormId } from "../api/get-additionalActivity-specific";
 import { getAdditionalActivitiesNextMonthByMonthlyFormId } from "../api/get-additionalActivity-nextMonth-specific";
 import useUpdateStatus from "../api/update-monthlyForm-status";
+import useParameters from "@/entities/parameters/api/parameters-list";
 
 const { Panel } = Collapse;
 
@@ -117,6 +108,9 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
 }) => {
   const [loggedUser, setLoggedUser] = useState("");
   const [loading, setLoading] = useState(true);
+  const { parametersList, isParametersListLoading } = useParameters({
+    condition: true,
+  });
   const [isAdditionalActivityDeleted, setIsAdditionalActivityDeleted] =
     useState(false);
   const [
@@ -124,6 +118,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     setIsAdditionalActivityNextMonthDeleted,
   ] = useState(false);
   const [defaultMonth, setDefaultMonth] = useState<number>();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [currentYear, setCurrentYear] = useState<string>();
   const [form] = Form.useForm();
   const [projectId, setProjectId] = useState<string>("");
@@ -215,37 +210,39 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
   const { saveAdditionalActivityNextMonth } =
     useSaveAdditionalActivityNextMonth();
 
-  // const { monthlyFormsList } = useMonthlyFormsList({
-  //   condition: true,
-  // });
-
-  // console.log("Monthly Forms List", monthlyFormsList);
-
-  const { deleteMonthlyForm } = useDeleteMonthlyForm();
-
   const { functionalAreasData, isFunctionalAreaTypesDataLoading } =
     useFunctionalAreaList({ condition: true });
 
   const {
     plans,
     isLoading: isPlanListloading,
-    error,
+    error: planListError,
   } = usePlansFetcher({
-    condition: true,
+    condition: !isParametersListLoading,
     projectId,
     userId: loggedUser,
-    month: 6,
-    // month: form.getFieldValue("month"),
-    // year: form.getFieldValue("year"),
-    year: 2025,
+    // month: 6,
+    month: form.getFieldValue("month"),
+    year: form.getFieldValue("year"),
+    // year: 2025,
   });
+
+  useEffect(() => {
+    if (planListError) {
+      setErrorMessage(planListError.message);
+    } else {
+      setErrorMessage(null); // Clear error message if no error
+    }
+  }, [planListError]);
 
   useEffect(() => {
     const currentDate = dayjs();
     const currentYear = currentDate.year();
     const currentDay = currentDate.date();
     const currentMonth = currentDate.month() + 1; // dayjs months are 0-indexed
-    const calculatedMonth = currentDay > 25 ? currentMonth : currentMonth - 1;
+    const startDate = Number(parametersList?.monthlyFormStartDate || 0);
+    const calculatedMonth =
+      currentDay > startDate ? currentMonth : currentMonth - 1;
 
     // Adjust for January (month 1) when subtracting 1 month
     const finalMonth = calculatedMonth > 0 ? calculatedMonth : 12;
@@ -253,7 +250,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     setDefaultMonth(finalMonth);
     form.setFieldValue("month", finalMonth);
     form.setFieldValue("year", currentYear);
-  }, [form]);
+  }, [form, parametersList]);
 
   useEffect(() => {
     if (
@@ -323,7 +320,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
   ]);
 
   const handleSubmit = (values: any) => {
-    console.log("Form valueskmekme:", values);
     const incompleteFields = values.goalsList.some(
       (goal: Goal) =>
         goal.achieved === undefined ||
@@ -336,9 +332,28 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       );
       return;
     }
+    const formValues = form.getFieldsValue();
+    const monthlyFormPayload = {
+      id: formValues.id || undefined, // Optional, if editing an existing form
+      projectId: formValues.project, // Maps to `projectId`
+      month: formValues.month, // Maps to `month`
+      year: formValues.year, // Maps to `year`
+      status: "waiting for approval", // Assuming "draft" is the status for saving as draft
+      facilitator: loggedUser, // Maps to `facilitator`
+      praisePoints:
+        formValues.praisePoints?.map((point: { point: any }) => point.point) ||
+        [], // Maps to `praisePoints`
+      prayerRequests:
+        formValues.prayerRequests?.map(
+          (request: { request: any }) => request.request
+        ) || [], // Maps to `prayerRequests`
+      story: formValues.storyTestimony || "", // Maps to `story`
+      concerns: formValues.concernsStruggles || "", // Maps to `concerns`
+      comments: "", // Assuming comments are not part of the form values
+    };
 
-    messageApi.success("Monthly form created successfully");
-    console.log(values);
+    createMonthlyForm(monthlyFormPayload, formValues);
+    messageApi.success("Monthly form successfully submitted for approval");
   };
 
   const handleAchievedChange = (value: any, index: number) => {
@@ -353,6 +368,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
 
   async function handleSaveAsDraft(): Promise<void> {
     const formValues = form.getFieldsValue();
+    form.validateFields;
     console.log("Form values:", formValues);
     const monthlyFormPayload = {
       id: formValues.id || undefined, // Optional, if editing an existing form
@@ -373,41 +389,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       comments: "", // Assuming comments are not part of the form values
     };
 
-    // monthlyFormPayload.id
-    // ?
     createMonthlyForm(monthlyFormPayload, formValues);
     messageApi.success("Monthly form successfully saved as draft");
-
-    // : updateExistingMonthlyForm(monthlyFormPayload, formValues);
-  }
-
-  async function handleSubmitForApproval(): Promise<void> {
-    const formValues = form.getFieldsValue();
-    console.log("Form values:", formValues);
-    const monthlyFormPayload = {
-      id: formValues.id || undefined, // Optional, if editing an existing form
-      projectId: formValues.project, // Maps to `projectId`
-      month: formValues.month, // Maps to `month`
-      year: formValues.year, // Maps to `year`
-      status: "waiting for approval", // Assuming "draft" is the status for saving as draft
-      facilitator: loggedUser, // Maps to `facilitator`
-      praisePoints:
-        formValues.praisePoints?.map((point: { point: any }) => point.point) ||
-        [], // Maps to `praisePoints`
-      prayerRequests:
-        formValues.prayerRequests?.map(
-          (request: { request: any }) => request.request
-        ) || [], // Maps to `prayerRequests`
-      story: formValues.storyTestimony || "", // Maps to `story`
-      concerns: formValues.concernsStruggles || "", // Maps to `concerns`
-      comments: "", // Assuming comments are not part of the form values
-    };
-
-    // monthlyFormPayload.id
-    // ?
-    createMonthlyForm(monthlyFormPayload, formValues);
-    messageApi.success("Monthly form successfully submitted for approval");
-    // : updateExistingMonthlyForm(monthlyFormPayload, formValues);
   }
 
   async function approve(): Promise<void> {
@@ -669,11 +652,23 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     );
   } else if (
     monthlyForm !== null &&
+    monthlyForm.status !== "draft" &&
+    monthlyForm.status !== "resend" &&
+    action === "edit"
+  ) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <h3 style={{ color: "red" }}>
+          You are not allowed to edit the monthly form unless it is in 'Draft'
+          or 'Resend' status.
+        </h3>
+      </div>
+    );
+  } else if (
+    monthlyForm !== null &&
     action === "approver-view" &&
     !clusters.includes(monthlyForm.clusterId)
   ) {
-    console.log("Clusters for the user", clusters);
-    console.log("Cluster id in monthly fomr", monthlyForm.clusterId);
     return (
       <div style={{ textAlign: "center", marginTop: "20px" }}>
         <h3 style={{ color: "red" }}>
@@ -681,18 +676,13 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
         </h3>
       </div>
     );
-  } else if (
-    monthlyForm === null ||
-    (monthlyForm && monthlyForm.status !== "waiting for approval") ||
-    monthlyForm.status !== "Approved"
-  ) {
+  } else {
     return (
       <Form
         form={form}
         disabled={action === "view" || action === "approver-view"}
         onFinish={handleSubmit}
         layout="vertical"
-        // onValuesChange={handleValuesChange}
       >
         {/* Hidden Form Item for ID */}
         <Form.Item name="id" hidden>
@@ -734,25 +724,18 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
 
         {/* {isGoalsListEnabled && */}
         {!isPlanListloading &&
-          projectId !== "" &&
-          plans != null &&
-          !isFunctionalAreaTypesDataLoading && (
+        projectId !== "" &&
+        plans != null &&
+        !isFunctionalAreaTypesDataLoading ? (
+          errorMessage !== null ? (
+            <div style={{ textAlign: "center", marginTop: "20px" }}>
+              <h3 style={{ color: "red" }}>{errorMessage}</h3>
+            </div>
+          ) : (
             <>
               <Collapse
                 defaultActiveKey={["1", "2", "3", "4", "5", "6", "7", "8"]}
               >
-                {/* Boxed Section for Goals */}
-                {/* <div
-              style={{
-                border: "1px solid #d9d9d9",
-                borderRadius: "8px",
-                padding: "10px",
-                marginTop: "16px",
-              }}
-            > */}
-                {/* <h3 style={{ marginBottom: "16px" }}>
-                Outcomes from the Month Just Ended
-              </h3> */}
                 <Panel header="Outcomes from the Month Just Ended" key="1">
                   {/* Goals Section */}
                   <Row gutter={24}>
@@ -976,13 +959,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                           </Row>
                         ))}
 
-                        {/* <Button
-                      type="dashed"
-                      onClick={() => add()}
-                      icon={<PlusOutlined />}
-                    >
-                      Add additional activity
-                    </Button> */}
                         {action === "view" ||
                         action === "approver-view" ? null : (
                           <Button type="dashed" onClick={() => add()} block>
@@ -1087,21 +1063,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                     )}
                   </Form.List>
                 </Panel>
-                {/* </div> */}
-
-                {/* Additional Activities for Next Month Section */}
-                {/* <div
-              style={{
-                border: "1px solid #d9d9d9",
-                borderRadius: "8px",
-                padding: "10px",
-                marginTop: "16px",
-                marginBottom: "24px",
-              }}
-            >
-              <h3 style={{ marginBottom: "16px" }}>
-                Additional activities for next month
-              </h3> */}
 
                 <Panel header="Additional activities for next month" key="4">
                   <Row gutter={24}>
@@ -1199,13 +1160,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                           </Row>
                         ))}
 
-                        {/* <Button
-                      type="dashed"
-                      onClick={() => add()}
-                      icon={<PlusOutlined />}
-                    >
-                      Add additional activity
-                    </Button> */}
                         {action === "view" ||
                         action === "approver-view" ? null : (
                           <Button type="dashed" onClick={() => add()} block>
@@ -1216,18 +1170,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                     )}
                   </Form.List>
                 </Panel>
-                {/* </div> */}
-
-                {/* <div
-              style={{
-                border: "1px solid #d9d9d9",
-                borderRadius: "8px",
-                padding: "10px",
-                marginTop: "16px",
-                marginBottom: "24px",
-              }}
-            >
-              <h3 style={{ marginBottom: "16px" }}>Praise points</h3> */}
 
                 <Panel header="Praise points" key="5">
                   {/* Praise/Prayer Request Section */}
@@ -1259,11 +1201,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                       <Input placeholder="Enter Praise Point" />
                                     </Form.Item>
                                   </Col>
-                                  {/* <Col xs={4}>
-                                <MinusCircleOutlined
-                                  onClick={() => remove(name)}
-                                />
-                              </Col> */}
                                   {action === "view" ||
                                   action === "approver-view" ? null : (
                                     <Col xs={4}>
@@ -1278,13 +1215,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 </Row>
                               ))}
                               <Form.Item>
-                                {/* <Button
-                              type="dashed"
-                              icon={<PlusOutlined />}
-                              onClick={() => add()} // Add another input field
-                            >
-                              Add Praise Point
-                            </Button> */}
                                 {action === "view" ||
                                 action === "approver-view" ? null : (
                                   <Button
@@ -1303,19 +1233,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                     </Col>
                   </Row>
                 </Panel>
-                {/* </div> */}
-
-                {/* Prayer Requests Section */}
-                {/* <div
-              style={{
-                border: "1px solid #d9d9d9",
-                borderRadius: "8px",
-                padding: "10px",
-                marginTop: "16px",
-                marginBottom: "24px",
-              }}
-            >
-              <h3 style={{ marginBottom: "16px" }}>Prayer requests</h3> */}
                 <Panel header="Prayer requests" key="6">
                   <Row gutter={24}>
                     <Col xs={24}>
@@ -1345,11 +1262,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                       <Input placeholder="Enter Prayer Request" />
                                     </Form.Item>
                                   </Col>
-                                  {/* <Col xs={4}>
-                                <MinusCircleOutlined
-                                  onClick={() => remove(name)}
-                                />
-                              </Col> */}
                                   {action === "view" ||
                                   action === "approver-view" ? null : (
                                     <Col xs={4}>
@@ -1364,13 +1276,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 </Row>
                               ))}
                               <Form.Item>
-                                {/* <Button
-                              type="dashed"
-                              icon={<PlusOutlined />}
-                              onClick={() => add()} // Add another input field
-                            >
-                              Add Prayer Request
-                            </Button> */}
                                 {action === "view" ||
                                 action === "approver-view" ? null : (
                                   <Button
@@ -1389,9 +1294,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                     </Col>
                   </Row>
                 </Panel>
-                {/* </div> */}
 
-                {/* Story/Testimony Section */}
                 <Panel header="Story/Testimony" key="7">
                   <Row gutter={24}>
                     <Col xs={24}>
@@ -1446,16 +1349,12 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   </Button>
                   <Button
                     type="primary"
-                    htmlType="submit"
+                    // htmlType="submit"
                     onClick={handleSaveAsDraft}
                   >
                     Save as draft
                   </Button>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    onClick={handleSubmitForApproval}
-                  >
+                  <Button type="primary" htmlType="submit">
                     Submit for approval
                   </Button>
                 </Space>
@@ -1478,7 +1377,19 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 </Space>
               )}
             </>
-          )}
+          )
+        ) : projectId === "" && !loading ? (
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+            <h3 style={{ color: "red" }}>
+              Please select the project to continue.
+            </h3>
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+            <Spin size="large" />
+            <p>Loading form data...</p>
+          </div>
+        )}
       </Form>
     );
   }
