@@ -66,6 +66,28 @@ export default function usePlansFetcher({
       const years = getYearString(year, quarter);
       const nextYears = getYearString(nextYear, nextQuarter);
 
+      const monthlyFormResponse =
+        await client.models.MonthlyForm.listMonthlyFormByFacilitator({
+          facilitator: userId,
+        });
+
+      if (monthlyFormResponse.data) {
+        const response = monthlyFormResponse.data;
+        response.forEach((monthlyForm) => {
+          if (
+            monthlyForm.projectId === projectId &&
+            Number(monthlyForm.year) === year &&
+            monthlyForm.month === getMonthName(month)
+          ) {
+            throw new Error(
+              `There is already a monthly plan existing for project ${projectId} for month ${getMonthName(
+                month
+              )} in the year ${year}.`
+            );
+          }
+        });
+      }
+
       console.log("Fetching plans for:", {
         projectId,
         userId,
