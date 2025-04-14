@@ -20,9 +20,6 @@ const EditMonthlyForm = ({ params }: { params: { id: string } }) => {
   const { monthlyForm, isMonthlyFormLoading, isMonthlyFormError } =
     useMonthlyForm({ formId: id as string, condition: true });
 
-  if (isMonthlyFormLoading) return <div>Loading...</div>;
-  if (isMonthlyFormError) return <div>Error loading form</div>;
-
   return (
     <>
       {contextHolder}

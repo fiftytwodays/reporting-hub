@@ -54,14 +54,9 @@ const Projects: React.FC<ProjectsProps> = ({
       setSelectedValue(project?.name);
     }
     setLoading(isProjectTypesDataLoading);
-
-    console.log("ProjectsData", projectsData);
-    console.log("isProjectTypesDataLoading", isProjectTypesDataLoading);
   }, [isProjectTypesDataLoading, projectsData, id, setLoading]);
 
   if (!selectedValue && id && id !== "project") {
-    console.log("Selected value is not set", selectedValue);
-    console.log("ID is not 'project'", id);
     return null; // Optionally, show a loading indicator instead
   }
 
