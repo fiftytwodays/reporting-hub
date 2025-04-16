@@ -37,8 +37,13 @@ const monthNames = [
   "December",
 ];
 
+const quarterNames = ["Apr - Jun", "Jul - Sept", "Oct - Dec", "Jan - Mar"];
+
 const getMonthName = (month: number) =>
   monthNames[month - 1] || "Invalid month";
+
+const getQuarterName = (quarter: number) =>
+  quarterNames[quarter - 1] || "Invalid quarter";
 
 const getYearString = (year: number, quarter: number) =>
   quarter === 4 ? `${year - 1}-${year}` : `${year}-${year + 1}`;
@@ -77,30 +82,22 @@ export default function usePlansFetcher({
           if (
             monthlyForm.projectId === projectId &&
             Number(monthlyForm.year) === year &&
-            monthlyForm.month === getMonthName(month)
+            Number(monthlyForm.month) === month
           ) {
             throw new Error(
-              `There is already a monthly plan existing for project ${projectId} for month ${getMonthName(
+              `A monthly plan already exists for project ${projectId} in month ${getMonthName(
                 month
-              )} in the year ${year}.`
+              )}, ${year}.`
             );
           }
         });
       }
 
-      console.log("Fetching plans for:", {
-        projectId,
-        userId,
-        month: getMonthName(month),
-        quarter,
-        years,
-      });
-
       // Fetch yearly plans
       const yearlyPlansResponse =
         await client.models.YearlyPlan.listYearlyPlanByUserId({ userId });
       if (!yearlyPlansResponse?.data || yearlyPlansResponse.data.length === 0) {
-        throw new Error("No yearly plan found for the given user.");
+        throw new Error("Yearly plan not found.");
       }
 
       // Find the specific yearly plan
@@ -108,9 +105,7 @@ export default function usePlansFetcher({
         (yp) => yp.year === years && yp.projectId === projectId
       );
       if (!yearlyPlan) {
-        throw new Error(
-          `No yearly plan found for the year ${years} and project ID ${projectId}.`
-        );
+        throw new Error(`Yearly plan not found for project ${projectId}`);
       }
 
       // Fetch quarterly plans
@@ -119,7 +114,7 @@ export default function usePlansFetcher({
         !quarterlyPlansResponse?.data ||
         quarterlyPlansResponse.data.length === 0
       ) {
-        throw new Error("No quarterly plans found for the given yearly plan.");
+        throw new Error("Quarterly plan not found in the yearly plan.");
       }
 
       // Find the specific quarterly plan
@@ -128,14 +123,18 @@ export default function usePlansFetcher({
       );
       if (!quarterlyPlan) {
         throw new Error(
-          `No quarterly plan found for quarter ${quarter} in the year ${years}.`
+          `Quarterly plan not found for quarter ${getQuarterName(
+            quarter
+          )} of ${years}.`
         );
       }
 
       // Check if the quarterly plan is approved
       if (quarterlyPlan.status !== "approved") {
         throw new Error(
-          `The quarterly plan for quarter ${quarter} in the year ${years} is not approved.`
+          `The quarterly plan for quarter ${getQuarterName(
+            quarter
+          )} of ${years} is not approved.`
         );
       }
 
@@ -183,6 +182,13 @@ export default function usePlansFetcher({
         const nextQuarterlyPlan = quarterlyPlansResponse.data.find(
           (qp) => qp.quarter === nextQuarter
         );
+        if (nextQuarterlyPlan?.status !== "approved") {
+          throw new Error(
+            `The quarterly plan for next quarter ${getQuarterName(
+              quarter
+            )} of ${years} is not approved.`
+          );
+        }
         if (nextQuarterlyPlan) {
           nextMonthGoalsQuarterlyPlanId = nextQuarterlyPlan.id;
           const nextPlansResponse = await nextQuarterlyPlan.plan();
@@ -202,9 +208,6 @@ export default function usePlansFetcher({
           }
         }
       }
-
-      console.log("Current Month Goals:", currentMonthGoals);
-      console.log("Next Month Goals:", nextMonthGoals);
 
       return {
         Plans: {

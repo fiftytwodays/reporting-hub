@@ -37,6 +37,7 @@ import { getAdditionalActivitiesByMonthlyFormId } from "../api/get-additionalAct
 import { getAdditionalActivitiesNextMonthByMonthlyFormId } from "../api/get-additionalActivity-nextMonth-specific";
 import useUpdateStatus from "../api/update-monthlyForm-status";
 import useParameters from "@/entities/parameters/api/parameters-list";
+import { useRouter } from "next/navigation";
 
 const { Panel } = Collapse;
 
@@ -106,6 +107,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
   monthlyForm,
   action,
 }) => {
+  const router = useRouter();
   const [loggedUser, setLoggedUser] = useState("");
   const [loading, setLoading] = useState(true);
   const { parametersList, isParametersListLoading } = useParameters({
@@ -263,7 +265,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       setDefaultMonth(Number(monthlyForm.month));
       setCurrentYear(monthlyForm.year);
 
-      console.log("Outcomes fetched:", outcomesFetched);
       const goalsList = outcomesFetched?.map((outcome: any, index: number) => ({
         id: outcome.id,
         goal: outcome.activityName,
@@ -292,7 +293,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
           })
         );
 
-      console.log("setting form values");
       form.setFieldsValue({
         id: monthlyForm.id,
         project: monthlyForm.projectId,
@@ -306,7 +306,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
         additionalActivities: additionalActivities,
         goalsList: goalsList,
       });
-      console.log("setting form ready");
       setIsFormReady(true); // Mark the form as ready after outcomes are fetched
     }
   }, [
@@ -353,7 +352,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     };
 
     createMonthlyForm(monthlyFormPayload, formValues);
-    messageApi.success("Monthly form successfully submitted for approval");
+    router.push("/monthly-form/my-forms");
   };
 
   const handleAchievedChange = (value: any, index: number) => {
@@ -970,7 +969,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   </Form.List>
                 </Panel>
 
-                <Panel header="Goals for next month Section" key="3">
+                <Panel header="Goals for next month" key="3">
                   {/* Goals for next month Section */}
 
                   <Row gutter={24}>
@@ -1064,7 +1063,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   </Form.List>
                 </Panel>
 
-                <Panel header="Additional activities for next month" key="4">
+                <Panel header="Additional goals for next month" key="4">
                   <Row gutter={24}>
                     <Col span={1}>Sl. No</Col>
                     <Col span={4}>
@@ -1175,7 +1174,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   {/* Praise/Prayer Request Section */}
                   <Row gutter={24}>
                     <Col xs={24}>
-                      <Form.Item required>
+                      <Form.Item label="Praise points" required>
                         <Form.List
                           name="praisePoints"
                           initialValue={[{ point: "" }]} // Add initial empty input field
@@ -1236,7 +1235,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                 <Panel header="Prayer requests" key="6">
                   <Row gutter={24}>
                     <Col xs={24}>
-                      <Form.Item required>
+                      <Form.Item label="Prayer requests" required>
                         <Form.List
                           name="prayerRequests"
                           initialValue={[{ request: "" }]} // Add initial empty input field
@@ -1309,7 +1308,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                         name="storyTestimony"
                       >
                         <Input.TextArea
-                          placeholder="Please enter your story or testimony. If you don't have one, simply write `none`"
+                          placeholder="Please enter your story or testimony."
                           rows={4}
                         />
                       </Form.Item>
@@ -1322,17 +1321,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   <Row gutter={24}>
                     <Col xs={24}>
                       <Form.Item
-                        rules={[
-                          {
-                            required: true,
-                            message: "Please provide an input",
-                          },
-                        ]}
                         label="Concerns/Struggles"
                         name="concernsStruggles"
                       >
                         <Input.TextArea
-                          placeholder="Please enter your concerns or struggles. If you don't have one, simply write `none`"
+                          placeholder="Please enter your concerns or struggles."
                           rows={4}
                         />
                       </Form.Item>
@@ -1355,7 +1348,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                     Save as draft
                   </Button>
                   <Button type="primary" htmlType="submit">
-                    Submit for approval
+                    Submit
                   </Button>
                 </Space>
               )}
