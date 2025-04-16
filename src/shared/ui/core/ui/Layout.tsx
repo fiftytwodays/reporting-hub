@@ -232,9 +232,16 @@ const AppLayout = ({ children }: LayoutProps) => {
     }
 
     if (groupNames.includes("user")) {
-      return updatedItems.map((item) =>
-        item.key === "yearly-form" ? menuConfigurations.yearlyForm : item
-      );
+      return updatedItems.map((item) => {
+        switch (item.key) {
+          case "monthly-form":
+            return menuConfigurations.monthlyForm;
+          case "yearly-form":
+            return menuConfigurations.yearlyForm;
+          default:
+            return item;
+        }
+      });
     }
     return updatedItems;
   };
