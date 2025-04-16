@@ -12,5 +12,12 @@ export default function MiscellaneousProjectReportsList({
   data,
   miscTitle,
 }: ProjectReportProps) {
-  return <EntityList rowKey="id" columns={columns(miscTitle)} data={data} mapColumn={mapToAntDColumns} />;
+  return (
+    <EntityList
+      rowKey="id"
+      columns={columns(miscTitle)}
+      data={data}
+      mapColumn={mapToAntDColumns}
+    />
+  );
 }

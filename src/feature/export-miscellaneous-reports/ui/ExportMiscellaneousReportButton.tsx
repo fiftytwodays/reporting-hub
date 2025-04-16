@@ -222,7 +222,7 @@ export default function ExportMiscellaneousReportButton({
     });
 
     Packer.toBlob(doc).then((blob) => {
-      saveAs(blob, "MiscellaneousReport.docx");
+      saveAs(blob, `MiscellaneousReport-${miscTitle}-${month}-${year}.docx`);
       message.success("Document exported successfully.");
     });
   };

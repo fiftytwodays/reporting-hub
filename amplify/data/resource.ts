@@ -296,7 +296,12 @@ const schema = a.schema({
         "monthlyFormId"
       ),
     })
-    .secondaryIndexes((index) => [index("projectId"), index("facilitator")])
+    .secondaryIndexes((index) => [
+      index("projectId"),
+      index("facilitator"),
+      index("year"),
+      index("month"),
+    ])
     .authorization((allow) => [
       allow.authenticated().to(["read"]),
       allow.groups(["admin"]),

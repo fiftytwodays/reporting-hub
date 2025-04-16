@@ -8,6 +8,26 @@ import { data } from "../api/miscellaneous-project-report";
 import { useState } from "react";
 import MiscellaneousProjectReportsList from "./MiscellaneousProjectReportsList";
 import { ExportMiscellaneousReportButton } from "@/feature/export-miscellaneous-reports";
+import { getMiscellaneousProjectReportsList } from "../api/miscellaneous-project-reports";
+import { Condiment } from "next/font/google";
+
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const getMonthName = (month: number) =>
+  monthNames[month - 1] || "Invalid month";
 
 export default function MiscellaneousProjectReportsPage() {
   const [isYearSelected, setIsYearSelected] = useState(false);
@@ -16,6 +36,17 @@ export default function MiscellaneousProjectReportsPage() {
   const [miscTitle, setMiscTitle] = useState<string>("");
   const [month, setMonth] = useState<string>("");
   const [year, setYear] = useState<string>("");
+
+  const {
+    miscellaneousProjectReport,
+    isMiscellaneousProjectReportError,
+    isMiscellaneousProjectReportLoading,
+    reloadMiscellaneousReports,
+  } = getMiscellaneousProjectReportsList({
+    condition: !!miscTitle,
+    year: year,
+    month: month,
+  });
 
   return (
     <>
@@ -49,20 +80,31 @@ export default function MiscellaneousProjectReportsPage() {
           </Space>
         </Col>
         <Col>
-          {isYearSelected && isMonthSelected && isReportTypeSelected && (
-            <ExportMiscellaneousReportButton
-              data={data}
-              miscTitle={miscTitle}
-              month={month}
-              year={year}
-            />
-          )}
+          {isYearSelected &&
+            isMonthSelected &&
+            isReportTypeSelected &&
+            !isMiscellaneousProjectReportLoading && (
+              <ExportMiscellaneousReportButton
+                data={
+                  miscellaneousProjectReport?.MiscellaneousProjectReports ?? []
+                }
+                miscTitle={miscTitle}
+                month={getMonthName(Number(month))}
+                year={year}
+              />
+            )}
         </Col>
       </Row>
       <Divider />
-      {isYearSelected && isMonthSelected && isReportTypeSelected && (
-        <MiscellaneousProjectReportsList data={data} miscTitle={miscTitle} />
-      )}
+      {isYearSelected &&
+        isMonthSelected &&
+        isReportTypeSelected &&
+        !isMiscellaneousProjectReportLoading && (
+          <MiscellaneousProjectReportsList
+            data={miscellaneousProjectReport?.MiscellaneousProjectReports ?? []}
+            miscTitle={miscTitle}
+          />
+        )}
     </>
   );
 }
