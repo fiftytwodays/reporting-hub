@@ -1,5 +1,5 @@
 export interface MiscellaneousProjectReport {
-  id: number;
+  id: string;
   project: string;
   facilitator: string;
   concerns?: string;
