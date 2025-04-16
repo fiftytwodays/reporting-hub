@@ -227,6 +227,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     month: form.getFieldValue("month"),
     year: form.getFieldValue("year"),
     // year: 2025,
+    action: action,
   });
 
   useEffect(() => {

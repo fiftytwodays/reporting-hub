@@ -11,6 +11,7 @@ interface FetchOptions {
   userId: string;
   month: number;
   year: number;
+  action: string;
 }
 
 interface ApiResponse {
@@ -57,6 +58,7 @@ export default function usePlansFetcher({
   userId,
   month,
   year,
+  action,
 }: FetchOptions) {
   const client = generateClient<Schema>();
 
@@ -76,7 +78,7 @@ export default function usePlansFetcher({
           facilitator: userId,
         });
 
-      if (monthlyFormResponse.data) {
+      if (monthlyFormResponse.data && action === "create") {
         const response = monthlyFormResponse.data;
         response.forEach((monthlyForm) => {
           if (
