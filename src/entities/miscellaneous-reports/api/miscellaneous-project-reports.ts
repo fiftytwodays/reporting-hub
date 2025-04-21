@@ -21,18 +21,19 @@ export function getMiscellaneousProjectReportsList({
 }: FetchOptions) {
   const { usersList, isUsersListLoading } = useUsersList({ condition: true });
   const client = generateClient<Schema>();
-  console.log("inside the fetcher");
   const fetcher = async () => {
     try {
       const monthlyFormsResponse =
         await client.models.MonthlyForm.listMonthlyFormByYear({
           year: year,
         });
-
       if (monthlyFormsResponse?.data?.length) {
         const monthlyForms = await Promise.all(
           monthlyFormsResponse.data
-            .filter((monthlyForm) => monthlyForm.month == month)
+            .filter(
+              (monthlyForm) =>
+                monthlyForm.month == month && monthlyForm.status !== "draft"
+            )
             .map(async (monthlyForm) => {
               try {
                 const projectDetails = await client.models.Project.get({
@@ -64,8 +65,6 @@ export function getMiscellaneousProjectReportsList({
               }
             })
         );
-
-        console.log("Fetched additional activities:", monthlyForms);
 
         return {
           MiscellaneousProjectReports: monthlyForms,

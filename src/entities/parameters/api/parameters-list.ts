@@ -4,6 +4,7 @@ import type { Schema } from "@root/amplify/data/resource";
 import { mutate } from "swr"; // Correct for SWR < 2.0 or SWR with named exports
 
 import type { Parameters } from "../config/types";
+import { start } from "repl";
 
 interface FetchOptions {
   condition: boolean;
@@ -24,6 +25,7 @@ export default function useParameters({ condition = true }: FetchOptions) {
         monthlyFormStartDate: response.data.at(0)?.monthlyFormStartDate ?? "",
         quarterlyPlanResetDate:
           response.data.at(0)?.quarterlyPlanResetDate ?? "",
+        startYear: response.data.at(0)?.startYear ?? "",
       };
 
       const apiResponse: ApiResponse = {

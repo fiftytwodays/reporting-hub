@@ -1,5 +1,5 @@
 export interface ReportingStatusReport {
-  id: number;
+  id: string;
   project: string;
   cluster: string;
   region: string;
@@ -8,10 +8,10 @@ export interface ReportingStatusReport {
   date: string;
   reportingMonth: string;
   year: string;
-  goalsFromLastMonth: MonthlyGoal[];
-  additionalActivities: MonthlyGoal[];
-  nextMonthGoal: NextMonthGoal[];
-  nextMonthAdditional: NextMonthGoal[];
+  goalsFromLastMonth: Goal[] | null;
+  additionalActivities: Goal[] | null;
+  nextMonthGoal: Goal[] | null;
+  nextMonthAdditional: Goal[] | null;
   praisePoints: string[];
   prayerRequests: string[];
   story: string;
@@ -19,21 +19,13 @@ export interface ReportingStatusReport {
 }
 
 export interface Goal {
-  goal: string;
-  functionalArea: string;
-  achieved?: string; // Optional since it's only present in completed/ongoing goals
+  activityName?: string;
+  activity?: string;
+  achieved?: string | boolean; // Optional since it's only present in completed/ongoing goals
+  isMajorGoal?: boolean | null | undefined; // Optional as not all goals are major
   reason?: string; // Optional as not all goals might have a reason
-  comments?: string; // Optional to allow flexibility
-}
-
-export interface MonthlyGoal extends Goal {
-  achieved: string;
-  reason: string;
-  comments: string;
-}
-
-export interface NextMonthGoal extends Goal {
-  comments: string;
+  comments?: string | null | undefined; // Optional to allow flexibility
+  // functionalArea: string; // Optional as not all goals might have a functional area
 }
 
 export interface ApiResponse {

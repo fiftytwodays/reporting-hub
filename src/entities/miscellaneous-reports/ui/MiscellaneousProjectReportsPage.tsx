@@ -10,6 +10,7 @@ import MiscellaneousProjectReportsList from "./MiscellaneousProjectReportsList";
 import { ExportMiscellaneousReportButton } from "@/feature/export-miscellaneous-reports";
 import { getMiscellaneousProjectReportsList } from "../api/miscellaneous-project-reports";
 import { Condiment } from "next/font/google";
+import useParameters from "@/entities/parameters/api/parameters-list";
 
 const monthNames = [
   "January",
@@ -37,6 +38,23 @@ export default function MiscellaneousProjectReportsPage() {
   const [month, setMonth] = useState<string>("");
   const [year, setYear] = useState<string>("");
 
+  const { parametersList, isParametersListLoading } = useParameters({
+    condition: true,
+  });
+
+  const getYears = (baseYearParam: string | number) => {
+    const baseYear = parseInt(baseYearParam.toString(), 10);
+    const currentYear = isNaN(baseYear) ? new Date().getFullYear() : baseYear;
+
+    return Array.from({ length: 10 }, (_, i) => {
+      const year = currentYear + i;
+      return {
+        label: year.toString(),
+        value: year.toString(),
+      };
+    });
+  };
+
   const {
     miscellaneousProjectReport,
     isMiscellaneousProjectReportError,
@@ -54,7 +72,9 @@ export default function MiscellaneousProjectReportsPage() {
         <Col>
           <Space>
             <Select
-              options={years}
+              options={getYears(
+                parametersList?.startYear ?? new Date().getFullYear()
+              )}
               placeholder="Select year"
               onChange={(value) => {
                 setIsYearSelected(true);
