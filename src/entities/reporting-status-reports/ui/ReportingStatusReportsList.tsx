@@ -8,18 +8,20 @@ interface ReportingStatusReportsProps {
   data: ReportingStatusReport[];
 }
 
-export default function ReportingStatusReportsList({ data }: ReportingStatusReportsProps) {
+export default function ReportingStatusReportsList({
+  data,
+}: ReportingStatusReportsProps) {
   return (
-      <EntityList
-        rowKey="id"
-        columns={columns}
-        expandable={{
-          expandedRowRender: (record: ReportingStatusReport) => (
-            <ExpandedContent record={record} />
-          ),
-        }}
-        data={data}
-        mapColumn={(columns): any => generateColumns(columns)}
-      />
-    );
+    <EntityList
+      rowKey="id"
+      columns={columns}
+      expandable={{
+        expandedRowRender: (record: ReportingStatusReport) => (
+          <ExpandedContent record={record} />
+        ),
+      }}
+      data={data}
+      mapColumn={(columns): any => generateColumns(columns)}
+    />
+  );
 }

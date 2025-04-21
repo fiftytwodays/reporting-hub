@@ -2,6 +2,7 @@ export interface Parameters {
   id: string;
   monthlyFormStartDate: string;
   quarterlyPlanResetDate: string;
+  startYear: string;
 }
 
 export interface ApiResponse {

@@ -17,6 +17,7 @@ interface EditParameterFormProps {
 interface FormValues {
   monthlyFormStartDate: string;
   quarterlyPlanResetDate: string;
+  startYear: string; // Added startYear property
 }
 
 const EditParametersForm: React.FC<EditParameterFormProps> = ({
@@ -129,6 +130,16 @@ const EditParametersForm: React.FC<EditParameterFormProps> = ({
                 },
               ]
             )}
+          </Col>
+        </Row>
+        <Row gutter={24}>
+          <Col xs={24} sm={6}>
+            {renderTextField("Start year", "startYear", [
+              {
+                required: true,
+                message: "Please enter the start year.",
+              },
+            ])}
           </Col>
         </Row>
 

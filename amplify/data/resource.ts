@@ -363,6 +363,7 @@ const schema = a.schema({
     .model({
       monthlyFormStartDate: a.string(),
       quarterlyPlanResetDate: a.string(),
+      startYear: a.string(),
     })
     .authorization((allow) => [
       allow.authenticated().to(["read"]),

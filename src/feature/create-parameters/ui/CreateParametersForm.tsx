@@ -12,6 +12,7 @@ interface CreateParametersFormProps {
 interface FormValues {
   monthlyFormStartDate: string;
   quarterlyPlanResetDate: string;
+  startYear: string;
 }
 
 const CreateParametersForm: React.FC<CreateParametersFormProps> = ({
@@ -97,6 +98,16 @@ const CreateParametersForm: React.FC<CreateParametersFormProps> = ({
               },
             ]
           )}
+        </Col>
+      </Row>
+      <Row gutter={24}>
+        <Col xs={24} sm={6}>
+          {renderTextField("Start year", "startYear", [
+            {
+              required: true,
+              message: "Please enter the start year.",
+            },
+          ])}
         </Col>
       </Row>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
