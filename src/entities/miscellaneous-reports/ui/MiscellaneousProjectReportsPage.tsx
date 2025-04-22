@@ -5,12 +5,13 @@ import {
   miscellaneous,
 } from "../config/miscellaneous-project-report";
 import { data } from "../api/miscellaneous-project-report";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MiscellaneousProjectReportsList from "./MiscellaneousProjectReportsList";
 import { ExportMiscellaneousReportButton } from "@/feature/export-miscellaneous-reports";
 import { getMiscellaneousProjectReportsList } from "../api/miscellaneous-project-reports";
 import { Condiment } from "next/font/google";
 import useParameters from "@/entities/parameters/api/parameters-list";
+import dayjs from "dayjs";
 
 const monthNames = [
   "January",
@@ -31,11 +32,9 @@ const getMonthName = (month: number) =>
   monthNames[month - 1] || "Invalid month";
 
 export default function MiscellaneousProjectReportsPage() {
-  const [isYearSelected, setIsYearSelected] = useState(false);
-  const [isMonthSelected, setIsMonthSelected] = useState(false);
   const [isReportTypeSelected, setIsReportTypeSelected] = useState(false);
   const [miscTitle, setMiscTitle] = useState<string>("");
-  const [month, setMonth] = useState<string>("");
+  const [month, setMonth] = useState<number>();
   const [year, setYear] = useState<string>("");
 
   const { parametersList, isParametersListLoading } = useParameters({
@@ -55,6 +54,21 @@ export default function MiscellaneousProjectReportsPage() {
     });
   };
 
+  useEffect(() => {
+    const currentDate = dayjs();
+    const currentYear = currentDate.year().toString();
+    const currentDay = currentDate.date();
+    const currentMonth = currentDate.month() + 1;
+    const startDate = Number(parametersList?.monthlyFormStartDate || 0);
+    const calculatedMonth =
+      currentDay > startDate ? currentMonth : currentMonth - 1;
+
+    const finalMonth = calculatedMonth > 0 ? calculatedMonth : 12;
+    // Set selected values
+    setYear(currentYear);
+    setMonth(finalMonth);
+  }, [parametersList]);
+
   const {
     miscellaneousProjectReport,
     isMiscellaneousProjectReportError,
@@ -63,7 +77,7 @@ export default function MiscellaneousProjectReportsPage() {
   } = getMiscellaneousProjectReportsList({
     condition: !!miscTitle,
     year: year,
-    month: month,
+    month: month?.toString() || "",
   });
 
   return (
@@ -77,18 +91,20 @@ export default function MiscellaneousProjectReportsPage() {
               )}
               placeholder="Select year"
               onChange={(value) => {
-                setIsYearSelected(true);
                 setYear(value);
               }}
+              value={year}
             />
+
             <Select
               placeholder="Select month"
               options={months}
               onChange={(value) => {
-                setIsMonthSelected(true);
                 setMonth(value);
               }}
+              value={month}
             />
+
             <Select
               placeholder="Select report type"
               options={miscellaneous}
@@ -100,31 +116,25 @@ export default function MiscellaneousProjectReportsPage() {
           </Space>
         </Col>
         <Col>
-          {isYearSelected &&
-            isMonthSelected &&
-            isReportTypeSelected &&
-            !isMiscellaneousProjectReportLoading && (
-              <ExportMiscellaneousReportButton
-                data={
-                  miscellaneousProjectReport?.MiscellaneousProjectReports ?? []
-                }
-                miscTitle={miscTitle}
-                month={getMonthName(Number(month))}
-                year={year}
-              />
-            )}
+          {!isMiscellaneousProjectReportLoading && (
+            <ExportMiscellaneousReportButton
+              data={
+                miscellaneousProjectReport?.MiscellaneousProjectReports ?? []
+              }
+              miscTitle={miscTitle}
+              month={getMonthName(Number(month))}
+              year={year}
+            />
+          )}
         </Col>
       </Row>
       <Divider />
-      {isYearSelected &&
-        isMonthSelected &&
-        isReportTypeSelected &&
-        !isMiscellaneousProjectReportLoading && (
-          <MiscellaneousProjectReportsList
-            data={miscellaneousProjectReport?.MiscellaneousProjectReports ?? []}
-            miscTitle={miscTitle}
-          />
-        )}
+      {isReportTypeSelected && !isMiscellaneousProjectReportLoading && (
+        <MiscellaneousProjectReportsList
+          data={miscellaneousProjectReport?.MiscellaneousProjectReports ?? []}
+          miscTitle={miscTitle}
+        />
+      )}
     </>
   );
 }

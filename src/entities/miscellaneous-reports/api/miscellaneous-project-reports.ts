@@ -65,7 +65,6 @@ export function getMiscellaneousProjectReportsList({
               }
             })
         );
-
         return {
           MiscellaneousProjectReports: monthlyForms,
         };

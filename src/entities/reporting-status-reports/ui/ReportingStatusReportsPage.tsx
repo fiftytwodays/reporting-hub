@@ -1,36 +1,52 @@
 import { Divider, Select, Space } from "antd";
 import { months, years } from "../config/reporting-status-report";
-import { data } from "../api/reporting-status-reports-jwdnjn";
 import dayjs from "dayjs";
 import ReportingStatusReportsList from "./ReportingStatusReportsList";
-import { ReportingStatusReport as ProjectReport } from "../config/types";
+import {
+  ReportingStatusReport as ProjectReport,
+  ReportingStatusReport,
+} from "../config/types";
 import useParameters from "@/entities/parameters/api/parameters-list";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useProjectReportStatus } from "../api/reporting-status-reports";
 
 interface ReportingStatusReportsPageProps {
-  setData: (record: ProjectReport[]) => void;
+  setData: (record: ReportingStatusReport[]) => void;
 }
 
 export default function ReportingStatusReportsPage({
   setData,
 }: ReportingStatusReportsPageProps) {
-  const [isYearSelected, setIsYearSelected] = useState(false);
   const [isMonthSelected, setIsMonthSelected] = useState(false);
-  const [month, setMonth] = useState<string>("");
+  const [month, setMonth] = useState<number>();
   const [year, setYear] = useState<string>("");
   const { parametersList, isParametersListLoading } = useParameters({
     condition: true,
   });
+
+  useEffect(() => {
+    const currentDate = dayjs();
+    const currentYear = currentDate.year().toString();
+    const currentDay = currentDate.date();
+    const currentMonth = currentDate.month() + 1;
+    const startDate = Number(parametersList?.monthlyFormStartDate || 0);
+    const calculatedMonth =
+      currentDay > startDate ? currentMonth : currentMonth - 1;
+
+    const finalMonth = calculatedMonth > 0 ? calculatedMonth : 12;
+    // Set selected values
+    setYear(currentYear);
+    setMonth(finalMonth);
+  }, [parametersList]);
 
   const {
     projectReportStatusReport,
     isreloadProjectReportStatusReportLoading,
     isreloadProjectReportStatusReportError,
   } = useProjectReportStatus({
-    condition: isYearSelected && isMonthSelected,
+    condition: true,
     year: year,
-    month: month,
+    month: month?.toString() || "",
   });
 
   const getYears = (baseYearParam: string | number) => {
@@ -63,27 +79,25 @@ export default function ReportingStatusReportsPage({
           )}
           placeholder="Select year"
           onChange={(value) => {
-            setIsYearSelected(true);
             setYear(value);
           }}
+          value={year}
         />
         <Select
           placeholder="Select month"
           options={months}
           onChange={(value) => {
-            setIsMonthSelected(true);
             setMonth(value);
           }}
+          value={month}
         />
       </Space>
       <Divider />
-      {isYearSelected &&
-        isMonthSelected &&
-        !isreloadProjectReportStatusReportLoading && (
-          <ReportingStatusReportsList
-            data={projectReportStatusReport?.ReportingStatusReport || []}
-          />
-        )}
+      {!isreloadProjectReportStatusReportLoading && (
+        <ReportingStatusReportsList
+          data={projectReportStatusReport?.ReportingStatusReport || []}
+        />
+      )}
     </>
   );
 }

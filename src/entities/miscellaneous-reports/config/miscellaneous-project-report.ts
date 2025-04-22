@@ -35,23 +35,23 @@ export const miscellaneous = [
 export const months = [
   {
     label: "January",
-    value: "January",
+    value: 1,
   },
   {
     label: "February",
-    value: "February",
+    value: 2,
   },
   {
     label: "March",
-    value: "March",
+    value: 3,
   },
   {
     label: "April",
-    value: "4",
+    value: 4,
   },
   {
     label: "May",
-    value: "May",
+    value: 5,
   },
   {
     label: "June",
@@ -59,26 +59,26 @@ export const months = [
   },
   {
     label: "July",
-    value: "June",
+    value: 7,
   },
   {
     label: "August",
-    value: "August",
+    value: 8,
   },
   {
     label: "September",
-    value: "September",
+    value: 9,
   },
   {
     label: "October",
-    value: "October",
+    value: 10,
   },
   {
     label: "November",
-    value: "November",
+    value: 11,
   },
   {
     label: "December",
-    value: "December",
+    value: 12,
   },
 ];
