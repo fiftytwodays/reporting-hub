@@ -4,10 +4,11 @@ import type { Schema } from "@root/amplify/data/resource";
 import useUsersList from "@/entities/user/api/users-list";
 import { ReportingStatusReport } from "../config/types";
 import {
-  fetchOutcomeByMonthlyFormId,
-  fetchAdditionalActivitiesByMonthlyFormId,
-  fetchAdditionalActivitiesNextMonthByMonthlyFormId,
-  fetchPlansByProjectUserMonthYear,
+  // fetchOutcomeByMonthlyFormId,
+  // fetchAdditionalActivitiesByMonthlyFormId,
+  // fetchAdditionalActivitiesNextMonthByMonthlyFormId,
+  // fetchPlansByProjectUserMonthYear,
+  getPlans,
 } from "../api/fetch-utils"; // You need to create this helper
 
 interface FetchOptions {
@@ -77,56 +78,58 @@ export function useProjectReportStatus({
           id: clusterDetails.data?.regionId ?? "",
         });
 
-        const [
-          outcomesRes,
-          additionalActivitiesRes,
-          additionalActivitiesNextMonthRes,
-          plansRes,
-        ] = await Promise.allSettled([
-          fetchOutcomeByMonthlyFormId(form.id),
-          fetchAdditionalActivitiesByMonthlyFormId(form.id),
-          fetchAdditionalActivitiesNextMonthByMonthlyFormId(form.id),
-          fetchPlansByProjectUserMonthYear({
-            projectId: form.projectId,
-            userId: form.facilitator ?? "",
-            month: getMonthNumber(form.month),
-            year: parseInt(form.year, 10),
-          }),
-        ]);
+        console.log("month", Number(form.month), "year", form.year);
 
-        if (outcomesRes.status === "rejected")
-          console.error("Outcomes error:", outcomesRes.reason);
-        if (additionalActivitiesRes.status === "rejected")
-          console.error(
-            "Additional activities error:",
-            additionalActivitiesRes.reason
-          );
-        if (plansRes.status === "rejected")
-          console.error("Plans error:", plansRes.reason);
+        const plansRes = await getPlans({
+          condition: true,
+          projectId: form.projectId,
+          userId: form.facilitator ?? "",
+          month: Number(form.month),
+          year: parseInt(form.year, 10),
+        });
+        console.log("outcomesRes", plansRes);
 
-        const outcomes =
-          outcomesRes.status === "fulfilled" ? outcomesRes.value : [];
-        const additionalActivities =
-          additionalActivitiesRes.status === "fulfilled"
-            ? additionalActivitiesRes.value
-            : [];
-        const additionalActivitiesNextMonth =
-          additionalActivitiesNextMonthRes.status === "fulfilled"
-            ? additionalActivitiesNextMonthRes.value
-            : [];
-        const plans = plansRes.status === "fulfilled" ? plansRes.value : {};
+        // const [
+        //   outcomesRes,
+        //   additionalActivitiesRes,
+        //   additionalActivitiesNextMonthRes,
+        //   plansRes,
+        // ] = await Promise.allSettled([
+        //   // fetchOutcomeByMonthlyFormId(form.id),
+        //   // fetchAdditionalActivitiesByMonthlyFormId(form.id),
+        //   // fetchAdditionalActivitiesNextMonthByMonthlyFormId(form.id),
+        //   getPlans({
+        //     condition: true,
+        //     projectId: form.projectId,
+        //     userId: form.facilitator ?? "",
+        //     month: getMonthNumber(form.month),
+        //     year: parseInt(form.year, 10),
+        //   }),
+        // ]);
 
-        console.log("Fetched additional activities:", additionalActivities);
-        console.log(
-          "Fetched additional activities next month:",
-          additionalActivitiesNextMonth
-        );
-        console.log("Fetched plans:", plans);
-        console.log("Fetched outcomes:", outcomes);
-        console.log("Fetched project details:", projectDetails);
-        console.log("Fetched user details:", userDetails);
-        console.log("Fetched cluster details:", clusterDetails);
-        console.log("Fetched region details:", regionDetails);
+        // const outcomes = outcomesRes.Plans.CurrentMonthGoals : [];
+        // const additionalActivities =
+        //   additionalActivitiesRes.status === "fulfilled"
+        //     ? additionalActivitiesRes.value
+        //     : [];
+        // const additionalActivitiesNextMonth =
+        //   additionalActivitiesNextMonthRes.status === "fulfilled"
+        //     ? additionalActivitiesNextMonthRes.value
+        //     : [];
+        const plans: any[] = plansRes.Plans.NextMonthGoals;
+        console.log("Plans", plans);
+
+        // console.log("Fetched additional activities:", additionalActivities);
+        // console.log(
+        //   "Fetched additional activities next month:",
+        //   additionalActivitiesNextMonth
+        // );
+        // console.log("Fetched plans:", plans);
+        // console.log("Fetched outcomes:", outcomes);
+        // console.log("Fetched project details:", projectDetails);
+        // console.log("Fetched user details:", userDetails);
+        // console.log("Fetched cluster details:", clusterDetails);
+        // console.log("Fetched region details:", regionDetails);
 
         return {
           id: form.id ?? "",
@@ -139,16 +142,13 @@ export function useProjectReportStatus({
           cluster: clusterDetails.data?.name ?? "",
           region: regionDetails.data?.name ?? "",
           status: form.status ?? "",
-          reportingMonth: form.month ?? "",
+          reportingMonth: getMonthName(Number(form.month)) ?? "",
           year: form.year ?? "",
           date: form.createdAt ?? "",
-          goalsFromLastMonth: outcomes,
-          additionalActivities,
-          nextMonthGoal:
-            Array.isArray(plans) || !plans?.NextMonthGoals
-              ? []
-              : plans.NextMonthGoals,
-          nextMonthAdditional: additionalActivitiesNextMonth,
+          // goalsFromLastMonth: outcomes,
+          // additionalActivities,
+          nextMonthGoal: plans,
+          // nextMonthAdditional: additionalActivitiesNextMonth,
           concerns: form.concerns ?? "",
           story: form.story ?? "",
           praisePoints: (form.praisePoints ?? []).filter(
