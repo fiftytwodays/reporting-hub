@@ -194,8 +194,7 @@ export default function CreateYearlyFormNew({
   }
 
   const getCurrentQuarter = () => {
-    const month = new Date().getMonth();
-
+    const month = new Date().getMonth() + 1; // Months are 0-indexed in JavaScript
     if (month >= 1 && month <= 3) return 4;
     if (month >= 4 && month <= 6) return 1;
     if (month >= 7 && month <= 9) return 2;
