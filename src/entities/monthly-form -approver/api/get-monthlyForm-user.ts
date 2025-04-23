@@ -73,7 +73,7 @@ export function useMonthlyFormsListUser({ condition = true }: FetchOptions) {
             const project = await client.models.Project.get({
               id: form.projectId ?? "",
             });
-            if (form.status === "waiting for approval") {
+            if (form.status === "submitted") {
               monthlyFormsAccumulated.push({
                 id: form.id ?? "",
                 projectName: project.data?.name ?? "",

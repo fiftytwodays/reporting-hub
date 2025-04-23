@@ -67,9 +67,8 @@ export default function ReportingStatusReportsPage({
   const currentYear =
     currentMonth == 0 ? currentDate.year() - 1 : currentDate.year();
 
-  console.log("THe datakmdkm", projectReportStatusReport);
-
   const finalMonth = currentMonth > 0 ? currentMonth : 12;
+  setData(projectReportStatusReport?.ReportingStatusReport || []);
   return (
     <>
       <Space>

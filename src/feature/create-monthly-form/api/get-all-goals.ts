@@ -4,6 +4,7 @@ import { generateClient } from "aws-amplify/data";
 import useSWR from "swr";
 import { Goal } from "../config/monthly-form";
 import next from "next";
+import { act } from "react";
 
 interface FetchOptions {
   condition: boolean;
@@ -11,6 +12,7 @@ interface FetchOptions {
   userId: string;
   month: number;
   year: number;
+  action: string;
 }
 
 interface ApiResponse {
@@ -57,6 +59,7 @@ export default function usePlansFetcher({
   userId,
   month,
   year,
+  action,
 }: FetchOptions) {
   const client = generateClient<Schema>();
 
@@ -82,7 +85,8 @@ export default function usePlansFetcher({
           if (
             monthlyForm.projectId === projectId &&
             Number(monthlyForm.year) === year &&
-            Number(monthlyForm.month) === month
+            Number(monthlyForm.month) === month &&
+            action === "create"
           ) {
             throw new Error(
               `A monthly plan already exists for project ${projectId} in month ${getMonthName(

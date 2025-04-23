@@ -53,7 +53,7 @@ export function getOutcomeByMonthlyFormId({
             achieved: outcome.achieved ?? "",
             reason: outcome.reason ?? "",
             comments: outcome.comments ?? "",
-            isMajorGoal: outcome.achieved ?? false,
+            isMajorGoal: activity.data?.isMajorGoal ?? false,
           };
         })
       );

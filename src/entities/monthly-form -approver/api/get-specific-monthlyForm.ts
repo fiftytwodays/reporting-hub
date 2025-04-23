@@ -42,7 +42,7 @@ export function useMonthlyFormsList({
     if (response?.data) {
       const monthlyForms = await Promise.all(
         response.data
-          .filter((form) => form.status === "waiting for approval")
+          .filter((form) => form.status === "submitted")
           .map(async (form) => {
             const project = await client.models.Project.get({
               id: form.projectId ?? "",

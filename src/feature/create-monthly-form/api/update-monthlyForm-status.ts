@@ -6,6 +6,7 @@ interface FetchOptions {
   condition: boolean;
   monthlyFormId: string;
   status: string;
+  comment?: string;
 }
 
 export default function useUpdateStatus() {
@@ -14,7 +15,7 @@ export default function useUpdateStatus() {
   const { trigger, data, isMutating, error } = useSWRMutation(
     "api/update-monthlyForm-status",
     async (key: string, { arg }: { arg: FetchOptions }) => {
-      const { condition, monthlyFormId, status } = arg;
+      const { condition, monthlyFormId, status, comment } = arg;
       if (!condition) {
         throw new Error("Condition not met for updating status");
       }
@@ -39,7 +40,7 @@ export default function useUpdateStatus() {
           prayerRequests: monthlyForm.prayerRequests,
           story: monthlyForm.story,
           concerns: monthlyForm.concerns,
-          comments: monthlyForm.comments,
+          comments: comment ?? monthlyForm.comments,
         });
         if (!updatedMonthlyForm || updatedMonthlyForm.errors) {
           throw new Error("Failed to update monthly form");
