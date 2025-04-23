@@ -54,6 +54,20 @@ export default function YearlyPlansList({ type }: { type: string }) {
 
   };
 
+  const handleView = (yearlyPlan: YearlyPlan) => {
+    setSelectedYearlyPlan(yearlyPlan);
+    // setIsEditModalVisible(true);
+    if (type === "myforms") {
+      router.push('/yearly-form/my-forms/' + yearlyPlan.id + '/view');
+    }
+
+    if (type === "approver")
+      router.push('/yearly-form/approver-view/' + yearlyPlan.id + '/view');
+    if (type === "reviewer")
+      router.push('/yearly-form/reviewer-view/' + yearlyPlan.id + '/view');
+
+  };
+
   // const { deleteYearlyPlan } = useDeleteYearlyPlan();
 
   const handleDelete = async (yearlyPlan: YearlyPlan) => {
@@ -95,6 +109,7 @@ export default function YearlyPlansList({ type }: { type: string }) {
         isLoading={isYearlyPlansListLoading}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
+        handleView={handleView}
         type={type}
         userId={userId}
       />)}

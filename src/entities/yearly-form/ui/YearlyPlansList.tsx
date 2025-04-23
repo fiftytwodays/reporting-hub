@@ -10,14 +10,15 @@ interface YearlyPlansListProps {
   userId: string;
   handleEdit: (yearlyPlan: YearlyPlan) => void;
   handleDelete: (yearlyPlan: YearlyPlan) => void;
+  handleView: (yearlyPlan: YearlyPlan) => void;
 }
 
-export default function YearlyPlansList({ data, isLoading, handleDelete, handleEdit, type, userId }: YearlyPlansListProps) {
+export default function YearlyPlansList({ data, isLoading, handleDelete, handleEdit, handleView, type, userId }: YearlyPlansListProps) {
   return (
     <EntityList
       rowKey="id"
       columns={columns}
-      mapColumn={(columns): any => generateColumns(columns, handleDelete, handleEdit, type, userId)}
+      mapColumn={(columns): any => generateColumns(columns, handleDelete, handleEdit, handleView, type, userId)}
       data={data}
       isLoading={isLoading}
 
