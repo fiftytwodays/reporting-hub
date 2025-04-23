@@ -207,7 +207,7 @@ export default function CreateYearlyFormNew({
     }
     if ((id || draftSaved) && yearlyPlanDetail) {
       setLoggedUserDetails();
-      setReadOnly(
+      setReadOnly((type==="myformsview")||
         (type !== "createNew" && type !== "myforms") ||
         (type === "myforms" &&
           yearlyPlanDetail?.status != "draft" &&

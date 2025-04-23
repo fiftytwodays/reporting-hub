@@ -20,6 +20,7 @@ export default function generateColumns<T>(
   columns: Column<any>[],
   handleDelete: (item: T) => void,
   handleEdit: (item: T) => void,
+  handleView: (item: T) => void,
   type: string,
   userId: string
 ): Column<T>[] {
@@ -46,6 +47,9 @@ export default function generateColumns<T>(
         return userId != "" && (
           <div>
             <Space>
+            <_Button type="link" onClick={() => handleView(item)}>
+                  View
+                </_Button>
               {(type === "myforms") ? (
                 (item.status === "approved" && item.userId === userId) ? (
                   <Popconfirm
@@ -62,15 +66,10 @@ export default function generateColumns<T>(
                   </Popconfirm>
                 ) : (((item.status === "draft" || item.status === "resent") && item.userId === userId) ? (<_Button type="link" onClick={() => handleEdit(item)}>
                   Edit
-                </_Button>) : (<_Button type="link" onClick={() => handleEdit(item)}>
-                  View
-                </_Button>)
+                </_Button>) : null
                 )
 
-              ) : (
-                <_Button type="link" onClick={() => handleEdit(item)}>
-                  View
-                </_Button>)}
+              ) : null}
               {(type === "myforms") && (item.userId === userId) && (
                 <Popconfirm
                   placement="bottomRight"
