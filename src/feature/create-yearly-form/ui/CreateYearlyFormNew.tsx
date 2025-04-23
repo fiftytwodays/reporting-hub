@@ -193,13 +193,13 @@ export default function CreateYearlyFormNew({
     setyearlyPlanDetails(yearlyPlanDetail);
   }
 
-  const getFutureQuarter = () => {
-    const month = new Date().getMonth() + 1;
+  const getCurrentQuarter = () => {
+    const month = new Date().getMonth();
 
-    if (month >= 1 && month <= 3) return 1;
-    if (month >= 4 && month <= 6) return 2;
-    if (month >= 7 && month <= 9) return 3;
-    return 4;
+    if (month >= 1 && month <= 3) return 4;
+    if (month >= 4 && month <= 6) return 1;
+    if (month >= 7 && month <= 9) return 2;
+    return 3;
   };
   useEffect(() => {
     if (!id) {
@@ -772,7 +772,7 @@ export default function CreateYearlyFormNew({
                       <Col span={5}>
                         <Form.Item>
                           <Tooltip title={plan.activity || ""}>
-                            <Input readOnly={readOnly}
+                            <Input readOnly={readOnly || quarter.key <= getCurrentQuarter()}
                               value={plan.activity || ""}
                               onChange={(e) =>
                                 handlePlanChange(
@@ -789,7 +789,7 @@ export default function CreateYearlyFormNew({
                       <Col span={4}>
                         <Form.Item>
                           <FunctionalArea
-                            disabled={readOnly}
+                            disabled={readOnly || quarter.key <= getCurrentQuarter()}
                             handlePlanChange={handlePlanChange}
                             quarterKey={quarter.key}
                             index={index}
@@ -800,7 +800,7 @@ export default function CreateYearlyFormNew({
                       <Col span={3}>
                         <Form.Item>
                           <Select
-                            disabled={readOnly}
+                            disabled={readOnly || quarter.key <= getCurrentQuarter()}
                             mode="multiple"
                             value={plan.month || []}
                             onChange={(value) =>
@@ -825,7 +825,7 @@ export default function CreateYearlyFormNew({
                       <Col span={3}>
                         <Form.Item>
                           <Checkbox
-                            disabled={readOnly}
+                            disabled={readOnly || quarter.key <= getCurrentQuarter()} 
                             checked={plan.isMajorGoal || false}
                             onChange={(e) =>
                               handlePlanChange(
@@ -842,7 +842,7 @@ export default function CreateYearlyFormNew({
                         <Form.Item>
                           <Tooltip title={plan.comments || ""}>
                             <Input
-                              readOnly={readOnly}
+                              readOnly={readOnly || quarter.key <= getCurrentQuarter()}
                               value={plan.comments || ""}
                               onChange={(e) =>
                                 handlePlanChange(
@@ -885,7 +885,7 @@ export default function CreateYearlyFormNew({
                   ))}
                   <Tooltip title="Add Planned Activities">
                     <Button
-                      disabled={readOnly}
+                      disabled={readOnly || quarter.key <= getCurrentQuarter()}
                       type="dashed"
                       onClick={() => handleAddPlan(quarter.key)}
                       block
