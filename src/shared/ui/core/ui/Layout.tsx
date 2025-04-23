@@ -91,10 +91,10 @@ const menuConfigurations = {
     key: "reports",
     label: "Reports",
     children: [
-      {
-        key: "project-reports",
-        label: <Link href="/reports/project-reports">Project reports</Link>,
-      },
+      // {
+      //   key: "project-reports",
+      //   label: <Link href="/reports/project-reports">Project reports</Link>,
+      // },
       {
         key: "miscellaneous-reports",
         label: (

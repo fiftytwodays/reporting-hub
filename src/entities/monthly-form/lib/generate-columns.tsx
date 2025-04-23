@@ -28,7 +28,7 @@ export default function generateColumns<T>(
           <div>
             <Space>
               {record.status !== "approved" &&
-                record.status !== "waiting for approval" && (
+                record.status !== "submitted" && (
                   <_Button
                     type="link"
                     href={`/monthly-form/my-forms/${record.id}/edit`}

@@ -1,6 +1,6 @@
 import { Descriptions, Space, Table } from "antd";
 import { nextMonth, currentMonth } from "../config/expanded-content-columns";
-import { MonthlyGoal, NextMonthGoal, ReportingStatusReport } from "../config/types";
+import { Goal, ReportingStatusReport } from "../config/types";
 import DescriptionsItem from "antd/es/descriptions/Item";
 
 interface ExpandedContentProps {
@@ -32,31 +32,31 @@ export default function ExpandedContent({ record }: ExpandedContentProps) {
       <Table
         rowKey="goal"
         columns={currentMonth}
-        dataSource={record.goalsFromLastMonth}
+        dataSource={record.goalsFromLastMonth || []}
         pagination={false}
       />
 
       <h3>Additional activities other than that was planned</h3>
-      <Table<MonthlyGoal>
+      <Table<Goal>
         rowKey="goal"
-        columns={currentMonth}
-        dataSource={record.additionalActivities}
+        columns={nextMonth}
+        dataSource={record.additionalActivities || []}
         pagination={false}
       />
 
       <h3>Goals for next month</h3>
-      <Table<NextMonthGoal>
+      <Table<Goal>
         rowKey="goal"
         columns={nextMonth}
-        dataSource={record.nextMonthGoal}
+        dataSource={record.nextMonthGoal || []}
         pagination={false}
       />
 
       <h3>Additional activities for next month</h3>
-      <Table<NextMonthGoal>
+      <Table<Goal>
         rowKey="goal"
         columns={nextMonth}
-        dataSource={record.nextMonthAdditional}
+        dataSource={record.nextMonthAdditional || []}
         pagination={false}
       />
 

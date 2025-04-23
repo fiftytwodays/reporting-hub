@@ -54,7 +54,10 @@ const createTable = (data: any[], columns: string[]) => {
           new Paragraph({
             children: [
               new TextRun({
-                text: col.replace(/([A-Z])/g, " $1").toUpperCase(), // Formatting column name for readability
+                text:
+                  col === "activityName"
+                    ? "GOAL"
+                    : col.replace(/([A-Z])/g, " $1").toUpperCase(), // Formatting column name for readability
                 bold: true, // Apply bold styling here
                 size: 14, // Set font size for header
               }),
@@ -167,14 +170,23 @@ export default function ExportProjectReportButton({
             spacing: { before: 100, after: 100 },
           }),
 
-          createTable(report.goalsFromLastMonth, [
-            "goal",
-            "majorGoal",
-            "functionalArea",
-            "achieved",
-            "reason",
-            "comments",
-          ]),
+          report.goalsFromLastMonth
+            ? createTable(report.goalsFromLastMonth, [
+                "activityName",
+                "majorGoal",
+                "functionalArea",
+                "achieved",
+                "reason",
+                "comments",
+              ])
+            : new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "No data available for goals from last month.",
+                    size: 14,
+                  }),
+                ],
+              }),
 
           new Paragraph({
             children: [
@@ -188,8 +200,8 @@ export default function ExportProjectReportButton({
             spacing: { before: 100, after: 100 },
           }),
 
-          createTable(report.additionalActivities, [
-            "goal",
+          createTable(report.additionalActivities ?? [], [
+            "activity",
             "majorGoal",
             "functionalArea",
             "achieved",
@@ -211,8 +223,8 @@ export default function ExportProjectReportButton({
             spacing: { before: 100, after: 100 },
           }),
 
-          createTable(report.nextMonthGoal, [
-            "goal",
+          createTable(report.nextMonthGoal ?? [], [
+            "activity",
             "majorGoal",
             "functionalArea",
             "comments",
@@ -230,8 +242,8 @@ export default function ExportProjectReportButton({
             spacing: { before: 100, after: 100 },
           }),
 
-          createTable(report.nextMonthAdditional, [
-            "goal",
+          createTable(report.nextMonthAdditional ?? [], [
+            "activity",
             "majorGoal",
             "functionalArea",
             "comments",

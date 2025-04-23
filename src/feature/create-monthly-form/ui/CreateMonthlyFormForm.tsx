@@ -17,6 +17,7 @@ import {
   Collapse,
   Divider,
   Spin,
+  Modal,
 } from "antd";
 import { MessageInstance } from "antd/es/message/interface";
 import dayjs from "dayjs";
@@ -226,6 +227,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     // month: 6,
     month: form.getFieldValue("month"),
     year: form.getFieldValue("year"),
+    action: action,
     // year: 2025,
     action: action,
   });
@@ -274,6 +276,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
         majorGoal: outcome.isMajorGoal,
         comments: outcome.comments,
       }));
+      console.log("Goals List:", goalsList);
       const additionalActivities = additionalActivitiesFetched?.map(
         (additionalActivity: any, index: number) => ({
           id: additionalActivity.id,
@@ -338,7 +341,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       projectId: formValues.project, // Maps to `projectId`
       month: formValues.month, // Maps to `month`
       year: formValues.year, // Maps to `year`
-      status: "waiting for approval", // Assuming "draft" is the status for saving as draft
+      status: "submitted", // Assuming "draft" is the status for saving as draft
       facilitator: loggedUser, // Maps to `facilitator`
       praisePoints:
         formValues.praisePoints?.map((point: { point: any }) => point.point) ||
@@ -410,12 +413,13 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     }
   }
 
-  async function reject(): Promise<void> {
+  async function reject(comment: string): Promise<void> {
     try {
       const response = await updateStatus({
         condition: true, // Replace with your actual condition
         monthlyFormId: monthlyForm?.id || "",
-        status: "resend",
+        status: "resent",
+        comment: comment,
       });
 
       if (response) {
@@ -653,14 +657,14 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
   } else if (
     monthlyForm !== null &&
     monthlyForm.status !== "draft" &&
-    monthlyForm.status !== "resend" &&
+    monthlyForm.status !== "resent" &&
     action === "edit"
   ) {
     return (
       <div style={{ textAlign: "center", marginTop: "20px" }}>
         <h3 style={{ color: "red" }}>
           You are not allowed to edit the monthly form unless it is in 'Draft'
-          or 'Resend' status.
+          or 'Resent' status.
         </h3>
       </div>
     );
@@ -1358,14 +1362,54 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   <Button
                     type="default"
                     disabled={false}
-                    href="/monthly-form/approver-view"
+                    onClick={() => router.push("/monthly-form/approver-view")}
                   >
                     Cancel
                   </Button>
-                  <Button type="primary" disabled={false} onClick={approve}>
+                  <Button
+                    type="primary"
+                    disabled={false}
+                    onClick={async () => {
+                      await approve();
+                      router.push("/monthly-form/approver-view");
+                    }}
+                  >
                     Approve
                   </Button>
-                  <Button type="primary" disabled={false} onClick={reject}>
+                  <Button
+                    type="primary"
+                    disabled={false}
+                    onClick={() => {
+                      Modal.confirm({
+                        title: "Resend Monthly Form",
+                        content: (
+                          <Input.TextArea
+                            placeholder="Please provide a comment for resending"
+                            rows={4}
+                            id="resend-comment"
+                          />
+                        ),
+                        onOk: async () => {
+                          const comment = (
+                            document.getElementById(
+                              "resend-comment"
+                            ) as HTMLTextAreaElement
+                          )?.value;
+                          if (comment) {
+                            await reject(comment);
+                            router.push("/monthly-form/approver-view");
+                          } else {
+                            messageApi.warning(
+                              "Resend action canceled. Comment is required."
+                            );
+                          }
+                        },
+                        onCancel: () => {
+                          messageApi.info("Resend action canceled.");
+                        },
+                      });
+                    }}
+                  >
                     Resend
                   </Button>
                 </Space>

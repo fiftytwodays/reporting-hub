@@ -22,10 +22,10 @@ export interface Goal {
   activityName?: string;
   activity?: string;
   achieved?: string | boolean; // Optional since it's only present in completed/ongoing goals
-  isMajorGoal?: boolean | null | undefined; // Optional as not all goals are major
+  isMajorGoal?: string | boolean | null | undefined; // Optional as not all goals are major
   reason?: string; // Optional as not all goals might have a reason
   comments?: string | null | undefined; // Optional to allow flexibility
-  functionalArea: string; // Optional as not all goals might have a functional area
+  functionalArea?: string; // Optional as not all goals might have a functional area
 }
 
 export interface ApiResponse {
