@@ -5,6 +5,7 @@ import type { Schema } from "@root/amplify/data/resource";
 interface FetchOptions {
   condition: boolean;
   projectId: string;
+  usersList: any[];
 }
 
 const monthNames = [
@@ -28,12 +29,11 @@ const getMonthName = (month: number) =>
 export function useMonthlyFormsList({
   condition = true,
   projectId,
+  usersList,
 }: FetchOptions) {
   const client = generateClient<Schema>();
 
   const fetcher = async () => {
-    const anc = await client.models.MonthlyForm.list({});
-
     const response = await client.models.MonthlyForm.listMonthlyFormByProjectId(
       {
         projectId: projectId,
@@ -44,6 +44,15 @@ export function useMonthlyFormsList({
         response.data
           .filter((form) => form.status === "submitted")
           .map(async (form) => {
+            let userName = "";
+            usersList.find((user) => {
+              if (user.Username === form.facilitator) {
+                userName = `${user.GivenName ?? ""} ${
+                  user.FamilyName ?? ""
+                }`.trim();
+              }
+            });
+
             const project = await client.models.Project.get({
               id: form.projectId ?? "",
             });
@@ -57,6 +66,7 @@ export function useMonthlyFormsList({
               year: form.year ?? "",
               status: form.status ?? "",
               facilitator: form.facilitator ?? "",
+              facilitatorName: userName,
               // praisePoints: form.praisePoints ?? [],
               // prayerRequests: form.prayerRequests ?? [],
               // story: form.story ?? "",
@@ -76,7 +86,7 @@ export function useMonthlyFormsList({
   };
 
   const { data, isLoading, error } = useSWR(
-    condition ? ["api/monthlyForms"] : null,
+    condition ? [`api/monthlyForms/${projectId}`] : null,
     fetcher,
     {
       keepPreviousData: true,
@@ -87,7 +97,7 @@ export function useMonthlyFormsList({
     mutate(
       (keys) =>
         Array.isArray(keys) &&
-        keys.some((item) => item.startsWith("api/monthlyForms")),
+        keys.some((item) => item.startsWith(`api/monthlyForms/${projectId}`)),
       undefined,
       {
         revalidate: true,
@@ -104,6 +114,7 @@ export function useMonthlyFormsList({
     status: form.status,
     facilitator: form.facilitator,
     location: form.location,
+    facilitatorName: form.facilitatorName,
   }));
 
   return {

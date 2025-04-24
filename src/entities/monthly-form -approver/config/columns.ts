@@ -11,6 +11,11 @@ export const columns = [
     key: "name",
   },
   {
+    title: "Facilitator",
+    dataIndex: "facilitatorName",
+    key: "facilitatorName",
+  },
+  {
     title: "Project location",
     dataIndex: "location",
     key: "location",
@@ -34,5 +39,4 @@ export const columns = [
     title: "Actions",
     key: "actions",
   },
-] 
-
+];

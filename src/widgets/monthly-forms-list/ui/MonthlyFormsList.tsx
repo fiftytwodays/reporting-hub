@@ -1,46 +1,44 @@
 import { message, Select } from "antd";
 import { useEffect, useState } from "react";
-import { MonthlyForm } from "@/entities/monthly-form/config/types";
 import { MonthlyFormsList as _MonthlyFormsList } from "@/entities/monthly-form";
 import useProjectList, {
   Project,
 } from "@/feature/create-monthly-form/api/project-list";
 import { useMonthlyFormsList } from "@/entities/monthly-form/api/get-specific-monthlyForm";
 import { useMonthlyFormsListUser } from "@/entities/monthly-form/api/get-monthlyForm-user";
+import useUsersList from "@/entities/user/api/users-list";
 
 export default function MonthlyFormsList() {
   const [messageApi, contextHolder] = message.useMessage({
     maxCount: 1,
     duration: 2,
   });
+  const [projectId, setSelectedProject] = useState<string | null>(null);
 
-  const [projectId, setSelectedProject] = useState("");
-
-  // Fetch all projects
   const { projectsData, isProjectTypesDataLoading } = useProjectList({
     condition: true,
     projectId: "project",
     type: "myforms",
   });
 
-  // Fetch monthly forms list only when projectId is selected
+  const { usersList } = useUsersList({ condition: true });
+
   const { monthlyFormsList, isMonthlyFormsListLoading } = useMonthlyFormsList({
-    projectId,
-    condition: !!projectId,
+    projectId: projectId || "",
+    condition: !!projectId && Array.isArray(usersList) && usersList.length > 0,
+    usersList,
   });
 
   const {
     monthlyFormsList: allMonthlyFormList,
     isMonthlyFormsListLoading: isAllMonthlyFormListLoading,
   } = useMonthlyFormsListUser({
-    condition: projectId === "",
+    condition: !projectId && Array.isArray(usersList) && usersList.length > 0,
+    usersList,
   });
 
   const transformProjectsData = (data?: Project[]) =>
-    data?.map((item) => ({
-      label: item.name,
-      value: item.id,
-    })) || [];
+    data?.map((item) => ({ label: item.name, value: item.id })) || [];
 
   return (
     <>
@@ -48,17 +46,19 @@ export default function MonthlyFormsList() {
       {!isProjectTypesDataLoading && (
         <Select
           options={transformProjectsData(projectsData)}
-          onChange={(value: string) => setSelectedProject(value)}
+          onChange={(value: string) => {
+            setSelectedProject(value || null);
+          }}
           placeholder="Select Project"
           style={{ width: 200, marginBottom: 16 }}
+          allowClear
         />
       )}
 
-      {/* Render Monthly Forms list when data is available */}
-      {projectId !== "" ? (
+      {projectId ? (
         <_MonthlyFormsList
           data={monthlyFormsList}
-          isLoading={isMonthlyFormsListLoading}
+          isLoading={!monthlyFormsList}
         />
       ) : (
         <_MonthlyFormsList
@@ -66,16 +66,6 @@ export default function MonthlyFormsList() {
           isLoading={isAllMonthlyFormListLoading}
         />
       )}
-
-      {/* Modal logic placeholder (optional) */}
-      {/* {isEditModalVisible && selectedMonthlyForm && (
-        <EditMonthlyFormModal
-          monthlyFormDetails={selectedMonthlyForm}
-          isModalVisible={isEditModalVisible}
-          setIsModalVisible={setIsEditModalVisible}
-          messageApi={messageApi}
-        />
-      )} */}
     </>
   );
 }
