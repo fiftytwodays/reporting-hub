@@ -207,7 +207,8 @@ export default function CreateYearlyFormNew({
     }
     if ((id || draftSaved) && yearlyPlanDetail) {
       setLoggedUserDetails();
-      setReadOnly((type==="myformsview")||
+      console.log("type", type);
+      setReadOnly((type==="myformsview" || type==="reviewerview" || type==="approverview")||
         (type !== "createNew" && type !== "myforms") ||
         (type === "myforms" &&
           yearlyPlanDetail?.status != "draft" &&
@@ -942,7 +943,7 @@ export default function CreateYearlyFormNew({
               </>
             )}
 
-            {type === "reviewer" && (
+            {(type === "reviewer" || type === "reviewerview") && (
               <>
                 <Tooltip title="Send for Approval">
                   <Button
@@ -966,7 +967,7 @@ export default function CreateYearlyFormNew({
               </>
             )}
 
-            {type === "approver" && (
+            {(type === "approver" || type === "approverview") && (
               <>
                 <Tooltip title="Approve">
                   <Button

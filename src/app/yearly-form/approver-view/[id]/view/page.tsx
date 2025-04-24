@@ -122,7 +122,7 @@ export default function MyForms({ params }: { params: { id: string } }) {
             id={id}
             setyearlyPlanDetails={setyearlyPlanDetails}
             messageApi={messageApi}
-            type="myformsview"
+            type="approverview"
           />
         }
       />
