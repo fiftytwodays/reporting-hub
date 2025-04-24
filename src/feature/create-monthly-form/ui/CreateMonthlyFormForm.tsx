@@ -101,6 +101,7 @@ interface FormValues {
   praisePrayerRequest: string;
   storyTestimony: string;
   concernsStruggles: string;
+  comments: string;
 }
 
 const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
@@ -228,6 +229,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     month: form.getFieldValue("month"),
     year: form.getFieldValue("year"),
     action: action,
+    facilitatorId: monthlyForm?.facilitator ?? "",
     // year: 2025,
   });
 
@@ -308,6 +310,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
         additionalActivitiesNextMonth: additionalActivitiesNextMonth,
         additionalActivities: additionalActivities,
         goalsList: goalsList,
+        comments: monthlyForm.comments,
       });
       setIsFormReady(true); // Mark the form as ready after outcomes are fetched
     }
@@ -351,7 +354,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
         ) || [], // Maps to `prayerRequests`
       story: formValues.storyTestimony || "", // Maps to `story`
       concerns: formValues.concernsStruggles || "", // Maps to `concerns`
-      comments: "", // Assuming comments are not part of the form values
+      comments: formValues.comments || "", // Assuming comments are not part of the form values
     };
 
     createMonthlyForm(monthlyFormPayload, formValues);
@@ -388,7 +391,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
         ) || [], // Maps to `prayerRequests`
       story: formValues.storyTestimony || "", // Maps to `story`
       concerns: formValues.concernsStruggles || "", // Maps to `concerns`
-      comments: "", // Assuming comments are not part of the form values
+      comments: formValues.comments || "", // Assuming comments are not part of the form values
     };
 
     createMonthlyForm(monthlyFormPayload, formValues);
@@ -719,6 +722,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
               <Col xs={24} sm={6}>
                 <Form.Item label="Year" name="year">
                   <Select options={years} value={currentYear} disabled />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={6}>
+                <Form.Item label="Comments" name="comments">
+                  <Input.TextArea rows={4} />
                 </Form.Item>
               </Col>
             </>

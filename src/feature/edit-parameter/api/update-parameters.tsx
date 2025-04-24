@@ -7,12 +7,14 @@ interface UpdateParametersInput {
   id: string;
   monthlyFormStartDate: string;
   quarterlyPlanResetDate: string;
+  startYear: string;
 }
 
 interface ParametersResponse {
   id: string;
   monthlyFormStartDate: string;
   quarterlyPlanResetDate: string;
+  startYear: string;
 }
 
 export default function useUpdateParameters() {
@@ -28,6 +30,7 @@ export default function useUpdateParameters() {
       id: arg.id,
       monthlyFormStartDate: arg.monthlyFormStartDate,
       quarterlyPlanResetDate: arg.quarterlyPlanResetDate,
+      startYear: arg.startYear,
     };
 
     const response = await client.models.Parameters.update(parametersData);
@@ -36,6 +39,7 @@ export default function useUpdateParameters() {
         id: response.data.id,
         monthlyFormStartDate: response.data.monthlyFormStartDate,
         quarterlyPlanResetDate: response.data.quarterlyPlanResetDate,
+        startYear: response.data.startYear,
       } as ParametersResponse;
 
       return parameters;
