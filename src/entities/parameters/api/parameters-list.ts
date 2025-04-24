@@ -32,6 +32,8 @@ export default function useParameters({ condition = true }: FetchOptions) {
         Parameters: parameters,
       };
 
+      console.log("API Response:", apiResponse);
+      
       return apiResponse;
     }
     return null;
