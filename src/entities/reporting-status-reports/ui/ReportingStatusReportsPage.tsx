@@ -1,4 +1,4 @@
-import { Divider, Select, Space } from "antd";
+import { Divider, Select, Space, Spin } from "antd";
 import { months, years } from "../config/reporting-status-report";
 import dayjs from "dayjs";
 import ReportingStatusReportsList from "./ReportingStatusReportsList";
@@ -68,7 +68,10 @@ export default function ReportingStatusReportsPage({
     currentMonth == 0 ? currentDate.year() - 1 : currentDate.year();
 
   const finalMonth = currentMonth > 0 ? currentMonth : 12;
-  setData(projectReportStatusReport?.ReportingStatusReport || []);
+  useEffect(() => {
+    setData(projectReportStatusReport?.ReportingStatusReport || []);
+  }, [projectReportStatusReport]);
+
   return (
     <>
       <Space>
@@ -92,7 +95,11 @@ export default function ReportingStatusReportsPage({
         />
       </Space>
       <Divider />
-      {!isreloadProjectReportStatusReportLoading && (
+      {isreloadProjectReportStatusReportLoading ? (
+        <div style={{ textAlign: "center", marginTop: "80px" }}>
+          <Spin size="default" />
+        </div>
+      ) : (
         <ReportingStatusReportsList
           data={projectReportStatusReport?.ReportingStatusReport || []}
         />
