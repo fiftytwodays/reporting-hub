@@ -870,12 +870,13 @@ export default function CreateYearlyFormNew({
                           (yearlyPlanDetail?.userId
                             ? yearlyPlanDetail.userId === loggedUser
                             : true) && (
+                              <Button icon={
                             <DeleteTwoTone
                               onClick={() =>
                                 handleDeletePlan(quarter.key, index)
                               }
                               twoToneColor="#FF0000"
-                            />
+                            />} disabled={readOnly || quarter.key <= getCurrentQuarter()}></Button>
                           )}
                         {/* </Button> */}
                       </Col>
