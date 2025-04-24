@@ -5,6 +5,7 @@ import { fetchUserAttributes, getCurrentUser } from "@aws-amplify/auth";
 
 interface FetchOptions {
   condition: boolean;
+  usersList: any[];
 }
 
 const monthNames = [
@@ -34,7 +35,10 @@ function stringToArray(str: string | undefined): string[] {
     : [cleanedStr];
 }
 
-export function useMonthlyFormsListUser({ condition = true }: FetchOptions) {
+export function useMonthlyFormsListUser({
+  condition = true,
+  usersList,
+}: FetchOptions) {
   const client = generateClient<Schema>();
 
   const fetcher = async () => {
@@ -70,6 +74,15 @@ export function useMonthlyFormsListUser({ condition = true }: FetchOptions) {
           });
         if (response?.data) {
           for (const form of response.data) {
+            let userName = "";
+            usersList.find((user) => {
+              if (user.Username === form.facilitator) {
+                userName = `${user.GivenName ?? ""} ${
+                  user.FamilyName ?? ""
+                }`.trim();
+              }
+            });
+
             const project = await client.models.Project.get({
               id: form.projectId ?? "",
             });
@@ -82,6 +95,7 @@ export function useMonthlyFormsListUser({ condition = true }: FetchOptions) {
                 year: form.year ?? "",
                 status: form.status ?? "",
                 facilitator: form.facilitator ?? "",
+                facilitatorName: userName,
               });
             }
           }
@@ -124,6 +138,7 @@ export function useMonthlyFormsListUser({ condition = true }: FetchOptions) {
     status: form.status,
     facilitator: form.facilitator,
     location: form.location,
+    facilitatorName: form.facilitatorName,
   }));
 
   return {

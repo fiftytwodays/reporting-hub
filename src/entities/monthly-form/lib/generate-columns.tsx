@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "antd";
 import styled from "@emotion/styled";
 import { Flex, Space, Typography, Popconfirm } from "antd";
+import { getCurrentUser } from "@aws-amplify/auth";
 
 interface Column<T = any> {
   key?: string | undefined;
@@ -19,6 +20,18 @@ export default function generateColumns<T>(
 ): Column<T>[] {
   const { Text } = Typography;
 
+  const [userId, setUserId] = React.useState<string | undefined>(undefined);
+
+  React.useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        setUserId(user.userId);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch user:", error);
+      });
+  }, []);
+
   return columns.map((column) => ({
     ...column,
     render: (item: any, record: any, index: number) => {
@@ -28,7 +41,8 @@ export default function generateColumns<T>(
           <div>
             <Space>
               {record.status !== "approved" &&
-                record.status !== "submitted" && (
+                record.status !== "submitted" &&
+                record.facilitator === userId && (
                   <_Button
                     type="link"
                     href={`/monthly-form/my-forms/${record.id}/edit`}

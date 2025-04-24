@@ -9,8 +9,11 @@ import useProjectList, {
   Project,
 } from "@/feature/create-monthly-form/api/project-list";
 import { useMonthlyFormsListUser } from "@/entities/monthly-form -approver/api/get-monthlyForm-user";
+import useUsersList from "@/entities/user/api/users-list";
 
 export default function MonthlyFormsListApprover() {
+  const { usersList } = useUsersList({ condition: true });
+
   const [messageApi, contextHolder] = message.useMessage({
     maxCount: 1,
     duration: 2,
@@ -29,6 +32,7 @@ export default function MonthlyFormsListApprover() {
   const { monthlyFormsList, isMonthlyFormsListLoading } = useMonthlyFormsList({
     projectId,
     condition: !!projectId,
+    usersList,
   });
 
   const {
@@ -36,6 +40,7 @@ export default function MonthlyFormsListApprover() {
     isMonthlyFormsListLoading: isAllMonthlyFormListLoading,
   } = useMonthlyFormsListUser({
     condition: projectId === "",
+    usersList,
   });
 
   const transformProjectsData = (data?: Project[]) =>

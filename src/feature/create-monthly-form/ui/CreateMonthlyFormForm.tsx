@@ -39,6 +39,7 @@ import { getAdditionalActivitiesNextMonthByMonthlyFormId } from "../api/get-addi
 import useUpdateStatus from "../api/update-monthlyForm-status";
 import useParameters from "@/entities/parameters/api/parameters-list";
 import { useRouter } from "next/navigation";
+import useUsersList from "@/entities/user/api/users-list";
 
 const { Panel } = Collapse;
 
@@ -231,6 +232,15 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     action: action,
     facilitatorId: monthlyForm?.facilitator ?? "",
     // year: 2025,
+  });
+
+  const userId = monthlyForm?.facilitator ?? loggedUser;
+  const { usersList } = useUsersList({ condition: true });
+  let userName = "";
+  usersList.find((user) => {
+    if (user.Username === userId) {
+      userName = `${user.GivenName ?? ""} ${user.FamilyName ?? ""}`.trim();
+    }
   });
 
   useEffect(() => {
@@ -722,6 +732,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
               <Col xs={24} sm={6}>
                 <Form.Item label="Year" name="year">
                   <Select options={years} value={currentYear} disabled />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={6}>
+                <Form.Item label="Facilitator" name="facilitatorName">
+                  <Input defaultValue={userName} disabled />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={6}>

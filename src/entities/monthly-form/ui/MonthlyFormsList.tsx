@@ -3,6 +3,7 @@ import generateColumns from "../lib/generate-columns";
 import { MonthlyForm } from "../config/types";
 import { columns } from "../config/columns";
 import { Column } from "@/shared/ui/entity-list/config/types";
+import { useState } from "react";
 
 interface MonthlyFormsListProps {
   data: MonthlyForm[];
@@ -17,9 +18,7 @@ export default function MonthlyFormsList({
     <EntityList
       rowKey="id"
       columns={columns}
-      mapColumn={(columns: Column<any>[]): any =>
-        generateColumns(columns)
-      }
+      mapColumn={(columns: Column<any>[]): any => generateColumns(columns)}
       data={data}
       isLoading={isLoading}
     />
