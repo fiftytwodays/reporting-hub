@@ -303,7 +303,8 @@ const schema = a.schema({
       index("month"),
     ])
     .authorization((allow) => [
-      allow.authenticated().to(["read"]),
+      allow.authenticated().to(["read", "update"]),
+      allow.owner(),
       allow.groups(["admin"]),
     ]),
   AdditionalActivity: a
@@ -318,7 +319,8 @@ const schema = a.schema({
     })
     .secondaryIndexes((index) => [index("monthlyFormId")])
     .authorization((allow) => [
-      allow.authenticated().to(["read"]),
+      allow.authenticated().to(["read", "update"]),
+      allow.owner(),
       allow.groups(["admin"]),
     ]),
   Outcome: a
@@ -333,7 +335,8 @@ const schema = a.schema({
     })
     .secondaryIndexes((index) => [index("monthlyFormId")])
     .authorization((allow) => [
-      allow.authenticated().to(["read"]),
+      allow.authenticated().to(["read", "update"]),
+      allow.owner(),
       allow.groups(["admin"]),
     ]),
   AdditionalActivityNextMonth: a
@@ -345,7 +348,8 @@ const schema = a.schema({
     })
     .secondaryIndexes((index) => [index("monthlyFormId"), index("activityId")])
     .authorization((allow) => [
-      allow.authenticated().to(["read"]),
+      allow.authenticated().to(["read", "update"]),
+      allow.owner(),
       allow.groups(["admin"]),
     ]),
   // AdditionalActivity: a
