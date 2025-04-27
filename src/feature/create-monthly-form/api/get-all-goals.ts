@@ -153,7 +153,9 @@ export default function usePlansFetcher({
       }
 
       // Fetch plans for the current month
-      const plansResponse = await quarterlyPlan.plan();
+      const plansResponse = await client.models.Plan.listPlanByQuarterlyPlanId({
+        quarterlyPlanId: quarterlyPlan.id,
+      });
       if (!plansResponse?.data || plansResponse.data.length === 0) {
         throw new Error(
           `No plans found for the current month (${getMonthName(month)}).`
@@ -205,7 +207,10 @@ export default function usePlansFetcher({
         }
         if (nextQuarterlyPlan) {
           nextMonthGoalsQuarterlyPlanId = nextQuarterlyPlan.id;
-          const nextPlansResponse = await nextQuarterlyPlan.plan();
+          const nextPlansResponse =
+            await client.models.Plan.listPlanByQuarterlyPlanId({
+              quarterlyPlanId: nextQuarterlyPlan.id,
+            });
           if (nextPlansResponse?.data) {
             nextMonthGoals = sortPlans(
               nextPlansResponse.data
