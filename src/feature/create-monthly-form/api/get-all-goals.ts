@@ -194,7 +194,51 @@ export default function usePlansFetcher({
               isMajorGoal: plan.isMajorGoal,
             }))
         );
+      } else if (years === nextYears) {
+        const nextQuarterlyPlan = quarterlyPlansResponse.data.find(
+          (qp) => qp.quarter === nextQuarter
+        );
+        if (nextQuarterlyPlan?.status !== "approved") {
+          throw new Error(
+            `The quarterly plan for next quarter ${getQuarterName(
+              quarter
+            )} of ${years} is not approved.`
+          );
+        }
+        if (nextQuarterlyPlan) {
+          nextMonthGoalsQuarterlyPlanId = nextQuarterlyPlan.id;
+          const nextPlansResponse =
+            await client.models.Plan.listPlanByQuarterlyPlanId({
+              quarterlyPlanId: nextQuarterlyPlan.id,
+            });
+          if (nextPlansResponse?.data) {
+            nextMonthGoals = sortPlans(
+              nextPlansResponse.data
+                .filter((plan) => plan.month?.includes(getMonthName(nextMonth)))
+                .map((plan) => ({
+                  id: plan.id,
+                  activity: plan.activity,
+                  month: getMonthName(nextMonth),
+                  functionalAreaId: plan.functionalAreaId,
+                  comments: plan.comments,
+                  isMajorGoal: plan.isMajorGoal,
+                }))
+            );
+          }
+        }
       } else {
+        const yearlyPlan = yearlyPlansResponse.data.find(
+          (yp) => yp.year === nextYears && yp.projectId === projectId
+        );
+        if (!yearlyPlan) {
+          throw new Error(
+            `Yearly plan not found for project ${projectId}, ${nextYears}`
+          );
+        }
+        const quarterlyPlansResponse =
+          await client.models.QuarterlyPlan.listQuarterlyPlanByYearlyPlanId({
+            yearlyPlanId: yearlyPlan.id,
+          });
         const nextQuarterlyPlan = quarterlyPlansResponse.data.find(
           (qp) => qp.quarter === nextQuarter
         );
@@ -248,7 +292,7 @@ export default function usePlansFetcher({
 
   const { data, isLoading, error } = useSWR<ApiResponse>(
     condition && projectId && userId
-      ? ["api/plans", projectId, userId, month, year]
+      ? [`api/plans`, projectId, userId, month, year]
       : null,
     fetcher,
     { keepPreviousData: true }
