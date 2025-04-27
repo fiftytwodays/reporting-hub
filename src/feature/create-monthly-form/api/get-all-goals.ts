@@ -118,13 +118,18 @@ export default function usePlansFetcher({
       }
 
       // Fetch quarterly plans
-      const quarterlyPlansResponse = await yearlyPlan.quarterlyPlan();
+      const quarterlyPlansResponse =
+        await client.models.QuarterlyPlan.listQuarterlyPlanByYearlyPlanId({
+          yearlyPlanId: yearlyPlan.id,
+        });
       if (
         !quarterlyPlansResponse?.data ||
         quarterlyPlansResponse.data.length === 0
       ) {
         throw new Error("Quarterly plan not found in the yearly plan.");
       }
+
+      console.log("Quarterly Plans:", quarterlyPlansResponse.data);
 
       // Find the specific quarterly plan
       const quarterlyPlan = quarterlyPlansResponse.data.find(
