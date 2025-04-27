@@ -236,7 +236,10 @@ export async function getPlans({
   if (!yearlyPlan)
     throw new Error(`Yearly plan not found for project ${projectId}`);
 
-  const quarterlyPlansResponse = await yearlyPlan.quarterlyPlan();
+  const quarterlyPlansResponse =
+    await client.models.QuarterlyPlan.listQuarterlyPlanByYearlyPlanId({
+      yearlyPlanId: yearlyPlan.id,
+    });
   if (!quarterlyPlansResponse?.data?.length)
     throw new Error("Quarterly plan not found in the yearly plan.");
 
@@ -251,7 +254,9 @@ export async function getPlans({
     );
   }
 
-  const plansResponse = await quarterlyPlan.plan();
+  const plansResponse = await client.models.Plan.listPlanByQuarterlyPlanId({
+    quarterlyPlanId: quarterlyPlan.id,
+  });
   if (!plansResponse?.data?.length) {
     throw new Error(
       `No plans found for the current month (${getMonthName(month)}).`
@@ -315,7 +320,10 @@ export async function getPlans({
     }
 
     nextMonthGoalsQuarterlyPlanId = nextQuarterlyPlan.id;
-    const nextPlansResponse = await nextQuarterlyPlan.plan();
+    const nextPlansResponse =
+      await client.models.Plan.listPlanByQuarterlyPlanId({
+        quarterlyPlanId: nextQuarterlyPlan.id,
+      });
     console.log("Next plans response:", nextPlansResponse);
     if (nextPlansResponse?.data?.length) {
       nextMonthGoals = await sortPlans(
