@@ -72,6 +72,7 @@ export function getAdditionalActivitiesNextMonthByMonthlyFormId({
     fetcher,
     {
       keepPreviousData: true,
+      revalidateOnFocus: false,
     }
   );
 
