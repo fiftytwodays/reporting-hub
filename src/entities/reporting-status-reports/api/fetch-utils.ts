@@ -307,7 +307,57 @@ export async function getPlans({
         }))
     );
     console.log("Next month goals:", nextMonthGoals);
+  } else if (nextYears === years) {
+    const nextQuarterlyPlan = quarterlyPlansResponse.data.find(
+      (qp) => qp.quarter === nextQuarter
+    );
+    if (!nextQuarterlyPlan || nextQuarterlyPlan.status !== "approved") {
+      throw new Error(
+        `Next quarterly plan for ${getQuarterName(
+          nextQuarter
+        )} of ${nextYears} is not approved.`
+      );
+    }
+
+    nextMonthGoalsQuarterlyPlanId = nextQuarterlyPlan.id;
+    const nextPlansResponse =
+      await client.models.Plan.listPlanByQuarterlyPlanId({
+        quarterlyPlanId: nextQuarterlyPlan.id,
+      });
+    console.log("Next plans response:", nextPlansResponse);
+    if (nextPlansResponse?.data?.length) {
+      nextMonthGoals = await sortPlans(
+        nextPlansResponse.data
+          .filter((plan) => plan.month?.includes(getMonthName(nextMonth)))
+          .map(async (plan) => ({
+            id: plan.id,
+            activity: plan.activity,
+            month: getMonthName(nextMonth),
+            functionalArea: plan.functionalAreaId
+              ? (
+                  await client.models.FunctionalArea.get({
+                    id: plan.functionalAreaId,
+                  })
+                )?.data?.name || "Unknown"
+              : "Unknown",
+            comments: plan.comments,
+            isMajorGoal: plan.isMajorGoal ? "Yes" : "No",
+          }))
+      );
+    }
   } else {
+    const yearlyPlan = yearlyPlansResponse.data.find(
+      (yp) => yp.year === nextYears && yp.projectId === projectId
+    );
+    if (!yearlyPlan) {
+      throw new Error(
+        `Yearly plan not found for project ${projectId}, ${nextYears}`
+      );
+    }
+    const quarterlyPlansResponse =
+      await client.models.QuarterlyPlan.listQuarterlyPlanByYearlyPlanId({
+        yearlyPlanId: yearlyPlan.id,
+      });
     const nextQuarterlyPlan = quarterlyPlansResponse.data.find(
       (qp) => qp.quarter === nextQuarter
     );
