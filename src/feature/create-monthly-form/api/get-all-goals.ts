@@ -295,7 +295,7 @@ export default function usePlansFetcher({
       ? ["api/plans", projectId, userId, month, year]
       : null,
     fetcher,
-    { keepPreviousData: true }
+    { keepPreviousData: true, revalidateOnFocus: false }
   );
 
   return { plans: data?.Plans || [], isLoading, error };

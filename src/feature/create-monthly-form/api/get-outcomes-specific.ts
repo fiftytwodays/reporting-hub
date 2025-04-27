@@ -69,6 +69,7 @@ export function getOutcomeByMonthlyFormId({
     fetcher,
     {
       keepPreviousData: true,
+      revalidateOnFocus: false,
     }
   );
 
