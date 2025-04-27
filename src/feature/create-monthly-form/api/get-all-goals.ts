@@ -292,7 +292,7 @@ export default function usePlansFetcher({
 
   const { data, isLoading, error } = useSWR<ApiResponse>(
     condition && projectId && userId
-      ? [`api/plans`, projectId, userId, month, year]
+      ? ["api/plans", projectId, userId, month, year]
       : null,
     fetcher,
     { keepPreviousData: true }
