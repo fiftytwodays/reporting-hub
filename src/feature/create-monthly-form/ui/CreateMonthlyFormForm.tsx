@@ -218,6 +218,8 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
   const { functionalAreasData, isFunctionalAreaTypesDataLoading } =
     useFunctionalAreaList({ condition: true });
 
+  const userId = monthlyForm?.facilitator ?? loggedUser;
+
   const {
     plans,
     isLoading: isPlanListloading,
@@ -230,11 +232,10 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     month: form.getFieldValue("month"),
     year: form.getFieldValue("year"),
     action: action,
-    facilitatorId: monthlyForm?.facilitator ?? "",
+    facilitatorId: userId,
     // year: 2025,
   });
 
-  const userId = monthlyForm?.facilitator ?? loggedUser;
   const { usersList } = useUsersList({ condition: true });
   let userName = "";
   usersList.find((user) => {
@@ -287,7 +288,6 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
         majorGoal: outcome.isMajorGoal,
         comments: outcome.comments,
       }));
-      console.log("Goals List:", goalsList);
       const additionalActivities = additionalActivitiesFetched?.map(
         (additionalActivity: any, index: number) => ({
           id: additionalActivity.id,

@@ -68,6 +68,7 @@ export function useMonthlyForm({
     fetcher,
     {
       keepPreviousData: true,
+      revalidateOnFocus: false,
     }
   );
 

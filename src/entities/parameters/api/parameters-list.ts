@@ -33,7 +33,7 @@ export default function useParameters({ condition = true }: FetchOptions) {
       };
 
       console.log("API Response:", apiResponse);
-      
+
       return apiResponse;
     }
     return null;
@@ -44,6 +44,7 @@ export default function useParameters({ condition = true }: FetchOptions) {
     fetcher,
     {
       keepPreviousData: true,
+      revalidateOnFocus: false,
     }
   );
 
