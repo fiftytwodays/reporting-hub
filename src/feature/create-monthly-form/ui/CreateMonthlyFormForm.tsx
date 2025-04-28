@@ -714,7 +714,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
             >
               <Projects
                 form={form}
-                fetchAll={action === "approver-view" ? true : false}
+                fetchAll={action !== "create" ? true : false}
                 setLoading={setLoading}
                 id={form.getFieldValue("project") ?? undefined}
                 setSelectedProject={setProjectId}
