@@ -31,7 +31,7 @@ export default function MonthlyFormsListApprover() {
   // Fetch monthly forms list only when projectId is selected
   const { monthlyFormsList, isMonthlyFormsListLoading } = useMonthlyFormsList({
     projectId,
-    condition: !!projectId,
+    condition: !!projectId && Array.isArray(usersList) && usersList.length > 0,
     usersList,
   });
 
@@ -39,7 +39,8 @@ export default function MonthlyFormsListApprover() {
     monthlyFormsList: allMonthlyFormList,
     isMonthlyFormsListLoading: isAllMonthlyFormListLoading,
   } = useMonthlyFormsListUser({
-    condition: projectId === "",
+    condition:
+      projectId === "" && Array.isArray(usersList) && usersList.length > 0,
     usersList,
   });
 
