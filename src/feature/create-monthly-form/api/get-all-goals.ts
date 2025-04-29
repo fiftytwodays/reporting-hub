@@ -99,6 +99,27 @@ export default function usePlansFetcher({
         });
       }
 
+      const currentMonthlyForm = monthlyFormResponse.data.find(
+        (monthlyForm) => {
+          return (
+            monthlyForm.projectId === projectId &&
+            Number(monthlyForm.year) === year &&
+            Number(monthlyForm.month) === month
+          );
+        }
+      );
+
+      const additionalActivitiesNextMonth =
+        await client.models.AdditionalActivityNextMonth.listAdditionalActivityNextMonthByMonthlyFormId(
+          {
+            monthlyFormId: currentMonthlyForm?.id || "",
+          }
+        );
+
+      const nextMonthActivitiesId = additionalActivitiesNextMonth.data?.map(
+        (activity) => activity.activityId
+      );
+
       if (facilitatorId !== "") {
         userId = facilitatorId;
       }
@@ -184,7 +205,11 @@ export default function usePlansFetcher({
         nextMonthGoalsQuarterlyPlanId = quarterlyPlan.id;
         nextMonthGoals = sortPlans(
           plansResponse.data
-            .filter((plan) => plan.month?.includes(getMonthName(nextMonth)))
+            .filter(
+              (plan) =>
+                plan.month?.includes(getMonthName(nextMonth)) &&
+                !nextMonthActivitiesId?.includes(plan.id)
+            )
             .map((plan) => ({
               id: plan.id,
               activity: plan.activity,
@@ -214,7 +239,11 @@ export default function usePlansFetcher({
           if (nextPlansResponse?.data) {
             nextMonthGoals = sortPlans(
               nextPlansResponse.data
-                .filter((plan) => plan.month?.includes(getMonthName(nextMonth)))
+                .filter(
+                  (plan) =>
+                    plan.month?.includes(getMonthName(nextMonth)) &&
+                    !nextMonthActivitiesId?.includes(plan.id)
+                )
                 .map((plan) => ({
                   id: plan.id,
                   activity: plan.activity,
@@ -258,7 +287,11 @@ export default function usePlansFetcher({
           if (nextPlansResponse?.data) {
             nextMonthGoals = sortPlans(
               nextPlansResponse.data
-                .filter((plan) => plan.month?.includes(getMonthName(nextMonth)))
+                .filter(
+                  (plan) =>
+                    plan.month?.includes(getMonthName(nextMonth)) &&
+                    !nextMonthActivitiesId?.includes(plan.id)
+                )
                 .map((plan) => ({
                   id: plan.id,
                   activity: plan.activity,

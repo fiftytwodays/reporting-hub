@@ -9,6 +9,7 @@ interface FetchOptions {
   userId: string;
   month: number;
   year: number;
+  facilitatorId: string;
 }
 
 interface ApiResponse {
@@ -210,6 +211,7 @@ export async function getPlans({
   userId,
   month,
   year,
+  facilitatorId,
 }: FetchOptions): Promise<ApiResponse> {
   if (!condition || !projectId || !userId) {
     throw new Error("Missing required fetch parameters.");
@@ -224,6 +226,30 @@ export async function getPlans({
     Math.ceil(nextMonth / 3) - 1 === 0 ? 4 : Math.ceil(nextMonth / 3) - 1;
   const years = getYearString(year, quarter);
   const nextYears = getYearString(nextYear, nextQuarter);
+
+  const monthlyFormResponse =
+    await client.models.MonthlyForm.listMonthlyFormByFacilitator({
+      facilitator: facilitatorId,
+    });
+
+  const currentMonthlyForm = monthlyFormResponse.data.find((monthlyForm) => {
+    return (
+      monthlyForm.projectId === projectId &&
+      Number(monthlyForm.year) === year &&
+      Number(monthlyForm.month) === month
+    );
+  });
+
+  const additionalActivitiesNextMonth =
+    await client.models.AdditionalActivityNextMonth.listAdditionalActivityNextMonthByMonthlyFormId(
+      {
+        monthlyFormId: currentMonthlyForm?.id || "",
+      }
+    );
+
+  const nextMonthActivitiesId = additionalActivitiesNextMonth.data?.map(
+    (activity) => activity.activityId
+  );
 
   const yearlyPlansResponse =
     await client.models.YearlyPlan.listYearlyPlanByUserId({ userId });
@@ -290,7 +316,11 @@ export async function getPlans({
     nextMonthGoalsQuarterlyPlanId = quarterlyPlan.id;
     nextMonthGoals = await sortPlans(
       plansResponse.data
-        .filter((plan) => plan.month?.includes(getMonthName(nextMonth)))
+        .filter(
+          (plan) =>
+            plan.month?.includes(getMonthName(nextMonth)) &&
+            !nextMonthActivitiesId?.includes(plan.id)
+        )
         .map(async (plan) => ({
           id: plan.id,
           activity: plan.activity,
@@ -328,7 +358,11 @@ export async function getPlans({
     if (nextPlansResponse?.data?.length) {
       nextMonthGoals = await sortPlans(
         nextPlansResponse.data
-          .filter((plan) => plan.month?.includes(getMonthName(nextMonth)))
+          .filter(
+            (plan) =>
+              plan.month?.includes(getMonthName(nextMonth)) &&
+              !nextMonthActivitiesId?.includes(plan.id)
+          )
           .map(async (plan) => ({
             id: plan.id,
             activity: plan.activity,
@@ -378,7 +412,11 @@ export async function getPlans({
     if (nextPlansResponse?.data?.length) {
       nextMonthGoals = await sortPlans(
         nextPlansResponse.data
-          .filter((plan) => plan.month?.includes(getMonthName(nextMonth)))
+          .filter(
+            (plan) =>
+              plan.month?.includes(getMonthName(nextMonth)) &&
+              !nextMonthActivitiesId?.includes(plan.id)
+          )
           .map(async (plan) => ({
             id: plan.id,
             activity: plan.activity,
