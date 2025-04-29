@@ -90,6 +90,21 @@ export const years = [
 export const achieved = [
   {
     label: "Yes",
+    value: "yes",
+  },
+  {
+    label: "No",
+    value: "no",
+  },
+  {
+    label: "Partially achieved",
+    value: "partial",
+  },
+];
+
+export const majorGoal = [
+  {
+    label: "Yes",
     value: true,
   },
   {

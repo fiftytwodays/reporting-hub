@@ -17,7 +17,7 @@ export function useUpdateOutcomes() {
           activityId?: string | undefined;
           monthlyFormId?: string | undefined;
           reason?: Nullable<string> | undefined;
-          achieved?: Nullable<boolean> | undefined;
+          achieved?: Nullable<string> | undefined;
         }) => client.models.Outcome.update(outcome)
       )
     );

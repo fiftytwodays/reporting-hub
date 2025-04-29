@@ -330,7 +330,7 @@ const schema = a.schema({
       activityId: a.string(),
       activity: a.belongsTo("Plan", "activityId"),
       reason: a.string(),
-      achieved: a.boolean(),
+      achieved: a.string(),
       comments: a.string(),
     })
     .secondaryIndexes((index) => [index("monthlyFormId")])

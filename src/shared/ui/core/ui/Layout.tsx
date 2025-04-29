@@ -33,7 +33,7 @@ const layoutStyle = {
 
 const defaultItems = [
   {
-    key: "monthly-form",
+    key: "monthly-plans",
     label: "null",
   },
   {
@@ -56,16 +56,16 @@ const defaultItems = [
 
 const menuConfigurations = {
   monthlyForm: {
-    key: "monthly-form",
-    label: "Monthly form",
+    key: "monthly-plans",
+    label: "Monthly plans",
     children: [
       {
-        key: "my-forms",
-        label: <Link href="/monthly-form/my-forms">My forms</Link>,
+        key: "my-plans",
+        label: <Link href="/monthly-plans/my-plans">My plans</Link>,
       },
       {
         key: "approver-view",
-        label: <Link href="/monthly-form/approver-view">Approver view</Link>,
+        label: <Link href="/monthly-plans/approver-view">Approver view</Link>,
       },
     ],
   },
@@ -215,7 +215,7 @@ const AppLayout = ({ children }: LayoutProps) => {
             return menuConfigurations.settings;
           case "reports":
             return menuConfigurations.reports;
-          case "monthly-form":
+          case "monthly-plans":
             return menuConfigurations.monthlyForm;
           case "yearly-form":
             return menuConfigurations.yearlyForm;
@@ -234,7 +234,7 @@ const AppLayout = ({ children }: LayoutProps) => {
     if (groupNames.includes("user")) {
       return updatedItems.map((item) => {
         switch (item.key) {
-          case "monthly-form":
+          case "monthly-plans":
             return menuConfigurations.monthlyForm;
           case "yearly-form":
             return menuConfigurations.yearlyForm;

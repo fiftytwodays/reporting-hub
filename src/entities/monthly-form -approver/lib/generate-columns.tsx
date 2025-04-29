@@ -28,7 +28,7 @@ export default function generateColumns<T>(
             <Space>
               <_Button
                 type="link"
-                href={`/monthly-form/approver-view/${record.id}/view`}
+                href={`/monthly-plans/approver-view/${record.id}/view`}
               >
                 View
               </_Button>

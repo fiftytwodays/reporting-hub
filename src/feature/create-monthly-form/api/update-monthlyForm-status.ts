@@ -25,7 +25,7 @@ export default function useUpdateStatus() {
       });
 
       if (!response || response.errors) {
-        throw new Error("Failed to fetch monthly form");
+        throw new Error("Failed to fetch monthly plan");
       }
       const monthlyForm = response.data;
       if (monthlyForm) {
@@ -43,15 +43,15 @@ export default function useUpdateStatus() {
           comments: comment ?? monthlyForm.comments,
         });
         if (!updatedMonthlyForm || updatedMonthlyForm.errors) {
-          throw new Error("Failed to update monthly form");
+          throw new Error("Failed to update monthly plan");
         }
         return updatedMonthlyForm.data;
       }
 
       if (!response || response.errors) {
-        throw new Error("Failed to update monthly form status");
+        throw new Error("Failed to update monthly plan status");
       }
-      throw new Error("Failed to update monthly form status");
+      throw new Error("Failed to update monthly plan status");
     }
   );
 

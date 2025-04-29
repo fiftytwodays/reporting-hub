@@ -182,7 +182,7 @@ export function useMonthlyFormsListUser({
   };
 
   const { data, isLoading, error } = useSWR(
-    condition ? ["api/myforms/monthlyForms"] : null,
+    condition ? ["api/myplans/monthlyPlans"] : null,
     fetcher,
     { keepPreviousData: true }
   );
@@ -191,7 +191,7 @@ export function useMonthlyFormsListUser({
     mutate(
       (keys) =>
         Array.isArray(keys) &&
-        keys.some((item) => item.startsWith("api/myforms/monthlyForms")),
+        keys.some((item) => item.startsWith("api/myplans/monthlyPlans")),
       undefined,
       { revalidate: true }
     );

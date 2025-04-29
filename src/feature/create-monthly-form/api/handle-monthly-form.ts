@@ -54,7 +54,7 @@ export function useSaveMonthlyForm() {
   };
 
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "api/save-monthly-form",
+    "api/save-monthly-plan",
     saveMonthlyForm
   );
 

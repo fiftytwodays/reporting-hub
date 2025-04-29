@@ -22,7 +22,7 @@ export default function MonthlyFormList() {
       <Page
         showPageHeader
         header={{
-          title: "Monthly forms",
+          title: "Monthly plans",
           breadcrumbs: [
             {
               title: "Home",
@@ -30,8 +30,8 @@ export default function MonthlyFormList() {
             },
 
             {
-              title: "Monthly forms",
-              href: "/monthly-form",
+              title: "Monthly plans",
+              href: "/monthly-plans",
             },
           ],
         }}

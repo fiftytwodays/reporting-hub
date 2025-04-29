@@ -37,11 +37,7 @@ const createTable = (data: any[], columns: string[]) => {
       children: columns.map((col) => {
         // Check for 'majorGoal' and 'achieved' columns and handle boolean conversion
         const cellValue =
-          col === "majorGoal" || col === "achieved"
-            ? item[col]
-              ? "Yes"
-              : "No"
-            : item[col] || ""; // Default to empty string if value is undefined
+          col === "majorGoal" ? (item[col] ? "Yes" : "No") : item[col] || ""; // Default to empty string if value is undefined
 
         return new TableCell({
           children: [

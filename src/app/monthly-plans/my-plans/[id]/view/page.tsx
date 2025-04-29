@@ -25,7 +25,7 @@ const MonthlyFormPage = ({ params }: { params: { id: string } }) => {
       <Page
         showPageHeader
         header={{
-          title: "View monthly form",
+          title: "View monthly plan",
           breadcrumbs: [
             {
               title: "Home",
@@ -33,8 +33,8 @@ const MonthlyFormPage = ({ params }: { params: { id: string } }) => {
             },
 
             {
-              title: "Monthly forms",
-              href: "/monthly-form/my-forms",
+              title: "Monthly plans",
+              href: "/monthly-plans/my-plans",
             },
           ],
         }}

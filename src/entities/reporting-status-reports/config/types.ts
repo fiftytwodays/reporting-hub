@@ -21,7 +21,7 @@ export interface ReportingStatusReport {
 export interface Goal {
   activityName?: string;
   activity?: string;
-  achieved?: string | boolean; // Optional since it's only present in completed/ongoing goals
+  achieved?: string; // Optional since it's only present in completed/ongoing goals
   isMajorGoal?: string | boolean | null | undefined; // Optional as not all goals are major
   reason?: string; // Optional as not all goals might have a reason
   comments?: string | null | undefined; // Optional to allow flexibility

@@ -30,7 +30,7 @@ export default function useProjectList({
     const { username, userId, signInDetails } = await getCurrentUser();
     const attributes = await fetchUserAttributes();
     let projectsList;
-    if (type === "myforms") {
+    if (type === "myplans") {
       projectsList = attributes["custom:projects"];
       const clusters = attributes["custom:clusters"];
       const regions = attributes["custom:regions"];
