@@ -544,7 +544,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   quarterlyPlanId: !Array.isArray(plans)
                     ? plans.nextMonthGoalsQuarterlyPlanId
                     : undefined,
-                  month: formValues.month,
+                  month: formValues.month + 1,
                   activity: activity.activity || "", // Maps to `activity`
                   majorGoal: activity.majorGoal, // Maps to `majorGoal`
                   functionalArea: activity.functionalArea || "", // Maps to `functionalAreaId`
@@ -1082,7 +1082,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                       <>
                         {Array.isArray(plans)
                           ? null
-                          : plans.NextMonthGoals.map((goal, index) => (
+                          : (plans.NextMonthGoals ?? []).map((goal, index) => (
                               <Row gutter={24} key={index}>
                                 <Col span={1}>
                                   <div>{index + 1}</div>
