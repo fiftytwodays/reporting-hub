@@ -5,7 +5,7 @@ export default function CreateMonthlyFormButton() {
   return (
     <>
       <Button
-        href="/monthly-form/my-forms/create"
+        href="/monthly-plans/my-plans/create"
         type="primary"
         icon={<PlusOutlined />}
       >

@@ -18,10 +18,15 @@ export default function MonthlyFormsList() {
   const { projectsData, isProjectTypesDataLoading } = useProjectList({
     condition: true,
     projectId: "project",
-    type: "myforms",
+    type: "myplans",
   });
 
   const { usersList } = useUsersList({ condition: true });
+  console.log("usersList", usersList);
+  console.log(
+    "the condition",
+    !!projectId && Array.isArray(usersList) && usersList.length > 0
+  );
 
   const { monthlyFormsList, isMonthlyFormsListLoading } = useMonthlyFormsList({
     projectId: projectId || "",
@@ -36,6 +41,11 @@ export default function MonthlyFormsList() {
     condition: !projectId && Array.isArray(usersList) && usersList.length > 0,
     usersList,
   });
+
+  console.log(
+    "all form the condition",
+    !projectId && Array.isArray(usersList) && usersList.length > 0
+  );
 
   const transformProjectsData = (data?: Project[]) =>
     data?.map((item) => ({ label: item.name, value: item.id })) || [];

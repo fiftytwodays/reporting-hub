@@ -35,12 +35,21 @@ const createTable = (data: any[], columns: string[]) => {
     return new TableRow({
       children: columns.map((col) => {
         // Check for 'majorGoal' and 'achieved' columns and handle boolean conversion
-        const cellValue =
-          col === "majorGoal" || col === "achieved"
-            ? item[col]
-              ? "Yes"
-              : "No"
-            : item[col] || ""; // Default to empty string if value is undefined
+        let cellValue = "";
+
+        if (col === "majorGoal") {
+          cellValue = item[col] ? "Yes" : "No";
+        } else if (col === "achieved") {
+          if (item[col] === "yes") {
+            cellValue = "Yes";
+          } else if (item[col] === "partial") {
+            cellValue = "Partially achieved";
+          } else {
+            cellValue = "No";
+          }
+        } else {
+          cellValue = item[col] || "";
+        }
 
         return new TableCell({
           children: [

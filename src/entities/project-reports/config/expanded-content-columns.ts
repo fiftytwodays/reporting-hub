@@ -23,7 +23,6 @@ export const currentMonth = [
     dataIndex: "achieved",
     key: "achieved",
     width: "10%",
-    render: (text: boolean) => (text ? "Yes" : "No"),
   },
   {
     title: "Reason",

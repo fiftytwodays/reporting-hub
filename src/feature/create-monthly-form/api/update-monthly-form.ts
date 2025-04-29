@@ -28,7 +28,7 @@ export function useUpdateMonthlyForm() {
   };
 
   const { trigger, data, isMutating, error } = useSWRMutation(
-    "api/update-monthly-form",
+    "api/update-monthly-plan",
     updateMonthlyForm
   );
 

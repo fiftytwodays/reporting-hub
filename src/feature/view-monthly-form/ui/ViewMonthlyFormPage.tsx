@@ -11,19 +11,19 @@ export default function ViewMonthlyFormPage({ id }: PageProps) {
       <Page
         showPageHeader
         header={{
-          title: "View monthly form",
+          title: "View monthly plan",
           breadcrumbs: [
             {
               title: "Home",
               href: "/",
             },
             {
-              title: "Monthly forms",
-              href: "/monthly-form/my-forms",
+              title: "Monthly plans",
+              href: "/monthly-plans/my-plans",
             },
             {
-              title: `Form ${id}`, // Dynamically set the breadcrumb title based on `id`
-              href: `/monthly-form/my-forms/${id}/view`,
+              title: `Plan ${id}`, // Dynamically set the breadcrumb title based on `id`
+              href: `/monthly-plans/my-plans/${id}/view`,
             },
           ],
         }}

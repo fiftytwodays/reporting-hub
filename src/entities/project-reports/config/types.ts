@@ -2,13 +2,13 @@ export interface Goal {
   goal: string;
   majorGoal: boolean;
   functionalArea: string;
-  achieved?: boolean; // Indicates if the goal was achieved (true/false)
+  achieved?: string; // Indicates if the goal was achieved (true/false)
   reason?: string; // Optional reason for achieving or not achieving the goal
   comments?: string; // Optional comments or additional notes about the goal
 }
 
 export interface MonthlyGoal extends Goal {
-  achieved: boolean; // Indicates if the goal was achieved (true/false)
+  achieved: string; // Indicates if the goal was achieved (true/false)
   reason: string; // Reason for achieving or not achieving the goal
   comments: string; // Comments or details about the goal
 }

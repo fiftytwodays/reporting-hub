@@ -28,7 +28,7 @@ export async function getAllOutcomes() {
             activityId: outcome.activityId ?? "",
             activityName: activity.data?.activity ?? "",
             reason: outcome.reason ?? "",
-            achieved: outcome.achieved ?? false,
+            achieved: outcome.achieved ?? "",
             comments: outcome.comments ?? "",
           };
         })

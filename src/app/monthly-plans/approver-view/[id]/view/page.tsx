@@ -1,16 +1,15 @@
 "use client";
 import { Amplify } from "aws-amplify";
 import outputs from "@root/amplify_outputs.json";
-import EditMonthlyFormPage from "@/feature/edit-monthly-form/ui/EditMonthlyFormPage";
-import { useRouter } from "next/router";
-import { useMonthlyForm } from "@/entities/monthly-form/api/get-monthlyForms";
-import { CreateMonthlyFormForm } from "@/feature/create-monthly-form";
+import ViewMonthlyFormPage from "@/feature/view-monthly-form-approver/ui/ViewMonthlyFormPage";
 import { message } from "antd";
 import Page from "@/shared/ui/page/ui/Page";
+import { CreateMonthlyFormForm } from "@/feature/create-monthly-form";
+import { useMonthlyForm } from "@/entities/monthly-form/api/get-monthlyForms";
 
 Amplify.configure(outputs);
 
-const EditMonthlyForm = ({ params }: { params: { id: string } }) => {
+const MonthlyFormApproverPage = ({ params }: { params: { id: string } }) => {
   const [messageApi, contextHolder] = message.useMessage({
     maxCount: 1,
     duration: 2,
@@ -20,13 +19,16 @@ const EditMonthlyForm = ({ params }: { params: { id: string } }) => {
   const { monthlyForm, isMonthlyFormLoading, isMonthlyFormError } =
     useMonthlyForm({ formId: id as string, condition: true });
 
+  if (isMonthlyFormLoading) return <div>Loading...</div>;
+  if (isMonthlyFormError) return <div>Error loading form</div>;
+
   return (
     <>
       {contextHolder}
       <Page
         showPageHeader
         header={{
-          title: "Edit monthly form",
+          title: "View monthly plan",
           breadcrumbs: [
             {
               title: "Home",
@@ -34,14 +36,14 @@ const EditMonthlyForm = ({ params }: { params: { id: string } }) => {
             },
 
             {
-              title: "Monthly forms",
-              href: "/monthly-form/my-forms",
+              title: "Monthly plans",
+              href: "/monthly-plans/approver-view",
             },
           ],
         }}
         content={
           <CreateMonthlyFormForm
-            action="edit"
+            action="approver-view"
             messageApi={messageApi}
             monthlyForm={monthlyForm}
           />
@@ -51,4 +53,4 @@ const EditMonthlyForm = ({ params }: { params: { id: string } }) => {
   );
 };
 
-export default EditMonthlyForm;
+export default MonthlyFormApproverPage;

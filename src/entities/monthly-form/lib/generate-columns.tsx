@@ -45,14 +45,14 @@ export default function generateColumns<T>(
                 record.facilitator === userId && (
                   <_Button
                     type="link"
-                    href={`/monthly-form/my-forms/${record.id}/edit`}
+                    href={`/monthly-plans/my-plans/${record.id}/edit`}
                   >
                     Edit
                   </_Button>
                 )}
               <_Button
                 type="link"
-                href={`/monthly-form/my-forms/${record.id}/view`}
+                href={`/monthly-plans/my-plans/${record.id}/view`}
               >
                 View
               </_Button>

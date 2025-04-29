@@ -41,6 +41,8 @@ export function useMonthlyFormsListUser({
 }: FetchOptions) {
   const client = generateClient<Schema>();
 
+  console.log("Users List:", usersList);
+
   const fetcher = async () => {
     const attributes = await fetchUserAttributes();
 
@@ -107,6 +109,7 @@ export function useMonthlyFormsListUser({
         (a, b) => a.year.localeCompare(b.year) || a.month.localeCompare(b.month)
       );
 
+      console.log("Sorted Monthly Forms:", sortedMonthlyForms);
       return { MonthlyForms: sortedMonthlyForms };
     }
 
@@ -114,7 +117,7 @@ export function useMonthlyFormsListUser({
   };
 
   const { data, isLoading, error } = useSWR(
-    condition ? ["api/approverview/monthlyForms"] : null,
+    condition ? ["api/approverview/monthlyPlans"] : null,
     fetcher,
     { keepPreviousData: true }
   );
@@ -123,7 +126,7 @@ export function useMonthlyFormsListUser({
     mutate(
       (keys) =>
         Array.isArray(keys) &&
-        keys.some((item) => item.startsWith("api/approverview/monthlyForms")),
+        keys.some((item) => item.startsWith("api/approverview/monthlyPlans")),
       undefined,
       { revalidate: true }
     );

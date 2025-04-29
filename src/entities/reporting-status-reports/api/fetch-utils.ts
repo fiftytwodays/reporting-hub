@@ -82,7 +82,7 @@ export async function getOutcomeByMonthlyFormId({
         id: outcome.id ?? "",
         activityId: outcome.activityId ?? "",
         activityName: activity.data?.activity ?? "",
-        achieved: outcome.achieved ? "Yes" : "No",
+        achieved: outcome.achieved ?? "",
         reason: outcome.reason ?? "",
         comments: outcome.comments ?? "",
         functionalArea: activity.data?.functionalAreaId

@@ -64,7 +64,7 @@ export function useMonthlyForm({
   };
 
   const { data, isLoading, error } = useSWR(
-    condition ? [`api/monthlyForm/${formId}`] : null,
+    condition ? [`api/monthlyPlans/${formId}`] : null,
     fetcher,
     {
       keepPreviousData: true,
@@ -76,7 +76,7 @@ export function useMonthlyForm({
     mutate(
       (keys) =>
         Array.isArray(keys) &&
-        keys.some((item) => item.startsWith(`api/monthlyForm/${formId}`)),
+        keys.some((item) => item.startsWith(`api/monthlyPlans/${formId}`)),
       undefined,
       {
         revalidate: true,

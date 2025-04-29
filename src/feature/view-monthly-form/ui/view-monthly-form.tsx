@@ -385,7 +385,7 @@ const ViewMonthlyForm: React.FC<ViewMonthlyFormProps> = ({ id }) => {
       </Form>
 
       <Space style={{ marginTop: "16px" }}>
-        <Button type="default" href="/monthly-form/my-forms">
+        <Button type="default" href="/monthly-plans/my-plans">
           Back
         </Button>
       </Space>
