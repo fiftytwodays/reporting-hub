@@ -9,7 +9,6 @@ interface FetchOptions {
   userId: string;
   month: number;
   year: number;
-  facilitatorId: string;
 }
 
 interface ApiResponse {
@@ -211,7 +210,6 @@ export async function getPlans({
   userId,
   month,
   year,
-  facilitatorId,
 }: FetchOptions): Promise<ApiResponse> {
   if (!condition || !projectId || !userId) {
     throw new Error("Missing required fetch parameters.");
@@ -229,7 +227,7 @@ export async function getPlans({
 
   const monthlyFormResponse =
     await client.models.MonthlyForm.listMonthlyFormByFacilitator({
-      facilitator: facilitatorId,
+      facilitator: userId,
     });
 
   const currentMonthlyForm = monthlyFormResponse.data.find((monthlyForm) => {
