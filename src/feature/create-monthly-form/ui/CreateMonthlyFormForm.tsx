@@ -806,8 +806,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 <Col xs={24} sm={8}>
                                   <Tooltip
                                     title={
-                                      plans.CurrentMonthGoals[index]
-                                        ?.activity || ""
+                                      form.getFieldValue([
+                                        "goalsList",
+                                        index,
+                                        "goal",
+                                      ]) || ""
                                     }
                                   >
                                     <Form.Item
@@ -913,10 +916,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 </Col>
                                 <Col xs={24} sm={5}>
                                   <Tooltip
-                                    title={
-                                      plans.CurrentMonthGoals[index]
-                                        ?.comments ?? ""
-                                    }
+                                    title={form.getFieldValue([
+                                      "goalsList",
+                                      index,
+                                      "comments",
+                                    ])}
                                   >
                                     <Form.Item
                                       name={[index, "comments"]}
