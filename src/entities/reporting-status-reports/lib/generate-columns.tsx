@@ -16,12 +16,22 @@ interface Column<T = any> {
 
 export default function generateColumns<T>(
   columns: Column[],
+  handleExport: (item: any) => void
 ): Column<T>[] {
   const { Text } = Typography;
 
   return columns.map((column) => ({
     ...column,
-    render: (item: any) => {
+    render: (item: any, record: any) => {
+      if (column.key === "action") {
+        return (
+          <div>
+            <_Button type="link" onClick={() => handleExport(record)}>
+              Export
+            </_Button>
+          </div>
+        );
+      }
       if (column?.type === "break") {
         return (
           <Flex justify="center">

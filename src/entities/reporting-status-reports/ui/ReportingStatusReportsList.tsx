@@ -6,10 +6,12 @@ import generateColumns from "../lib/generate-columns";
 
 interface ReportingStatusReportsProps {
   data: ReportingStatusReport[];
+  handleExport: (report: any) => void;
 }
 
 export default function ReportingStatusReportsList({
   data,
+  handleExport,
 }: ReportingStatusReportsProps) {
   return (
     <EntityList
@@ -21,7 +23,7 @@ export default function ReportingStatusReportsList({
         ),
       }}
       data={data}
-      mapColumn={(columns): any => generateColumns(columns)}
+      mapColumn={(columns): any => generateColumns(columns, handleExport)}
     />
   );
 }

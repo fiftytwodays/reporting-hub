@@ -398,7 +398,7 @@ export default function ExportProjectReportButton({
     });
 
     Packer.toBlob(doc).then((blob) => {
-      saveAs(blob, "MOnthlyProjectReports.docx");
+      saveAs(blob, "MonthlyProjectReports.docx");
       message.success("Document exported successfully.");
     });
   };

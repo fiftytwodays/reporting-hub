@@ -30,6 +30,11 @@ export const columns = [
     dataIndex: "region",
     key: "region",
   },
+  {
+    title: "Action",
+    dataIndex: "action",
+    key: "action",
+  },
 
 ] 
 

@@ -27,7 +27,11 @@ export default function ProjectReports() {
           title: "Monthly report",
           extra: <ExportMonthlyProjectReportButton data={data} />,
         }}
-        content={<ReportingStatusReportsList setData={setData} />}
+        content={
+          <ReportingStatusReportsList
+            setData={setData}
+          />
+        }
       />
     </>
   );
