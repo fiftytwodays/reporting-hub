@@ -9,6 +9,7 @@ import {
 import useParameters from "@/entities/parameters/api/parameters-list";
 import { useEffect, useState } from "react";
 import { useProjectReportStatus } from "../api/reporting-status-reports";
+import { exportData } from "../lib/ExportProjectReport";
 
 interface ReportingStatusReportsPageProps {
   setData: (record: ReportingStatusReport[]) => void;
@@ -72,6 +73,11 @@ export default function ReportingStatusReportsPage({
     setData(projectReportStatusReport?.ReportingStatusReport || []);
   }, [projectReportStatusReport]);
 
+  // Dummy handleExport function, replace with actual implementation as needed
+  const handleExport = (item: any) => {
+    exportData(item);
+  };
+
   return (
     <>
       <Space>
@@ -102,6 +108,7 @@ export default function ReportingStatusReportsPage({
       ) : (
         <ReportingStatusReportsList
           data={projectReportStatusReport?.ReportingStatusReport || []}
+          handleExport={handleExport}
         />
       )}
     </>

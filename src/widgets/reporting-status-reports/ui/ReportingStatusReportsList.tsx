@@ -8,9 +8,12 @@ interface ReportingStatusReportsListProps {
 export default function ReportingStatusReportsList({
   setData,
 }: ReportingStatusReportsListProps) {
+
   return (
     <>
-      <ReportingStatusReportsPage setData={setData} />
+      <ReportingStatusReportsPage
+        setData={setData}
+      />
     </>
   );
 }
