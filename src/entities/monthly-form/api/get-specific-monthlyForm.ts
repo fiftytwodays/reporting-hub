@@ -72,7 +72,16 @@ export function useMonthlyFormsList({
           };
         })
       );
-
+      monthlyForms.sort((a, b) => {
+        const yearA = Number(a.year);
+        const yearB = Number(b.year);
+        if (yearA !== yearB) {
+          return yearB - yearA; // Descending year
+        }
+        const monthA = monthNames.indexOf(a.month);
+        const monthB = monthNames.indexOf(b.month);
+        return monthB - monthA; // Descending month
+      });
       monthlyForms.sort(
         (a, b) => a.month.localeCompare(b.month) || a.year.localeCompare(b.year)
       );
