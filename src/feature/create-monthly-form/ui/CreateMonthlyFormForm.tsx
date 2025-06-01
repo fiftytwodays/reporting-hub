@@ -703,6 +703,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
         disabled={action === "view" || action === "approver-view"}
         onFinish={handleSubmit}
         layout="vertical"
+        scrollToFirstError
       >
         {/* Hidden Form Item for ID */}
         <Form.Item name="id" hidden>
@@ -1026,6 +1027,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                             <Col xs={24} sm={2}>
                               <Form.Item
                                 name={[index, "majorGoal"]}
+                                initialValue={false}
                                 rules={[
                                   {
                                     required: true,
@@ -1036,7 +1038,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               >
                                 <Select
                                   options={majorGoal}
-                                  defaultValue="No"
+                                  defaultValue={false}
                                   placeholder="Major goal or not"
                                 />
                               </Form.Item>
@@ -1266,6 +1268,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                             <Col xs={24} sm={2}>
                               <Form.Item
                                 name={[index, "majorGoal"]}
+                                initialValue={false}
                                 rules={[
                                   {
                                     required: true,
@@ -1276,7 +1279,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               >
                                 <Select
                                   options={majorGoal}
-                                  defaultValue="No"
+                                  defaultValue={false}
                                   placeholder="Major goal or not"
                                 />
                               </Form.Item>
