@@ -1036,6 +1036,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               >
                                 <Select
                                   options={majorGoal}
+                                  defaultValue="No"
                                   placeholder="Major goal or not"
                                 />
                               </Form.Item>
@@ -1275,6 +1276,7 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                               >
                                 <Select
                                   options={majorGoal}
+                                  defaultValue="No"
                                   placeholder="Major goal or not"
                                 />
                               </Form.Item>
