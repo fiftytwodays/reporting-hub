@@ -847,11 +847,16 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 </Col>
                                 <Col xs={24} sm={5}>
                                   <Tooltip
-                                    title={form.getFieldValue([
-                                      "goalsList",
-                                      index,
-                                      "whyNotAchieved",
-                                    ])}
+                                    title={
+                                      action === "view" ||
+                                      action === "approver-view"
+                                        ? form.getFieldValue([
+                                            "goalsList",
+                                            index,
+                                            "whyNotAchieved",
+                                          ])
+                                        : null
+                                    }
                                   >
                                     <Form.Item
                                       name={[index, "whyNotAchieved"]}
@@ -916,11 +921,16 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 </Col>
                                 <Col xs={24} sm={5}>
                                   <Tooltip
-                                    title={form.getFieldValue([
-                                      "goalsList",
-                                      index,
-                                      "comments",
-                                    ])}
+                                    title={
+                                      action === "view" ||
+                                      action === "approver-view"
+                                        ? form.getFieldValue([
+                                            "goalsList",
+                                            index,
+                                            "comments",
+                                          ])
+                                        : null
+                                    }
                                   >
                                     <Form.Item
                                       name={[index, "comments"]}
@@ -974,11 +984,14 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                             <Col xs={24} sm={8}>
                               <Tooltip
                                 title={
-                                  form.getFieldValue([
-                                    "additionalActivities",
-                                    index,
-                                    "activity",
-                                  ]) || ""
+                                  action === "view" ||
+                                  action === "approver-view"
+                                    ? form.getFieldValue([
+                                        "additionalActivities",
+                                        index,
+                                        "activity",
+                                      ]) || ""
+                                    : null
                                 }
                               >
                                 <Form.Item
@@ -1030,11 +1043,14 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                             <Col xs={24} sm={7}>
                               <Tooltip
                                 title={
-                                  form.getFieldValue([
-                                    "additionalActivities",
-                                    index,
-                                    "comments",
-                                  ]) || ""
+                                  action === "view" ||
+                                  action === "approver-view"
+                                    ? form.getFieldValue([
+                                        "additionalActivities",
+                                        index,
+                                        "comments",
+                                      ]) || ""
+                                    : null
                                 }
                               >
                                 <Form.Item name={[index, "comments"]}>
@@ -1150,7 +1166,12 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                 </Col>
                                 <Col xs={24} sm={7}>
                                   <Tooltip
-                                    title={plans.NextMonthGoals[index].comments}
+                                    title={
+                                      action === "view" ||
+                                      action === "approver-view"
+                                        ? plans.NextMonthGoals[index].comments
+                                        : null
+                                    }
                                   >
                                     <Form.Item
                                       // label={index === 0 ? "Comments" : ""}
@@ -1202,11 +1223,14 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                             <Col xs={24} sm={8}>
                               <Tooltip
                                 title={
-                                  form.getFieldValue([
-                                    "additionalActivitiesNextMonth",
-                                    index,
-                                    "activity",
-                                  ]) || ""
+                                  action === "view" ||
+                                  action === "approver-view"
+                                    ? form.getFieldValue([
+                                        "additionalActivitiesNextMonth",
+                                        index,
+                                        "activity",
+                                      ]) || ""
+                                    : null
                                 }
                               >
                                 <Form.Item
@@ -1258,11 +1282,14 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                             <Col xs={24} sm={7}>
                               <Tooltip
                                 title={
-                                  form.getFieldValue([
-                                    "additionalActivitiesNextMonth",
-                                    index,
-                                    "comments",
-                                  ]) || ""
+                                  action === "view" ||
+                                  action === "approver-view"
+                                    ? form.getFieldValue([
+                                        "additionalActivitiesNextMonth",
+                                        index,
+                                        "comments",
+                                      ]) || ""
+                                    : null
                                 }
                               >
                                 <Form.Item name={[index, "comments"]}>
@@ -1317,11 +1344,14 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                   <Col xs={16}>
                                     <Tooltip
                                       title={
-                                        form.getFieldValue([
-                                          "praisePoints",
-                                          key,
-                                          "point",
-                                        ]) || ""
+                                        action === "view" ||
+                                        action === "approver-view"
+                                          ? form.getFieldValue([
+                                              "praisePoints",
+                                              key,
+                                              "point",
+                                            ]) || ""
+                                          : null
                                       }
                                     >
                                       <Form.Item
@@ -1388,11 +1418,14 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                                   <Col xs={16}>
                                     <Tooltip
                                       title={
-                                        form.getFieldValue([
-                                          "prayerRequests",
-                                          key,
-                                          "request",
-                                        ]) || ""
+                                        action === "view" ||
+                                        action === "approver-view"
+                                          ? form.getFieldValue([
+                                              "prayerRequests",
+                                              key,
+                                              "request",
+                                            ]) || ""
+                                          : null
                                       }
                                     >
                                       <Form.Item
@@ -1446,7 +1479,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   <Row gutter={24}>
                     <Col xs={24}>
                       <Tooltip
-                        title={form.getFieldValue("storyTestimony") || ""}
+                        title={
+                          action === "view" || action === "approver-view"
+                            ? form.getFieldValue("storyTestimony") || ""
+                            : null
+                        }
                       >
                         <Form.Item
                           rules={[
@@ -1473,7 +1510,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
                   <Row gutter={24}>
                     <Col xs={24}>
                       <Tooltip
-                        title={form.getFieldValue("concernsStruggles") || ""}
+                        title={
+                          action === "view" || action === "approver-view"
+                            ? form.getFieldValue("concernsStruggles") || ""
+                            : null
+                        }
                       >
                         <Form.Item
                           label="Concerns/Struggles"
