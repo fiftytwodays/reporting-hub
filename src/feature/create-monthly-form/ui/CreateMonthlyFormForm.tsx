@@ -266,9 +266,11 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
     // Adjust for January (month 1) when subtracting 1 month
     const finalMonth = calculatedMonth > 0 ? calculatedMonth : 12;
 
-    setDefaultMonth(finalMonth);
-    form.setFieldValue("month", finalMonth);
-    form.setFieldValue("year", currentYear);
+    if (!monthlyForm) {
+      setDefaultMonth(finalMonth);
+      form.setFieldValue("month", finalMonth);
+      form.setFieldValue("year", currentYear);
+    }
   }, [form, parametersList]);
 
   useEffect(() => {
@@ -281,6 +283,9 @@ const CreateMonthlyFormForm: React.FC<CreateMonthlyFormProps> = ({
       setProjectId(monthlyForm.projectId);
       setDefaultMonth(Number(monthlyForm.month));
       setCurrentYear(monthlyForm.year);
+
+      form.setFieldValue("month", Number(monthlyForm.month));
+      form.setFieldValue("year", Number(monthlyForm.year));
 
       const goalsListFetched = outcomesFetched?.map(
         (outcome: any, index: number) => ({
