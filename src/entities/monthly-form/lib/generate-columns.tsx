@@ -3,6 +3,9 @@ import { Button } from "antd";
 import styled from "@emotion/styled";
 import { Flex, Space, Typography, Popconfirm } from "antd";
 import { getCurrentUser } from "@aws-amplify/auth";
+import useParameters from "@/entities/parameters/api/parameters-list";
+import dayjs from "dayjs";
+import { months } from "@/widgets/monthly-forms-list/config/projects";
 
 interface Column<T = any> {
   key?: string | undefined;
@@ -21,6 +24,7 @@ export default function generateColumns<T>(
   const { Text } = Typography;
 
   const [userId, setUserId] = React.useState<string | undefined>(undefined);
+  const { parametersList } = useParameters({ condition: true });
 
   React.useEffect(() => {
     getCurrentUser()
@@ -32,6 +36,39 @@ export default function generateColumns<T>(
       });
   }, []);
 
+  const canShowEdit = (record: any) => {
+    if (!parametersList?.monthlyFormStartDate) return false;
+    const monthlyFormStartDate = Number(parametersList.monthlyFormStartDate);
+    const today = dayjs();
+
+    // Convert record.month (string) to number using months array
+    let recordMonth = Number(record.month);
+    if (isNaN(recordMonth)) {
+      const found = months.find((m) => m.label === record.month);
+      recordMonth = found ? found.value : -1;
+    }
+    const recordYear = Number(record.year);
+    const currentMonth = today.month() + 1; // dayjs months are 0-indexed
+    const currentYear = today.year();
+
+    // Previous month logic (handle January edge case)
+    let prevMonth = currentMonth - 1;
+    let prevMonthYear = currentYear;
+    if (prevMonth === 0) {
+      prevMonth = 12;
+      prevMonthYear = currentYear - 1;
+    }
+
+    return (
+      record.status !== "approved" &&
+      record.status !== "submitted" &&
+      record.facilitator === userId &&
+      recordMonth === prevMonth &&
+      recordYear === prevMonthYear &&
+      today.date() < monthlyFormStartDate
+    );
+  };
+
   return columns.map((column) => ({
     ...column,
     render: (item: any, record: any, index: number) => {
@@ -40,16 +77,14 @@ export default function generateColumns<T>(
         return (
           <div>
             <Space>
-              {record.status !== "approved" &&
-                record.status !== "submitted" &&
-                record.facilitator === userId && (
-                  <_Button
-                    type="link"
-                    href={`/monthly-plans/my-plans/${record.id}/edit`}
-                  >
-                    Edit
-                  </_Button>
-                )}
+              {canShowEdit(record) && (
+                <_Button
+                  type="link"
+                  href={`/monthly-plans/my-plans/${record.id}/edit`}
+                >
+                  Edit
+                </_Button>
+              )}
               <_Button
                 type="link"
                 href={`/monthly-plans/my-plans/${record.id}/view`}
